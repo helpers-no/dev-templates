@@ -9,7 +9,7 @@
     "dev": "nodemon app/index.ts"
   },
   "dependencies": {
-    "express": "^5.0.0"
+    "express": "^5.2.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.1",
