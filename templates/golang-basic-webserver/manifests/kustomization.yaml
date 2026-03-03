@@ -17,7 +17,6 @@ kind: Kustomization
 # Reference all manifest files that should be applied
 resources:
   - deployment.yaml
-  - ingress.yaml
 
 # Add common labels to all resources
 commonLabels:

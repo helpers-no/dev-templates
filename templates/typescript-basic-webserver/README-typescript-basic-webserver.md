@@ -80,8 +80,7 @@ templates/typescript-basic-webserver/
 │   └── index.ts                 # Express server with Hello World
 ├── Dockerfile                   # Container build for app
 ├── manifests/
-│   ├── deployment.yaml          # K8s deployment
-│   ├── ingress.yaml             # Traefik ingress
+│   ├── deployment.yaml          # K8s deployment + service
 │   └── kustomization.yaml       # For ArgoCD compatibility
 ├── .dockerignore                # Ignore files for Docker build
 ├── .gitignore                  # Ignore files for Git

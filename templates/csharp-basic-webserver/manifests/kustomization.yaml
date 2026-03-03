@@ -9,7 +9,6 @@ kind: Kustomization
 
 resources:
   - deployment.yaml
-  - ingress.yaml
 
 commonLabels:
   app: "{{REPO_NAME}}"

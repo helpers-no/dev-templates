@@ -197,21 +197,7 @@ For detailed instructions, see the [official GitHub documentation](https://docs.
 
 Keep the token secure and do not share it with anyone. It is used to authenticate your GitHub account and access your repositories.
 
-**Set the GITHUB_PAT on your host machine, not inside the devcontainer.**
-
-macOS/Linux:
-
-```bash
-./urbalurba-scripts/set-github-pat.sh ghp_yourToken
-```
-
-Windows (CMD only):
-
-```bat
-urbalurba-scripts\set-github-pat.bat ghp_yourToken
-```
-
-The token is used by the `provision-host` container to authenticate with GitHub and deploy the application to the local Kubernetes cluster.
+The token is used by the UIS platform to authenticate with GitHub when registering private repositories with ArgoCD.
 
 ## Setting up for local development
 
@@ -258,25 +244,25 @@ We use GitHub Actions to build and push the container image to the GitHub Contai
 #### 6. Deploy app to test environment
 
 The test environment is the local Kubernetes cluster on the developers machine.
-To make the cluster autimatically pull the built image from the GitHub Container Registry every time the developer pushes code/app updates to GitHub, we need to register the application with ArgoCD.
+To make the cluster automatically pull the built image from the GitHub Container Registry every time the developer pushes code/app updates to GitHub, we need to register the application with ArgoCD.
 
-This is done once for each project. And the scripts must be run from the host machine, not from inside the devcontainer.
+This is done once for each project, from the host machine (not inside the devcontainer):
 
-- From the host machine, developer runs `./urbalurba-scripts/register-argocd.sh` (or `.bat` on Windows)
-- This script uses the `provision-host` container to talk to the kubernetes cluster and register the repository with ArgoCD
-- Developer verifies that ArgoCD successfully pulls the application from GitHub and deploys it to the local cluster by running the `./urbalurba-scripts/check-deployment.sh` (or `.bat` on Windows) script.
+```bash
+./uis argocd register <app-name> <github-repo-url>
+```
+
+For example:
+
+```bash
+./uis argocd register my-app https://github.com/username/my-repo
+```
+
+This registers the repository with ArgoCD, creates a namespace, and sets up routing so the app is accessible at `http://<app-name>.localhost`.
 
 #### 7. Test app in local cluster
 
-ArgoCD deploys the application to the local Kubernetes cluster. But in order to access the application, we need to set up a local DNS entry that points to the application.
-
-We do this by adding the app/repository name to the local hosts file. This so that the developer can access the app at `http://<repo-name>.local` in their browser.
-
-This is done once for each project. And the scripts must be run from the host machine, not from inside the devcontainer.
-
-- From the host machine, developer runs `./urbalurba-scripts/setup-local-dns.sh` (or `.bat` on Windows)
-- This adds a local DNS entry pointing to the application
-- Developer can now access the app at `http://<repo-name>.local` in their browser
+After registration, the application is automatically accessible at `http://<app-name>.localhost` in your browser. The platform creates a Traefik IngressRoute that routes traffic to your application — no manual DNS setup needed.
 
 #### 8. Ongoing Development
 
@@ -339,127 +325,20 @@ There are several templates for different types of applications. The folder stru
 
 ```plaintext
 project-repository/
-├── provision-host/              # Container for cluster management
-│   └── register-app.sh         # Application registration script
 ├── templates/                  # Project templates
 │   └── typescript-basic-webserver/
 │       ├── app/               # Application code
 │       │   └── index.ts
 │       ├── manifests/         # Kubernetes manifests for ArgoCD
-│       │   ├── deployment.yaml
-│       │   ├── ingress.yaml   # Traefik ingress configuration
+│       │   ├── deployment.yaml  # Deployment + Service definition
 │       │   └── kustomization.yaml
 │       ├── Dockerfile         # Container definition
 │       ├── package.json
 │       ├── package-lock.json
 │       ├── tsconfig.json
 │       └── README-typescript-basic-webserver.md
-├── urbalurba-scripts/         # Utility scripts for platform integration
-│   ├── register-argocd.sh     # macOS/Linux registration script
-│   ├── register-argocd.bat    # Windows registration script
-│   ├── setup-local-dns.sh     # macOS/Linux DNS setup
-│   ├── setup-local-dns.bat    # Windows DNS setup
-│   ├── check-deployment.sh    # macOS/Linux deployment status
-│   └── check-deployment.bat   # Windows deployment status
 ├── LICENSE
 └── README.md # This file
-```
-
-### urbalurba-scripts Design and Functionality
-
-#### Registration Scripts
-
-The registration process involves scripts that run on the developer's host machine and connect to the `provision-host` container:
-
-```mermaid
-flowchart LR
-    subgraph "Host Machine"
-        reg[register-argocd.sh/bat]
-    end
-    
-    subgraph "provision-host"
-        ph[provision-host-scripts]
-    end
-    
-    subgraph "Kubernetes Cluster"
-        secret[GitHub Auth Secret]
-        app[ArgoCD Application]
-        ns[Application Namespace]
-    end
-    
-    reg -->|Extract Git info| reg
-    reg -->|Run container| ph
-    ph -->|Create| ns
-    ph -->|Create| secret
-    ph -->|Create| app
-```
-
-**Key workflow:**
-
-1. The host script (`register-argocd.sh`/`register-argocd.bat`) extracts Git repository information
-2. It runs the provision-host container, passing repository information and GitHub token
-3. The container script (`/scripts/register-app.sh`) creates:
-   - A namespace for the application
-   - A Kubernetes secret for GitHub authentication
-   - An ArgoCD Application resource
-
-#### Local DNS Scripts
-
-These scripts configure the developer's machine to access the application through Traefik Ingress:
-
-```mermaid
-flowchart LR
-    subgraph "Host Machine"
-        dns[setup-local-dns.sh/bat]
-        hosts["etc-hosts"]
-    end
-    
-    subgraph "provision-host Container"
-        query[kubectl query]
-    end
-    
-    subgraph "Kubernetes Cluster"
-        traefik[Traefik Service]
-    end
-    
-    dns -->|Run container| query
-    query -->|Get IP| traefik
-    query -->|Return IP| dns
-    dns -->|Update| hosts
-```
-
-TODO: verify this
-
-**Key workflow:**
-
-1. The host script runs the provision-host container to query Traefik's IP address
-2. It adds or updates an entry in the hosts file mapping `<repo-name>.local` to that IP
-
-#### Deployment Status Scripts
-
-These scripts provide developers with visibility into their application's deployment status:
-
-```mermaid
-flowchart LR
-    subgraph "Host Machine"
-        check[check-deployment.sh/bat]
-    end
-    
-    subgraph "provision-host Container"
-        query[kubectl queries]
-    end
-    
-    subgraph "Kubernetes Cluster"
-        pods[Application Pods]
-        app[ArgoCD Application]
-        logs[Container Logs]
-    end
-    
-    check -->|Run container| query
-    query -->|Get status| pods
-    query -->|Get sync status| app
-    query -->|Get| logs
-    query -->|Return info| check
 ```
 
 ### Kubernetes Manifest Design
@@ -467,6 +346,7 @@ flowchart LR
 The manifests are structured to be automatically parameterized during template setup. The files are in the `manifests/` directory and are used by ArgoCD to deploy the application.
 
 - **deployment.yaml**: Defines the application Deployment and Service
-- **ingress.yaml**: Configures Traefik to route traffic to the application
 - **kustomization.yaml**: Ties the resources together for ArgoCD
+
+Routing is handled automatically by the platform — when you run `uis argocd register`, it creates a Traefik IngressRoute that routes `<app-name>.localhost` to your application. Repos do not need to include ingress manifests.
 

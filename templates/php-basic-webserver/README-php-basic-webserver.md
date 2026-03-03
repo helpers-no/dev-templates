@@ -28,7 +28,6 @@ php-basic-webserver/
 │   └── index.php
 ├── manifests/
 │   ├── deployment.yaml
-│   ├── ingress.yaml
 │   └── kustomization.yaml
 ├── .github/
 │   └── workflows/

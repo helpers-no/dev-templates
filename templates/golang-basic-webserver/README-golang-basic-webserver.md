@@ -27,7 +27,6 @@ golang-basic-webserver/
 │   └── main.go
 ├── manifests/
 │   ├── deployment.yaml
-│   ├── ingress.yaml
 │   └── kustomization.yaml
 ├── .github/
 │   └── workflows/

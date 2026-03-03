@@ -71,8 +71,7 @@ templates/csharp-basic-webserver/
 │       └── WebApplication.csproj  # Project dependencies
 ├── Dockerfile                  # .NET multi-stage build
 ├── manifests/
-│   ├── deployment.yaml         # K8s deployment (port 80)
-│   ├── ingress.yaml            # Traefik ingress
+│   ├── deployment.yaml         # K8s deployment + service (port 80)
 │   └── kustomization.yaml      # ArgoCD configuration
 ├── .dockerignore               # C# specific ignores
 ├── .gitignore                  

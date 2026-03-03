@@ -33,7 +33,6 @@ java-basic-webserver/
 │                       └── App.java
 ├── manifests/
 │   ├── deployment.yaml
-│   ├── ingress.yaml
 │   └── kustomization.yaml
 ├── .github/
 │   └── workflows/

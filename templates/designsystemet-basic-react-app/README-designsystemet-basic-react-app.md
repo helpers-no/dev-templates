@@ -120,7 +120,6 @@ TODO: Add instructions for deploying to Kubernetes on your local machine.
 ├── vite.config.ts
 ├── manifests/
 │   ├── deployment.yaml
-│   ├── ingress.yaml
 │   └── kustomization.yaml
 └── README-designsystemet-basic-react-app.md
 ```
