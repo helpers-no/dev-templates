@@ -301,7 +301,7 @@ Press Enter to open github.com in your browser...
 ✓ Authentication complete.
 - gh config set -h github.com git_protocol https
 ✓ Configured git protocol
-✓ Logged in as terchris
+✓ Logged in as yourusername
 ```
 
 After authenticating, you can use CLI commands to manage your repositories:

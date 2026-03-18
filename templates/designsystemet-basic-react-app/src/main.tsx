@@ -1,7 +1,7 @@
 /**
  * @file src/main.tsx
  * @description Entry point for the React application
- * @author [@terchris]
+ * @author [@helpers-no]
  */
 
 import { StrictMode } from 'react'

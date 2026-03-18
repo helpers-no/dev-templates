@@ -2,7 +2,7 @@
     "metadata": {
         "file": "src/data/blog-posts.json",
         "description": "Blog posts data for the Designsystemet Blog",
-        "author": "@terchris"
+        "author": "@helpers-no"
     },
     "blogPosts": [
       {

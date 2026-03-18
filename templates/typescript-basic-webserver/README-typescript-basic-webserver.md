@@ -4,7 +4,7 @@ File: templates/typescript-basic-webserver/README-typescript-basic-webserver.md
 
 A simple Express server written in TypeScript.
 Purpose is to demonstrate how to develop a simple web server that can be deployed to your local Kubernetes using ArgoCD and GitHub Actions.
-See the repo https://github.com/terchris/urbalurba-infrastructure for setting up local kubernetes and ArgoCD.
+See the repo https://github.com/helpers-no/urbalurba-infrastructure for setting up local kubernetes and ArgoCD.
 
 ## Prerequisites
 

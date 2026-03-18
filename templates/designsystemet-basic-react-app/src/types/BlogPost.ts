@@ -1,7 +1,7 @@
 /**
  * @file src/types/BlogCard.tsx
  * @description BlogCard component for displaying blog posts.
- * @author [@terchris]
+ * @author [@helpers-no]
  */
 
 export interface BlogPost {

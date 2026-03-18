@@ -1,7 +1,7 @@
 /**
  * @file src/components/BlogCard.tsx
  * @description BlogCard component for displaying blog posts.
- * @author [@terchris]
+ * @author [@helpers-no]
  */
 
 import {

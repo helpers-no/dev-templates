@@ -1,7 +1,7 @@
 /**
  * @file src/App.tsx
  * @description Main application component that renders the blog posts grid
- * @author [@terchris]
+ * @author [@helpers-no]
  */
 
 import { Heading, Link } from '@digdir/designsystemet-react';

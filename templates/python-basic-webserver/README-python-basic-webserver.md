@@ -4,7 +4,7 @@ filename: templates/python-basic-webserver/README-python-basic-webserver.md
 
 A simple Flask server written in Python.
 Purpose is to demonstrate how to develop a simple web server that can be deployed to your local Kubernetes using ArgoCD and GitHub Actions.
-See the repo https://github.com/terchris/urbalurba-infrastructure for setting up local kubernetes and ArgoCD.
+See the repo https://github.com/helpers-no/urbalurba-infrastructure for setting up local kubernetes and ArgoCD.
 
 ## Prerequisites
 
