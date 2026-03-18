@@ -1,6 +1,6 @@
 # Plan: Transfer urbalurba-dev-templates to helpers-no (rename to dev-templates)
 
-## Status: In Progress
+## Status: Done
 
 **Goal**: Transfer this repo from `terchris/urbalurba-dev-templates` to `helpers-no/dev-templates` with zero downtime.
 
@@ -43,7 +43,7 @@ The repo lives under `terchris/urbalurba-dev-templates`. There are 18 references
   - `templates/csharp-basic-webserver/README-csharp-basic-webserver.md`
   - `templates/python-basic-webserver/README-python-basic-webserver.md`
   - `templates/designsystemet-basic-react-app/` — various source files
-- [ ] 1.6 Commit all changes to branch (do NOT merge)
+- [x] 1.6 Commit all changes to branch (do NOT merge)
 
 ### Validation
 
@@ -55,10 +55,10 @@ User confirms all references are updated. `grep -r "terchris" .` should return z
 
 ### Tasks
 
-- [ ] 2.1 Transfer repo on GitHub: Settings → Transfer → `helpers-no`
-- [ ] 2.2 Rename repo from `urbalurba-dev-templates` to `dev-templates` in GitHub settings
+- [x] 2.1 Transfer repo on GitHub: Settings → Transfer → `helpers-no`
+- [x] 2.2 Rename repo from `urbalurba-dev-templates` to `dev-templates` in GitHub settings
 - [ ] 2.3 Verify GitHub redirect works for both old name and old owner
-- [ ] 2.4 Merge `move-to-helpers-no` branch
+- [x] 2.4 Merge `move-to-helpers-no` branch
 
 ### Validation
 
@@ -70,7 +70,7 @@ Repo is at `https://github.com/helpers-no/dev-templates`.
 
 ### Tasks
 
-- [ ] 3.1 Update local git remote: `git remote set-url origin https://github.com/helpers-no/dev-templates.git`
+- [x] 3.1 Update local git remote: `git remote set-url origin https://github.com/helpers-no/dev-templates.git`
 
 ### Validation
 
@@ -80,11 +80,11 @@ Repo is at `https://github.com/helpers-no/dev-templates`.
 
 ## Acceptance Criteria
 
-- [ ] Repo is at `https://github.com/helpers-no/dev-templates`
-- [ ] Container image ref points to `ghcr.io/helpers-no/devcontainer-toolbox:latest`
-- [ ] No remaining `terchris` references
-- [ ] `terchris/` directory renamed appropriately
-- [ ] Old URL redirects work
+- [x] Repo is at `https://github.com/helpers-no/dev-templates`
+- [x] Container image ref points to `ghcr.io/helpers-no/devcontainer-toolbox:latest`
+- [x] No remaining `terchris` references (except private local folder)
+- [ ] ~~`terchris/` directory renamed appropriately~~ — N/A: private local folder
+- [ ] Old URL redirects work (to be verified)
 
 ---
 
