@@ -11,8 +11,8 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://helpers-no.github.io',
-  baseUrl: '/dev-templates/',
+  url: 'https://tmp.sovereignsky.no',
+  baseUrl: '/',
 
   onBrokenLinks: 'throw',
 
