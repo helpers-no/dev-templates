@@ -1,8 +1,8 @@
-# Case: Red Cross Norway Volunteer Developer Platform
-
-> This content was originally part of the project README. It is preserved here for the future Docusaurus documentation site.
-
 ---
+sidebar_position: 4
+---
+
+# Case: Red Cross Norway Volunteer Developer Platform
 
 ## Executive Summary
 

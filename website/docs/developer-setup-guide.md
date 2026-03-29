@@ -1,8 +1,8 @@
-# Developer Setup Guide
-
-> This content was originally part of the project README. It is preserved here for the future Docusaurus documentation site.
-
 ---
+sidebar_position: 3
+---
+
+# Developer Setup Guide
 
 ## Prerequisites
 

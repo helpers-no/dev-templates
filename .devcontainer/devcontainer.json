@@ -1,0 +1,49 @@
+{
+    // DevContainer Toolbox — image mode template for USER PROJECTS
+    // Docs: https://github.com/helpers-no/devcontainer-toolbox
+    //
+    // This file is the SINGLE SOURCE OF TRUTH for user project configuration.
+    // All install scripts and deployment tools download this file.
+    // Do NOT confuse with .devcontainer/devcontainer.json (toolbox development only).
+    //
+    // overrideCommand: false is REQUIRED so VS Code doesn't bypass the ENTRYPOINT.
+    // The entrypoint handles all startup — no lifecycle hooks needed.
+    "image": "ghcr.io/helpers-no/devcontainer-toolbox:latest",
+    "overrideCommand": false,
+
+    // VPN capabilities
+    "runArgs": [
+        "--cap-add=NET_ADMIN",
+        "--cap-add=NET_RAW",
+        "--cap-add=SYS_ADMIN",
+        "--cap-add=AUDIT_WRITE",
+        "--device=/dev/net/tun:/dev/net/tun",
+        "--privileged"
+    ],
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "yzhang.markdown-all-in-one",
+                "MermaidChart.vscode-mermaid-chart",
+                "redhat.vscode-yaml",
+                "mhutchie.git-graph",
+                "timonwong.shellcheck"
+            ]
+        }
+    },
+
+    "remoteEnv": {
+        "DCT_HOME": "/opt/devcontainer-toolbox",
+        "DCT_WORKSPACE": "/workspace"
+    },
+
+    "workspaceFolder": "/workspace",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+
+    "remoteUser": "vscode",
+    "containerUser": "vscode",
+    "shutdownAction": "stopContainer",
+    "updateRemoteUserUID": true,
+    "init": true
+}
