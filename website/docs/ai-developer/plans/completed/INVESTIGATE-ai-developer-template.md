@@ -4,7 +4,9 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Backlog
+## Status: Completed
+
+**Completed**: 2026-03-29
 
 **Goal**: Create AI workflow templates that can be installed into any project via a new `dev-template-ai.sh` command, following the same pattern as `dev-template.sh` for app templates.
 
@@ -303,5 +305,5 @@ No versioning mechanism. The user re-runs the script to get the latest. If versi
 
 ## Next Steps
 
-- [ ] Create PLAN for this repo's work (ai-templates folder + plan-based-workflow content)
-- [ ] File issue or handoff notes for DCT repo work (dev-template-ai.sh script)
+- [x] Create PLAN for this repo's work (ai-templates folder + plan-based-workflow content) ✓ — see `plans/completed/PLAN-ai-templates-content.md`
+- [x] File issue or handoff notes for DCT repo work (dev-template-ai.sh script) ✓ — updated `INVESTIGATE-ai-workflow-installer.md` in devcontainer-toolbox
