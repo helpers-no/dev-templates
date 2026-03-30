@@ -55,12 +55,38 @@ This file gets copied to the build output root, which tells GitHub Pages the cus
 
 ### 4. GitHub: Enable Pages
 
-1. Go to repo **Settings > Pages**
-2. Source: select **GitHub Actions**
-3. Custom domain: enter `tmp.sovereignsky.no`
-4. Enable **Enforce HTTPS**
+```bash
+# Create Pages with GitHub Actions as source
+gh api repos/helpers-no/dev-templates/pages -X POST -f build_type=workflow
 
-### 5. Verify
+# Set custom domain
+gh api repos/helpers-no/dev-templates/pages -X PUT -f cname=tmp.sovereignsky.no
+```
+
+### 5. TLS Certificate Provisioning
+
+**Gotcha:** Setting the custom domain via `gh api` does not always trigger certificate provisioning. If `gh api repos/<owner>/<repo>/pages` does not show an `https_certificate` field, the cert was never requested.
+
+**Fix:** Remove and re-add the custom domain to force certificate provisioning:
+
+```bash
+# Remove custom domain
+gh api repos/helpers-no/dev-templates/pages -X PUT -f cname=""
+
+# Re-add — this triggers the certificate request
+gh api repos/helpers-no/dev-templates/pages -X PUT -f cname=tmp.sovereignsky.no
+
+# Verify cert is being provisioned (state should be "new" then "approved")
+gh api repos/helpers-no/dev-templates/pages --jq '.https_certificate'
+```
+
+Wait for `state: "approved"` (usually 2-5 minutes), then enforce HTTPS:
+
+```bash
+gh api repos/helpers-no/dev-templates/pages -X PUT -F https_enforced=true
+```
+
+### 6. Verify
 
 - Push to main triggers the deploy workflow
 - Site available at `https://tmp.sovereignsky.no`
@@ -74,6 +100,6 @@ This file gets copied to the build output root, which tells GitHub Pages the cus
 - [x] CNAME file created in `website/static/` ✓
 - [x] GitHub Pages enabled with Actions source ✓
 - [x] Custom domain configured ✓
-- [x] TLS certificate provisioned ✓
+- [x] TLS certificate provisioned (required remove + re-add of custom domain to trigger) ✓
 - [x] HTTPS enforced ✓
 - [x] Site live at `https://tmp.sovereignsky.no` ✓

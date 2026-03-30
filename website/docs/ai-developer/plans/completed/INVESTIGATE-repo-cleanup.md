@@ -4,7 +4,9 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Backlog
+## Status: Completed
+
+**Completed**: 2026-03-29
 
 **Goal**: Clean up obsolete files, remove the `terchris/` folder, and update the README to accurately reflect the current state of the repository.
 
@@ -85,5 +87,5 @@ The Red Cross case study and infrastructure setup instructions belong in `urbalu
 
 ## Next Steps
 
-- [ ] Get answers to questions 3, 4, and 5 above
-- [ ] Create PLAN for the cleanup and README rewrite
+- [x] Get answers to questions 3, 4, and 5 above ✓
+- [x] Create PLAN for the cleanup and README rewrite ✓ — see `plans/completed/PLAN-repo-cleanup.md`
