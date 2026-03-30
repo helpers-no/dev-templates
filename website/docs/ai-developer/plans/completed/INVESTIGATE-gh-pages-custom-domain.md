@@ -4,7 +4,9 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Backlog
+## Status: Completed
+
+**Completed**: 2026-03-30
 
 **Goal**: Enable GitHub Pages for this repo and configure `tmp.sovereignsky.no` as the custom domain.
 
@@ -65,14 +67,13 @@ This file gets copied to the build output root, which tells GitHub Pages the cus
 
 ---
 
-## Open Questions
+## All Steps Completed
 
-- [ ] Who manages the `sovereignsky.no` DNS? Can you create the CNAME record, or does someone else need to do it?
-
----
-
-## Next Steps
-
-- [ ] Create the DNS CNAME record for `tmp.sovereignsky.no`
-- [ ] Implement the repo changes (config update + CNAME file)
-- [ ] Enable GitHub Pages in repo settings
+- [x] DNS CNAME record created: `tmp.sovereignsky.no` → `helpers-no.github.io` ✓
+- [x] Docusaurus config updated (url + baseUrl) ✓
+- [x] CNAME file created in `website/static/` ✓
+- [x] GitHub Pages enabled with Actions source ✓
+- [x] Custom domain configured ✓
+- [x] TLS certificate provisioned ✓
+- [x] HTTPS enforced ✓
+- [x] Site live at `https://tmp.sovereignsky.no` ✓
