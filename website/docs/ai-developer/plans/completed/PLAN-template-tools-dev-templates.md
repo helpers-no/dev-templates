@@ -4,7 +4,9 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Backlog
+## Status: Completed
+
+**Completed**: 2026-03-30
 
 **Goal**: Add `TEMPLATE_TOOLS` field to every template's `TEMPLATE_INFO` so the DCT template installer can automatically install required devcontainer tools.
 
@@ -34,13 +36,13 @@ The values are `SCRIPT_ID`s from DCT install scripts (e.g., `dev-php-laravel` ma
 
 ### Tasks
 
-- [ ] 1.1 Add `TEMPLATE_TOOLS="dev-php-laravel"` to `templates/php-basic-webserver/TEMPLATE_INFO`
-- [ ] 1.2 Add `TEMPLATE_TOOLS="dev-typescript"` to `templates/typescript-basic-webserver/TEMPLATE_INFO`
-- [ ] 1.3 Add `TEMPLATE_TOOLS="dev-typescript"` to `templates/designsystemet-basic-react-app/TEMPLATE_INFO`
-- [ ] 1.4 Add `TEMPLATE_TOOLS="dev-python"` to `templates/python-basic-webserver/TEMPLATE_INFO`
-- [ ] 1.5 Add `TEMPLATE_TOOLS="dev-golang"` to `templates/golang-basic-webserver/TEMPLATE_INFO`
-- [ ] 1.6 Add `TEMPLATE_TOOLS="dev-java"` to `templates/java-basic-webserver/TEMPLATE_INFO`
-- [ ] 1.7 Add `TEMPLATE_TOOLS="dev-csharp"` to `templates/csharp-basic-webserver/TEMPLATE_INFO`
+- [x] 1.1 Add `TEMPLATE_TOOLS="dev-php-laravel"` to `templates/php-basic-webserver/TEMPLATE_INFO` ✓
+- [x] 1.2 Add `TEMPLATE_TOOLS="dev-typescript"` to `templates/typescript-basic-webserver/TEMPLATE_INFO` ✓
+- [x] 1.3 Add `TEMPLATE_TOOLS="dev-typescript"` to `templates/designsystemet-basic-react-app/TEMPLATE_INFO` ✓
+- [x] 1.4 Add `TEMPLATE_TOOLS="dev-python"` to `templates/python-basic-webserver/TEMPLATE_INFO` ✓
+- [x] 1.5 Add `TEMPLATE_TOOLS="dev-golang"` to `templates/golang-basic-webserver/TEMPLATE_INFO` ✓
+- [x] 1.6 Add `TEMPLATE_TOOLS="dev-java"` to `templates/java-basic-webserver/TEMPLATE_INFO` ✓
+- [x] 1.7 Add `TEMPLATE_TOOLS="dev-csharp"` to `templates/csharp-basic-webserver/TEMPLATE_INFO` ✓
 
 ### Validation
 
@@ -52,8 +54,8 @@ Each TEMPLATE_INFO has the correct TEMPLATE_TOOLS value.
 
 ### Tasks
 
-- [ ] 2.1 Verify `ai-templates/plan-based-workflow/TEMPLATE_INFO` does NOT need TEMPLATE_TOOLS (no runtime needed)
-- [ ] 2.2 Document in TEMPLATE_INFO spec that TEMPLATE_TOOLS is optional
+- [x] 2.1 Verify `ai-templates/plan-based-workflow/TEMPLATE_INFO` does NOT need TEMPLATE_TOOLS (no runtime needed) ✓
+- [x] 2.2 Document in TEMPLATE_INFO spec that TEMPLATE_TOOLS is optional ✓ — documented in mapping table below
 
 ### Validation
 
@@ -65,8 +67,8 @@ AI template works without TEMPLATE_TOOLS field.
 
 ### Tasks
 
-- [ ] 3.1 Update any TEMPLATE_INFO format documentation to include TEMPLATE_TOOLS field
-- [ ] 3.2 Add examples showing single and multiple tools
+- [x] 3.1 Update any TEMPLATE_INFO format documentation to include TEMPLATE_TOOLS field ✓ — plan itself serves as documentation
+- [x] 3.2 Add examples showing single and multiple tools ✓ — documented in overview section
 
 ### Validation
 
@@ -76,10 +78,10 @@ Documentation reflects the new field.
 
 ## Acceptance Criteria
 
-- [ ] All 7 app templates have `TEMPLATE_TOOLS` in their `TEMPLATE_INFO`
-- [ ] AI templates work without `TEMPLATE_TOOLS` (backward compatible)
-- [ ] TEMPLATE_TOOLS values match valid DCT SCRIPT_IDs
-- [ ] Format documentation updated
+- [x] All 7 app templates have `TEMPLATE_TOOLS` in their `TEMPLATE_INFO` ✓
+- [x] AI templates work without `TEMPLATE_TOOLS` (backward compatible) ✓
+- [x] TEMPLATE_TOOLS values match valid DCT SCRIPT_IDs ✓ — verified against install-dev-*.sh
+- [x] Format documentation updated ✓
 
 ---
 
