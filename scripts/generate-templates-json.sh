@@ -85,7 +85,7 @@ for info_file in "$REPO_ROOT"/templates/*/TEMPLATE_INFO; do
       "related": $local_related
     }
 EOF
-    ((template_count++))
+    ((template_count++)) || true
     log_success "$T_ID"
 done
 
@@ -128,7 +128,7 @@ for info_file in "$REPO_ROOT"/ai-templates/*/TEMPLATE_INFO; do
       "related": $local_related
     }
 EOF
-    ((template_count++))
+    ((template_count++)) || true
     log_success "$T_ID (ai)"
 done
 
