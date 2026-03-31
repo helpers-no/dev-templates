@@ -1,0 +1,8 @@
+{
+  "label": "Workflow Templates",
+  "position": 3,
+  "link": {
+    "type": "doc",
+    "id": "templates/workflow/index"
+  }
+}

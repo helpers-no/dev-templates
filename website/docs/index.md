@@ -16,7 +16,7 @@ Project templates for the Urbalurba developer platform. Each template provides a
 
 ## Templates
 
-Browse all templates on the [Templates page](/templates), or see the [template docs](templates/) for details.
+Browse all templates on the [Templates page](/templates), or see the [template docs](category/templates) for details.
 
 Templates are installed inside the devcontainer using the `dev-template` command.
 

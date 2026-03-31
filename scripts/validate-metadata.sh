@@ -54,6 +54,23 @@ validate_template() {
         log_warn "$template_name: TEMPLATE_ID '$T_ID' does not match directory name"
     fi
 
+    # Validate README file exists
+    if [[ -n "$T_README" ]]; then
+        local readme_found=false
+        # Check app template path
+        if [[ -f "$template_dir/$T_README" ]]; then
+            readme_found=true
+        fi
+        # Check ai template path (template/ subdirectory)
+        if [[ -f "$template_dir/template/$T_README" ]]; then
+            readme_found=true
+        fi
+        if [[ "$readme_found" != "true" ]]; then
+            log_error "$template_name: README file '$T_README' not found"
+            has_error=true
+        fi
+    fi
+
     if [[ "$has_error" == "true" ]]; then
         ((ERRORS++)) || true
     else
