@@ -1,59 +1,53 @@
-# Java Basic Web Server Template
+# Java Basic Web Server
 
-This is a basic web server template using Spring Boot and Java. It serves a simple "Hello world" message on the root URL and demonstrates how to set up a Java project with Spring Boot.
+A minimal Spring Boot web server. Displays "Hello World" with current time and date, and provides health check endpoints via Spring Boot Actuator.
 
-## Features
+## Quick Start
 
-- Spring Boot web server
-- Simple "Hello world" endpoint
-- Current time and date display
-- Health check endpoints
-- Docker multi-stage build
-- Kubernetes deployment
-- GitHub Actions CI/CD
+1. Update your terminal (tools were installed):
+   ```bash
+   source ~/.bashrc
+   ```
+
+2. Build and run:
+   ```bash
+   mvn clean package
+   java -jar target/*.jar
+   ```
+
+3. Open in browser: http://localhost:3000
 
 ## Prerequisites
 
-- Java 17 or later
-- Maven
-- Docker
-- Kubernetes cluster
-- GitHub account
+Development tools are installed automatically by the devcontainer.
+If you need to reinstall, run: `dev-setup`
 
 ## Project Structure
 
+After installation, your project contains:
+
 ```plaintext
-java-basic-webserver/
 ├── app/
-│   └── src/
-│       └── main/
-│           └── java/
-│               └── com/
-│                   └── example/
-│                       └── App.java
+│   └── src/main/java/com/example/
+│       └── App.java                       # Spring Boot application
 ├── manifests/
-│   ├── deployment.yaml
-│   └── kustomization.yaml
+│   ├── deployment.yaml                    # K8s Deployment + Service
+│   └── kustomization.yaml                 # ArgoCD configuration
 ├── .github/
 │   └── workflows/
-│       └── build.yml
-├── Dockerfile
-├── pom.xml
-└── README-java-basic-webserver.md
+│       └── urbalurba-build-and-push.yaml  # CI/CD pipeline
+├── Dockerfile                             # Container build (multi-stage)
+├── pom.xml                                # Maven dependencies
+├── TEMPLATE_INFO                          # Template metadata
+└── README-java-basic-webserver.md         # This file
 ```
 
-## Getting Started
+## Development
 
-1. Clone this repository
-2. Build the project:
-   ```bash
-   mvn clean package
-   ```
-3. Run the application:
-   ```bash
-   java -jar target/*.jar
-   ```
-4. Access the web server at http://localhost:3000
+- Edit `app/src/main/java/com/example/App.java` — the main Spring Boot application
+- The `/` endpoint returns "Hello World" with the template name and current time/date
+- Health check endpoints are provided by Spring Boot Actuator
+- Rebuild with `mvn clean package` after changes
 
 ## Docker Build
 
@@ -64,23 +58,12 @@ docker run -p 3000:3000 java-basic-webserver
 
 ## Kubernetes Deployment
 
-1. Apply the Kubernetes manifests:
-   ```bash
-   kubectl apply -k manifests/
-   ```
-2. Access the web server at http://java-basic-webserver.local
+```bash
+kubectl apply -k manifests/
+```
 
-## Development
-
-- The main application code is in `app/src/main/java/com/example/App.java`
-- The application uses Spring Boot for the web server
-- The `/` endpoint returns a "Hello world" message with the current time and date
-- Health check endpoints are automatically provided by Spring Boot Actuator
+The app will be accessible at `http://<app-name>.localhost` after ArgoCD registration.
 
 ## CI/CD
 
 The GitHub Actions workflow automatically builds and pushes the Docker image to GitHub Container Registry when changes are pushed to the main branch.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details. 

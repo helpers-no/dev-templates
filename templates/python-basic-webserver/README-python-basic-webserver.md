@@ -1,77 +1,69 @@
-# Python Basic Webserver
+# Python Basic Web Server
 
-filename: templates/python-basic-webserver/README-python-basic-webserver.md
+A minimal Flask web server. Displays "Hello World" with current time and date, and demonstrates deployment to Kubernetes via ArgoCD and GitHub Actions.
 
-A simple Flask server written in Python.
-Purpose is to demonstrate how to develop a simple web server that can be deployed to your local Kubernetes using ArgoCD and GitHub Actions.
-See the repo https://github.com/helpers-no/urbalurba-infrastructure for setting up local kubernetes and ArgoCD.
+## Quick Start
+
+1. Update your terminal (tools were installed):
+   ```bash
+   source ~/.bashrc
+   ```
+
+2. Install dependencies and run:
+   ```bash
+   pip install -r requirements.txt
+   python app/app.py
+   ```
+
+3. Open in browser: http://localhost:6000
+
+The server auto-reloads on file changes (Flask debug mode).
 
 ## Prerequisites
 
-The devcontainer-toolbox sets up everything you need to run this project locally.
-See the repo https://github.com/norwegianredcross/devcontainer-toolbox on how to set it up.
-When you have the devcontainer-toolbox set up, you type the following command in your terminal:
+Development tools are installed automatically by the devcontainer.
+If you need to reinstall, run: `dev-setup`
 
-```bash
-.devcontainer/dev/dev-template.sh
-```
+## Project Structure
 
-Then you select this template from the list:
+After installation, your project contains:
 
 ```plaintext
-1. python-basic-webserver
-````
-
-## Getting started
-
-Once you have installed the template you are ready to start developing.
-
-Run the following commands to build and run the server locally:
-
-```bash
-pip install -r requirements.txt
-python app/app.py
-```
-
-You will see the following output:
-
-```plaintext
-Server running at http://localhost:6000
- * Serving Flask app 'app/app.py'
- * Debug mode: on
- * Running on all addresses (0.0.0.0)
- * Running on http://127.0.0.1:6000
- * Running on http://192.168.x.x:6000
- * Press CTRL+C to quit
- * Restarting with stat
-```
-
-This means the server is running and listening on port 6000. You can access it by navigating to `http://localhost:6000` in your web browser.
-You will see the message "Hello World" with the current time and date.
-
-Change the message in `app/app.py` to something else, save the file and see how the server restarts automatically and the message changes.
-
-## Deploying to Kubernetes on your local machine
-
-TODO: Add instructions for deploying to Kubernetes on your local machine.
-
-## File structure
-
-The file structure of the project is as follows:
-
-```plaintext
-templates/python-basic-webserver/
 ├── app/
-│   └── app.py                  # Flask server with Hello World
-├── Dockerfile                  # Container build for app
+│   └── app.py                             # Flask server with Hello World
 ├── manifests/
-│   ├── deployment.yaml         # K8s deployment + service
-│   └── kustomization.yaml      # For ArgoCD compatibility
-├── .dockerignore               # Ignore files for Docker build
-├── .gitignore                 # Ignore files for Git
+│   ├── deployment.yaml                    # K8s Deployment + Service
+│   └── kustomization.yaml                 # ArgoCD configuration
 ├── .github/
 │   └── workflows/
-│       └── urbalurba-build-and-push.yaml  # GitHub Actions CI
-├── requirements.txt            # Python dependencies
-└── README-python-basic-webserver.md    # this file
+│       └── urbalurba-build-and-push.yaml  # CI/CD pipeline
+├── Dockerfile                             # Container build
+├── requirements.txt                       # Python dependencies
+├── TEMPLATE_INFO                          # Template metadata
+└── README-python-basic-webserver.md       # This file
 ```
+
+## Development
+
+- Edit `app/app.py` — the main Flask application
+- Changes auto-reload in debug mode
+- The `/` endpoint returns "Hello World" with the template name and current time/date
+
+## Docker Build
+
+```bash
+docker build -t python-basic-webserver .
+docker run -p 6000:6000 python-basic-webserver
+```
+
+## Kubernetes Deployment
+
+```bash
+kubectl apply -k manifests/
+```
+
+The app will be accessible at `http://<app-name>.localhost` after ArgoCD registration.
+
+## CI/CD
+
+The GitHub Actions workflow automatically builds and pushes the Docker image to GitHub Container Registry when changes are pushed to the main branch.

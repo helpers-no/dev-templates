@@ -1,0 +1,73 @@
+# Plan-Based AI Workflow
+
+A structured AI-assisted development workflow with investigation plans, phased implementation, and human-in-the-loop validation. Works with Claude Code and other AI coding assistants.
+
+## Quick Start
+
+1. Update your terminal (if tools were installed):
+   ```bash
+   source ~/.bashrc
+   ```
+
+2. Read the AI developer guide:
+   ```bash
+   cat docs/ai-developer/README.md
+   ```
+
+3. Create your first plan:
+   - Create an `INVESTIGATE-*.md` or `PLAN-*.md` in `docs/ai-developer/plans/backlog/`
+   - Or tell your AI assistant: "I want to add feature X"
+
+4. If your project already had a `CLAUDE.md`:
+   - A template is at `docs/ai-developer/CLAUDE-template.md`
+   - Ask your AI assistant: "Merge CLAUDE-template.md into my CLAUDE.md"
+
+## Prerequisites
+
+No development tools are required. This template installs documentation and workflow files only.
+
+## What's Included
+
+- **6 portable docs** in `docs/ai-developer/`:
+  - `README.md` — AI developer entry point
+  - `WORKFLOW.md` — End-to-end flow from idea to implementation
+  - `PLANS.md` — Plan structure, templates, and best practices
+  - `DEVCONTAINER.md` — How to work inside the devcontainer
+  - `GIT.md` — Git safety rules and platform operations
+  - `TALK.md` — AI-to-AI testing protocol
+
+- **Plan folder structure:**
+  - `docs/ai-developer/plans/backlog/` — Approved plans waiting for implementation
+  - `docs/ai-developer/plans/active/` — Currently being worked on
+  - `docs/ai-developer/plans/completed/` — Done, kept for reference
+
+- **CLAUDE.md** — Project instructions for Claude Code, pointing to the docs
+- **project-TEMPLATE.md** — Skeleton for documenting project-specific setup (rename to `project-<your-project>.md`)
+
+## How It Works
+
+The workflow follows three stages:
+
+1. **Investigate** — Research the problem, evaluate options, document findings in `INVESTIGATE-*.md`
+2. **Plan** — Define the solution with phases, tasks, and validation steps in `PLAN-*.md`
+3. **Implement** — Work through phases in order, with human confirmation after each phase
+
+Plans move through folders as they progress: `backlog/` → `active/` → `completed/`
+
+The AI assistant creates plans, asks for your review, implements phase by phase, and checks in after each phase. You stay in control.
+
+## Project Structure
+
+```plaintext
+docs/ai-developer/
+├── README.md              # Start here — entry point for AI assistants
+├── WORKFLOW.md            # The full development workflow
+├── PLANS.md               # How to write plans
+├── DEVCONTAINER.md        # Devcontainer guide
+├── GIT.md                 # Git safety rules
+├── TALK.md                # AI-to-AI testing protocol
+└── plans/
+    ├── backlog/           # Plans waiting to start
+    ├── active/            # Plans in progress
+    └── completed/         # Done
+```

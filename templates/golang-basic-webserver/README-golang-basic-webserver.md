@@ -1,53 +1,50 @@
-# Go Basic Web Server Template
+# Go Basic Web Server
 
-This is a basic web server template using Go's standard net/http package. It serves a simple "Hello world" message on the root URL and demonstrates how to set up a Go project.
+A minimal web server using Go's standard `net/http` package. Displays "Hello World" with current time and date, and provides health check endpoints.
 
-## Features
+## Quick Start
 
-- Go standard library web server
-- Simple "Hello world" endpoint
-- Current time and date display
-- Health check endpoints
-- Docker multi-stage build
-- Kubernetes deployment
-- GitHub Actions CI/CD
-
-## Prerequisites
-
-- Go 1.21 or later
-- Docker
-- Kubernetes cluster
-- GitHub account
-
-## Project Structure
-
-```plaintext
-golang-basic-webserver/
-├── app/
-│   └── main.go
-├── manifests/
-│   ├── deployment.yaml
-│   └── kustomization.yaml
-├── .github/
-│   └── workflows/
-│       └── build.yml
-├── Dockerfile
-└── README-golang-basic-webserver.md
-```
-
-## Getting Started
-
-1. Clone this repository
-2. Initialize Go modules:
+1. Update your terminal (tools were installed):
    ```bash
-   go mod init example.com/hello
-   go mod tidy
+   source ~/.bashrc
    ```
-3. Run the application:
+
+2. Run the app:
    ```bash
    go run app/main.go
    ```
-4. Access the web server at http://localhost:3000
+
+3. Open in browser: http://localhost:3000
+
+## Prerequisites
+
+Development tools are installed automatically by the devcontainer.
+If you need to reinstall, run: `dev-setup`
+
+## Project Structure
+
+After installation, your project contains:
+
+```plaintext
+├── app/
+│   └── main.go                            # Web server using net/http
+├── manifests/
+│   ├── deployment.yaml                    # K8s Deployment + Service
+│   └── kustomization.yaml                 # ArgoCD configuration
+├── .github/
+│   └── workflows/
+│       └── urbalurba-build-and-push.yaml  # CI/CD pipeline
+├── Dockerfile                             # Container build (multi-stage)
+├── go.mod                                 # Go module definition
+├── TEMPLATE_INFO                          # Template metadata
+└── README-golang-basic-webserver.md       # This file
+```
+
+## Development
+
+- Edit `app/main.go` — the main application file
+- The `/` endpoint returns "Hello World" with the template name and current time/date
+- Restart the server after changes (`go run app/main.go` again)
 
 ## Docker Build
 
@@ -58,23 +55,12 @@ docker run -p 3000:3000 golang-basic-webserver
 
 ## Kubernetes Deployment
 
-1. Apply the Kubernetes manifests:
-   ```bash
-   kubectl apply -k manifests/
-   ```
-2. Access the web server at http://golang-basic-webserver.local
+```bash
+kubectl apply -k manifests/
+```
 
-## Development
-
-- The main application code is in `app/main.go`
-- The application uses Go's standard net/http package for the web server
-- The `/` endpoint returns a "Hello world" message with the current time and date
-- Health check endpoints are provided by the root endpoint
+The app will be accessible at `http://<app-name>.localhost` after ArgoCD registration.
 
 ## CI/CD
 
 The GitHub Actions workflow automatically builds and pushes the Docker image to GitHub Container Registry when changes are pushed to the main branch.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details. 

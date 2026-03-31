@@ -1,4 +1,5 @@
 TEMPLATE_NAME="Plan-Based AI Workflow"
 TEMPLATE_DESCRIPTION="Structured AI development with plans, phases, and validation"
 TEMPLATE_CATEGORY="WORKFLOW"
-TEMPLATE_PURPOSE="Provides a complete AI-assisted development workflow with investigation plans, phased implementation, and human-in-the-loop validation. Includes CLAUDE.md, plan templates, and git safety rules."
+TEMPLATE_ABSTRACT="Provides a complete AI-assisted development workflow with investigation plans, phased implementation, and human-in-the-loop validation. Includes CLAUDE.md, plan templates, and git safety rules."
+TEMPLATE_README="README-plan-based-workflow.md"
