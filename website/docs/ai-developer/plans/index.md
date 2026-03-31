@@ -1,0 +1,24 @@
+---
+title: Plans Overview
+sidebar_position: 1
+slug: /ai-developer/plans-overview
+---
+
+# Plans
+
+Implementation plans and investigations for dev-templates. Plans follow the workflow described in [WORKFLOW.md](../WORKFLOW.md) and use the templates in [PLANS.md](../PLANS.md).
+
+## Plan Types
+
+| Type | When to use |
+|------|-------------|
+| `PLAN-*.md` | Solution is clear, ready to implement |
+| `INVESTIGATE-*.md` | Needs research first, approach unclear |
+
+## Folders
+
+| Folder | Purpose |
+|--------|---------|
+| [Active](active/index.md) | Currently being worked on (max 1-2 at a time) |
+| [Backlog](backlog/index.md) | Approved plans and investigations waiting for work |
+| [Completed](completed/index.md) | Done — kept for reference |

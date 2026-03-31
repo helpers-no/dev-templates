@@ -6,11 +6,14 @@ on:
       - main
     paths:
       - 'website/**'
+      - 'templates/**/TEMPLATE_INFO'
+      - 'ai-templates/**/TEMPLATE_INFO'
+      - 'scripts/**'
       - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -19,11 +22,53 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  generate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Validate template metadata
+        run: bash scripts/validate-metadata.sh
+
+      - name: Validate documentation
+        run: bash scripts/validate-docs.sh
+
+      - name: Generate templates.json and categories.json
+        run: bash scripts/generate-templates-json.sh
+
+      - name: Generate template documentation pages
+        run: bash scripts/generate-docs-markdown.sh --force
+
+      - name: Generate plan indexes
+        run: bash scripts/generate-plan-indexes.sh
+
+      - name: Check for generated changes
+        id: check_changes
+        run: |
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit generated files
+        if: steps.check_changes.outputs.changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add website/src/data/ website/docs/templates/ website/docs/ai-developer/plans/*/index.md
+          git commit -m "Auto-generate template docs and plan indexes [skip ci]" || true
+          git push
+
+  build:
+    runs-on: ubuntu-latest
+    needs: generate
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
