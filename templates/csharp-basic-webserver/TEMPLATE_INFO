@@ -1,5 +1,6 @@
 TEMPLATE_NAME="C# Basic Webserver"
 TEMPLATE_DESCRIPTION="ASP.NET Core server with health endpoint and Docker support"
 TEMPLATE_CATEGORY="WEB_SERVER"
-TEMPLATE_PURPOSE="Provides a minimal starting point for developers who want to build a C# web server using ASP.NET Core"
+TEMPLATE_ABSTRACT="Provides a minimal starting point for developers who want to build a C# web server using ASP.NET Core"
 TEMPLATE_TOOLS="dev-csharp"
+TEMPLATE_README="README-csharp-basic-webserver.md"

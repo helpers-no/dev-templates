@@ -1,5 +1,6 @@
 TEMPLATE_NAME="PHP Basic Webserver"
 TEMPLATE_DESCRIPTION="PHP web server using built-in server with health endpoint and Docker support"
 TEMPLATE_CATEGORY="WEB_SERVER"
-TEMPLATE_PURPOSE="Provides a minimal starting point for developers who want to build a PHP web server using PHP's built-in server"
+TEMPLATE_ABSTRACT="Provides a minimal starting point for developers who want to build a PHP web server using PHP's built-in server"
 TEMPLATE_TOOLS="dev-php-laravel"
+TEMPLATE_README="README-php-basic-webserver.md"

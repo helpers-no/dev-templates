@@ -1,49 +1,49 @@
-# PHP Basic Web Server Template
+# PHP Basic Web Server
 
-This is a basic web server template using PHP's built-in web server. It serves a simple "Hello world" message on the root URL and demonstrates how to set up a PHP project.
+A minimal PHP web server using PHP's built-in server. Displays "Hello World" with current time and date, and provides health check endpoints.
 
-## Features
+## Quick Start
 
-- PHP 8.2 web server with Apache
-- Simple "Hello world" endpoint
-- Current time and date display
-- Health check endpoints
-- Docker multi-stage build
-- Kubernetes deployment
-- GitHub Actions CI/CD
+1. Update your terminal (tools were installed):
+   ```bash
+   source ~/.bashrc
+   ```
+
+2. Run the app:
+   ```bash
+   php -S 0.0.0.0:3000 app/index.php
+   ```
+
+3. Open in browser: http://localhost:3000
 
 ## Prerequisites
 
-- PHP 8.2 or later
-- Apache web server
-- Docker
-- Kubernetes cluster
-- GitHub account
+Development tools are installed automatically by the devcontainer.
+If you need to reinstall, run: `dev-setup`
 
 ## Project Structure
 
+After installation, your project contains:
+
 ```plaintext
-php-basic-webserver/
 ├── app/
-│   └── index.php
+│   └── index.php                          # Main application
 ├── manifests/
-│   ├── deployment.yaml
-│   └── kustomization.yaml
+│   ├── deployment.yaml                    # K8s Deployment + Service
+│   └── kustomization.yaml                 # ArgoCD configuration
 ├── .github/
 │   └── workflows/
-│       └── build.yml
-├── Dockerfile
-└── README-php-basic-webserver.md
+│       └── urbalurba-build-and-push.yaml  # CI/CD pipeline
+├── Dockerfile                             # Container build (multi-stage)
+├── TEMPLATE_INFO                          # Template metadata
+└── README-php-basic-webserver.md          # This file
 ```
 
-## Getting Started
+## Development
 
-1. Clone this repository
-2. Run the application locally:
-   ```bash
-   php -S localhost:3000 app/index.php
-   ```
-3. Access the web server at http://localhost:3000
+- Edit `app/index.php` — the main application file
+- The `/` endpoint returns "Hello World" with the template name and current time/date
+- Restart the server after changes (PHP's built-in server does not auto-reload)
 
 ## Docker Build
 
@@ -54,23 +54,12 @@ docker run -p 3000:3000 php-basic-webserver
 
 ## Kubernetes Deployment
 
-1. Apply the Kubernetes manifests:
-   ```bash
-   kubectl apply -k manifests/
-   ```
-2. Access the web server at http://php-basic-webserver.localhost
+```bash
+kubectl apply -k manifests/
+```
 
-## Development
-
-- The main application code is in `app/index.php`
-- The application uses PHP's built-in web server
-- The `/` endpoint returns a "Hello world" message with the current time and date
-- Health check endpoints are provided by the root endpoint
+The app will be accessible at `http://<app-name>.localhost` after ArgoCD registration.
 
 ## CI/CD
 
 The GitHub Actions workflow automatically builds and pushes the Docker image to GitHub Container Registry when changes are pushed to the main branch.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details. 
