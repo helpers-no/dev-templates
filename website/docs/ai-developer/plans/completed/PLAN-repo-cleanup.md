@@ -10,7 +10,7 @@
 
 **Goal**: Remove obsolete files, preserve valuable content for future Docusaurus site, and rewrite the README to accurately describe the repo.
 
-**Investigation**: [INVESTIGATE-repo-cleanup.md](../backlog/INVESTIGATE-repo-cleanup.md)
+**Investigation**: [INVESTIGATE-repo-cleanup.md](../completed/INVESTIGATE-repo-cleanup.md)
 
 **Last Updated**: 2026-03-29
 

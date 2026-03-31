@@ -128,10 +128,10 @@ Brief description of what this template provides.
 
 2. Run the app:
    ```bash
-   <run command>
+   your-run-command-here
    ```
 
-3. Open in browser: http://localhost:<port>
+3. Open in browser: `http://localhost:PORT`
 
 ## Prerequisites
 
@@ -140,23 +140,23 @@ If you need to reinstall, run: `dev-setup`
 
 ## Project Structure
 
-<directory tree with descriptions>
+*directory tree with descriptions*
 
 ## Development
 
-<how to edit, test, and debug>
+*how to edit, test, and debug*
 
 ## Docker Build
 
-<how to build the container image locally>
+*how to build the container image locally*
 
 ## Kubernetes Deployment
 
-<how to deploy to the local K8s cluster>
+*how to deploy to the local K8s cluster*
 
 ## CI/CD
 
-<how the GitHub Actions workflow works>
+*how the GitHub Actions workflow works*
 ```
 
 This standard structure makes it easy to create new templates and gives users a consistent experience across all templates.
@@ -482,16 +482,14 @@ Where `<DCT>` = the `helpers-no/devcontainer-toolbox` repo root (locally at `/Us
 
 Doing all metadata, README, and Docusaurus work in this repo first means we can validate everything locally before touching DCT. If field names, structures, or formats need to change, we only modify one repo. Once the metadata is stable and tested, DCT picks it up in one coordinated update.
 
-### Phase A: TEMPLATE_README + README Revision (this repo)
+### Phase A: TEMPLATE_README + README Revision — COMPLETED 2026-03-31
 
-**Why first:** The most impactful change — makes template READMEs useful and adds the `TEMPLATE_README` field that DCT will need.
+See `plans/completed/PLAN-template-readme-and-metadata.md`.
 
-1. Rename `TEMPLATE_PURPOSE` → `TEMPLATE_ABSTRACT` in all 8 TEMPLATE_INFO files
-2. Add `TEMPLATE_README` to all 8 TEMPLATE_INFO files
-3. Revise all 7 app template READMEs to follow the standard structure
-4. Create `README-plan-based-workflow.md` for the ai-template
-
-**Result:** All TEMPLATE_INFO files have `TEMPLATE_ABSTRACT` and `TEMPLATE_README`. All READMEs follow a consistent standard structure.
+- Renamed `TEMPLATE_PURPOSE` → `TEMPLATE_ABSTRACT` in all 8 TEMPLATE_INFO files
+- Added `TEMPLATE_README` to all 8 TEMPLATE_INFO files
+- Revised all 7 app template READMEs to standard structure
+- Created `README-plan-based-workflow.md` for the ai-template
 
 ### Phase B: Full Metadata + Generation Scripts (this repo)
 
@@ -530,6 +528,6 @@ Doing all metadata, README, and Docusaurus work in this repo first means we can 
 
 ## Next Steps
 
-- [ ] Create PLAN for Phase A (TEMPLATE_README + README revision + PURPOSE→ABSTRACT rename)
-- [ ] Create PLAN for Phase B (full metadata + generation scripts)
+- [x] Create PLAN for Phase A (TEMPLATE_README + README revision + PURPOSE→ABSTRACT rename) ✓ — completed 2026-03-31
+- [x] Create PLAN for Phase B (full metadata + generation scripts) ✓ — completed 2026-03-31
 - [ ] Phase C is tracked in DCT repo

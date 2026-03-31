@@ -16,7 +16,9 @@ Project templates for the Urbalurba developer platform. Each template provides a
 
 ## Templates
 
-Templates are installed inside the devcontainer using the `dev-template` command. See the [project README](https://github.com/helpers-no/dev-templates) for the full template catalog.
+Browse all templates on the [Templates page](/templates), or see the [template docs](templates/) for details.
+
+Templates are installed inside the devcontainer using the `dev-template` command.
 
 ### App Templates
 

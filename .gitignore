@@ -4,6 +4,10 @@ templates/.DS_Store
 # Node
 node_modules/
 
+# Docusaurus build artifacts
+website/build/
+website/.docusaurus/
+
 # Backups
 website-backup/
 

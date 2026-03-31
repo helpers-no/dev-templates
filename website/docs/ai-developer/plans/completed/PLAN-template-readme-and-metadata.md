@@ -10,7 +10,7 @@
 
 **Goal**: Add `TEMPLATE_README` field, rename `TEMPLATE_PURPOSE` to `TEMPLATE_ABSTRACT`, and revise all template READMEs to follow a standard structure. This unblocks the DCT template installer from displaying the correct README path.
 
-**Investigation**: [INVESTIGATE-template-metadata-system.md](INVESTIGATE-template-metadata-system.md)
+**Investigation**: [INVESTIGATE-template-metadata-system.md](../backlog/INVESTIGATE-template-metadata-system.md)
 
 **Last Updated**: 2026-03-31
 
