@@ -1,0 +1,8 @@
+{
+  "label": "Templates",
+  "position": 10,
+  "link": {
+    "type": "generated-index",
+    "description": "Project templates for the Urbalurba developer platform."
+  }
+}

@@ -1,0 +1,135 @@
+.header {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  background: var(--ifm-color-emphasis-100);
+}
+
+[data-theme='dark'] .header {
+  background: var(--ifm-color-emphasis-100);
+  border-color: var(--ifm-color-emphasis-300);
+}
+
+.logo {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--ifm-heading-color);
+}
+
+.version {
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.description {
+  margin: 0.25rem 0 0.75rem;
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.95rem;
+}
+
+.install {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  padding: 0.4rem 0.8rem;
+  background: var(--ifm-color-emphasis-200);
+  border-radius: 6px;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-800);
+}
+
+[data-theme='dark'] .install {
+  background: var(--ifm-color-emphasis-200);
+  color: var(--ifm-color-emphasis-800);
+}
+
+.installLabel {
+  font-weight: 600;
+  margin-right: 0.5rem;
+  font-family: var(--ifm-font-family-base);
+}
+
+.links {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.link {
+  font-size: 0.85rem;
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.tag {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  background: var(--ifm-color-emphasis-200);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.tools {
+  font-size: 0.8rem;
+  color: var(--ifm-color-emphasis-600);
+  margin-bottom: 0.5rem;
+}
+
+.toolsLabel {
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .titleRow {
+    justify-content: center;
+  }
+
+  .links {
+    justify-content: center;
+  }
+
+  .tags {
+    justify-content: center;
+  }
+}

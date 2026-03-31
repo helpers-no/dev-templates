@@ -1,10 +1,10 @@
 {"categories": [
     {
-      "id": "WEB_SERVER",
-      "name": "Web Server Templates",
+      "id": "BASIC_WEB_SERVER",
+      "name": "Basic Web Server Templates",
       "order": 0,
-      "description": "Backend web server starter templates for multiple languages",
-      "tags": "webserver backend api rest server",
+      "description": "Minimal web server templates that demonstrate Hello World in multiple languages",
+      "tags": "webserver backend hello-world starter",
       "icon": "server",
       "logo": "webserver-logo.svg"
     }

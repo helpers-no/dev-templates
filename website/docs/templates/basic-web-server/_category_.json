@@ -1,0 +1,8 @@
+{
+  "label": "Basic Web Server Templates",
+  "position": 9,
+  "link": {
+    "type": "doc",
+    "id": "templates/basic-web-server/index"
+  }
+}

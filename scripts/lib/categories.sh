@@ -17,13 +17,13 @@ _CATEGORIES_LOADED=1
 # Category definitions as indexed arrays (bash 3.x compatible)
 # Format: ID|Display Name|Description|tags|icon|logo
 _CATEGORY_DATA=(
-    "WEB_SERVER|Web Server Templates|Backend web server starter templates for multiple languages|webserver backend api rest server|server|webserver-logo.svg"
+    "BASIC_WEB_SERVER|Basic Web Server Templates|Minimal web server templates that demonstrate Hello World in multiple languages|webserver backend hello-world starter|server|webserver-logo.svg"
     "WEB_APP|Web Application Templates|Frontend web application starter templates|webapp frontend react vite|layout|webapp-logo.svg"
     "WORKFLOW|Workflow Templates|AI-assisted development workflow templates|ai workflow planning automation|clipboard|workflow-logo.svg"
 )
 
 # Category display order (just the IDs)
-CATEGORY_ORDER=(WEB_SERVER WEB_APP WORKFLOW)
+CATEGORY_ORDER=(BASIC_WEB_SERVER WEB_APP WORKFLOW)
 
 # Internal: Find category data by ID
 _find_category_data() {
