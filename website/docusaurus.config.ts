@@ -86,6 +86,11 @@ const config: Config = {
           position: 'left',
         },
         {
+          to: '/docs/contributors/',
+          label: 'Contributors',
+          position: 'left',
+        },
+        {
           to: '/blog',
           label: 'Blog',
           position: 'left',
