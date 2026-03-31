@@ -15,8 +15,8 @@
 **Last Updated**: 2026-03-31
 
 **Related**:
-- [INVESTIGATE-template-metadata-system.md](INVESTIGATE-template-metadata-system.md) — the metadata system that generates these pages
-- `PLAN-template-metadata-and-docusaurus.md` in `plans/active/` — Phase B that created the current pages
+- [INVESTIGATE-template-metadata-system.md](../backlog/INVESTIGATE-template-metadata-system.md) — the metadata system that generates these pages
+- [PLAN-template-metadata-and-docusaurus.md](PLAN-template-metadata-and-docusaurus.md) — Phase B that created the current pages
 
 ---
 

@@ -10,7 +10,7 @@
 
 **Goal**: Redesign the generated template detail pages and the `/templates` overview page to show full README content, logos, install commands, and better navigation — following UIS component patterns with CSS Modules and MDX.
 
-**Investigation**: [INVESTIGATE-docusaurus-template-pages.md](../backlog/INVESTIGATE-docusaurus-template-pages.md)
+**Investigation**: [INVESTIGATE-docusaurus-template-pages.md](INVESTIGATE-docusaurus-template-pages.md)
 
 **Last Updated**: 2026-03-31
 
