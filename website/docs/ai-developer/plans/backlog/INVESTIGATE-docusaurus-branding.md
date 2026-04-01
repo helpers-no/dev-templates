@@ -93,35 +93,29 @@ website/static/img/
 | **GitHub link in navbar** | **Done** — GitHub link on the right side of the navbar, matching UIS. |
 | **Brand README** | **Done** — `website/static/img/brand/README.md` documents assets, scripts, and workflow. |
 | **Contributors reference** | **Done** — Brand scripts documented in `contributors/scripts-reference.md`. |
-| **Homepage hero** | **Done** — Navy gradient background, two-line tagline, Get Started + Browse Templates buttons, placeholder animation SVG (to be replaced with animated SVG later). Matches UIS layout. |
-| **Homepage content** | **Done** — CategoryGrid + TemplateGrid below the hero, same as `/templates` page. |
+| **Homepage hero** | **Done** — DCT-style layout (animation left, logo+title+tagline+buttons right). Navy gradient background. |
+| **Homepage content** | **Done** — CategoryGrid + TemplateGrid below the hero. |
 | **Tagline** | **Done** — "Instant-start templates / for any service, any language" (two lines). |
 | **Navbar cleanup** | **Done** — Removed Contributors from top nav (still in sidebar and footer). |
-
-### Remaining
-
-| Item | Description |
-|------|-------------|
-| **Social card** | Open Graph image for link previews (GitHub, Slack, etc.) |
-| **Hero animated SVG** | Replace the placeholder animation with a proper animated SVG |
-| ~~**Dark mode logo**~~ | ~~Alternate logo for dark mode~~ | **Done** — teal variant at `website/static/img/logo-dark.svg`, configured via `srcDark` in navbar. |
-| ~~**Homepage hero layout**~~ | ~~Hero section design~~ | **Done** — centered vertical layout (DCT style): logo above, title, tagline, buttons. Navy gradient background. |
+| **Hero SVG illustration** | **Done** — Clean SVG with multiple isometric stacked plates at different heights, `</>` and `{}` symbols, subtle floating animation. Can be refined later. |
+| **Dark mode logo** | **Done** — teal variant at `website/static/img/logo-dark.svg`, configured via `srcDark` in navbar. |
+| **Homepage hero layout** | **Done** — DCT style: animation left, logo+title+tagline+buttons right. |
 
 ### Note for UIS contributor
 
-The hero layout was changed from UIS side-by-side style to DCT centered style (logo above title). The UIS site should be updated to match this pattern for consistency across all three sites (DCT, dev-templates, UIS).
+The hero layout follows DCT style (animation left, text right). The UIS site should be updated to match this pattern for consistency across all three sites (DCT, dev-templates, UIS).
 
 ---
 
-## Questions to Answer
+## Status
 
-1. ~~Should we create a unique Dev Templates logo, or reuse/adapt the SovereignSky logo?~~ — **User will provide a logo file.** Create `website/static/img/brand/` folder for it.
-2. ~~What tagline for the hero section?~~ — **"Instant-start templates for any service, any language"**
-3. ~~Should the homepage show templates overview?~~ — **Yes**, something similar to the `/templates` page layout.
-4. ~~Should we copy the UIS brand scripts?~~ — **Yes**, copy and adapt for dev-templates.
+All branding items are complete. The investigation can be marked as completed.
 
 ---
 
-## Next Steps
+## Questions — All Answered
 
-- [ ] Create PLAN for branding implementation
+1. ~~Logo~~ — User provided logo file. Processed to SovereignSky green with solid `</>` fills.
+2. ~~Tagline~~ — "Instant-start templates for any service, any language"
+3. ~~Homepage~~ — CategoryGrid + TemplateGrid, matching `/templates` page.
+4. ~~Brand scripts~~ — Copied and adapted from UIS.
