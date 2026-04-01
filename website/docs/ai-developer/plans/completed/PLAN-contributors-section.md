@@ -10,7 +10,7 @@
 
 **Goal**: Add a minimum viable "Contributors" section to the Docusaurus site with guides for creating templates, metadata reference, naming conventions, scripts reference, and basic rules.
 
-**Investigation**: [INVESTIGATE-contributors-section.md](../backlog/INVESTIGATE-contributors-section.md)
+**Investigation**: [INVESTIGATE-contributors-section.md](INVESTIGATE-contributors-section.md)
 
 **Last Updated**: 2026-03-31
 

@@ -4,7 +4,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'Dev Templates',
-  tagline: 'Project templates for the Urbalurba developer platform',
+  tagline: 'Instant-start templates for any service, any language',
   favicon: 'img/favicon.ico',
 
   future: {
@@ -73,6 +73,11 @@ const config: Config = {
     },
     navbar: {
       title: 'Dev Templates',
+      logo: {
+        alt: 'Dev Templates Logo',
+        src: 'img/logo.svg',
+        srcDark: 'img/logo-dark.svg',
+      },
       items: [
         {
           type: 'docSidebar',
@@ -86,14 +91,14 @@ const config: Config = {
           position: 'left',
         },
         {
-          to: '/docs/contributors/',
-          label: 'Contributors',
-          position: 'left',
-        },
-        {
           to: '/blog',
           label: 'Blog',
           position: 'left',
+        },
+        {
+          href: 'https://github.com/helpers-no/dev-templates',
+          label: 'GitHub',
+          position: 'right',
         },
       ],
     },
@@ -107,6 +112,31 @@ const config: Config = {
               label: 'Getting Started',
               to: '/docs/',
             },
+            {
+              label: 'Templates',
+              to: '/templates',
+            },
+            {
+              label: 'Contributors',
+              to: '/docs/contributors/',
+            },
+          ],
+        },
+        {
+          title: 'Community',
+          items: [
+            {
+              label: 'GitHub',
+              href: 'https://github.com/helpers-no/dev-templates',
+            },
+            {
+              label: 'DevContainer Toolbox',
+              href: 'https://dct.sovereignsky.no',
+            },
+            {
+              label: 'Infrastructure Stack',
+              href: 'https://uis.sovereignsky.no',
+            },
           ],
         },
         {
@@ -116,10 +146,14 @@ const config: Config = {
               label: 'Blog',
               to: '/blog',
             },
+            {
+              label: 'SovereignSky',
+              href: 'https://sovereignsky.no',
+            },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} helpers-no.`,
+      copyright: `Copyright © ${new Date().getFullYear()} SovereignSky.`,
     },
     prism: {
       theme: prismThemes.github,

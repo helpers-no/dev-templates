@@ -1,0 +1,93 @@
+.heroBanner {
+  padding: 4rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: 2rem;
+  }
+}
+
+.heroContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+}
+
+.heroAnimation {
+  flex: 0 0 auto;
+  width: 400px;
+}
+
+.heroContent {
+  flex: 1;
+  text-align: left;
+  max-width: 500px;
+}
+
+.heroLogo {
+  width: 100px;
+  height: auto;
+  margin-bottom: 1rem;
+  opacity: 0.6;
+}
+
+.heroTitle {
+  color: var(--ifm-color-primary-light) !important;
+  font-size: 3rem;
+  font-weight: 700;
+}
+
+@media screen and (max-width: 996px) {
+  .heroContainer {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .heroAnimation {
+    width: 320px;
+  }
+
+  .heroContent {
+    text-align: center;
+  }
+
+  .heroLogo {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .heroAnimation {
+    width: 280px;
+  }
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.heroContent .buttons {
+  justify-content: flex-start;
+}
+
+@media screen and (max-width: 996px) {
+  .heroContent .buttons {
+    justify-content: center;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .buttons {
+    flex-direction: column;
+  }
+}

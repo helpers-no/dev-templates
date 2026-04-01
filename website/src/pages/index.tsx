@@ -1,31 +1,47 @@
-import type {ReactNode} from 'react';
+import React from 'react';
+import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import Layout from '@theme/Layout';
-import Heading from '@theme/Heading';
+import HeroAnimation from '@site/src/components/HeroAnimation';
+import CategoryGrid from '@site/src/components/CategoryGrid';
+import TemplateGrid from '@site/src/components/TemplateGrid';
+
+import styles from './index.module.css';
 
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
+  const logoUrl = useBaseUrl('/img/logo.svg');
   return (
-    <header style={{padding: '4rem 0', textAlign: 'center'}}>
-      <div className="container">
-        <Heading as="h1" className="hero__title">
-          {siteConfig.title}
-        </Heading>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div>
-          <Link
-            className="button button--primary button--lg"
-            to="/docs/">
-            Get Started
-          </Link>
+    <header className={clsx('hero', styles.heroBanner)}>
+      <div className={clsx('container', styles.heroContainer)}>
+        <div className={styles.heroAnimation}>
+          <HeroAnimation />
+        </div>
+        <div className={styles.heroContent}>
+          <img src={logoUrl} alt="Dev Templates logo" className={styles.heroLogo} />
+          <h1 className={clsx('hero__title', styles.heroTitle)}>{siteConfig.title}</h1>
+          <p className="hero__subtitle">Instant-start templates<br />for any service, any language</p>
+          <div className={styles.buttons}>
+            <Link
+              className="button button--lg button--primary"
+              to="/docs/">
+              Get Started
+            </Link>
+            <Link
+              className="button button--lg button--secondary"
+              to="/templates">
+              Browse Templates
+            </Link>
+          </div>
         </div>
       </div>
     </header>
   );
 }
 
-export default function Home(): ReactNode {
+export default function Home(): React.JSX.Element {
   const {siteConfig} = useDocusaurusContext();
   return (
     <Layout
@@ -34,20 +50,10 @@ export default function Home(): ReactNode {
       <HomepageHeader />
       <main>
         <div className="container" style={{padding: '2rem 0'}}>
-          <div className="row">
-            <div className="col col--4">
-              <h3>Easy to Use</h3>
-              <p>Get your documentation site up and running quickly.</p>
-            </div>
-            <div className="col col--4">
-              <h3>Powered by React</h3>
-              <p>Extend and customize with React components.</p>
-            </div>
-            <div className="col col--4">
-              <h3>Built-in Search</h3>
-              <p>Local search included out of the box.</p>
-            </div>
-          </div>
+          <h2>Categories</h2>
+          <CategoryGrid />
+          <h2>All Templates</h2>
+          <TemplateGrid />
         </div>
       </main>
     </Layout>

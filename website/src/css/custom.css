@@ -1,17 +1,16 @@
 /**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
+ * SovereignSky brand colors for Dev Templates.
+ * Matches the color scheme used by DCT and UIS.
  */
 
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-color-primary: #3a8f5e;
+  --ifm-color-primary-dark: #348053;
+  --ifm-color-primary-darker: #31794f;
+  --ifm-color-primary-darkest: #286441;
+  --ifm-color-primary-light: #409e69;
+  --ifm-color-primary-lighter: #43a56d;
+  --ifm-color-primary-lightest: #52b87c;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
@@ -25,4 +24,60 @@
   --ifm-color-primary-lighter: #32d8b4;
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+/* Hero section - navy gradient matching UIS */
+.hero {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6f 100%);
+}
+
+.hero__title {
+  font-size: 3rem;
+  font-weight: 700;
+}
+
+.hero__subtitle {
+  font-size: 1.5rem;
+  color: #d1d5db;
+}
+
+/* Button styling */
+.button--primary {
+  background-color: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+  color: white;
+}
+
+.button--primary:hover {
+  background-color: var(--ifm-color-primary-dark);
+  border-color: var(--ifm-color-primary-dark);
+  color: white;
+}
+
+.button--secondary,
+.button--outline {
+  background-color: transparent;
+  border-color: white !important;
+  color: white !important;
+}
+
+.button--secondary:hover,
+.button--outline:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: white !important;
+  color: white !important;
+}
+
+/* Hero buttons */
+.hero .button--secondary,
+.hero .button--outline {
+  background-color: transparent;
+  border: 2px solid white !important;
+  color: white !important;
+}
+
+.hero .button--secondary:hover,
+.hero .button--outline:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white !important;
 }

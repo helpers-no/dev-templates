@@ -110,6 +110,16 @@ Located in `scripts/lib/`. Sourced by the scripts above.
 | `categories.sh` | Template category definitions and accessor functions. Includes JSON generation. |
 | `template-scanner.sh` | Reads `TEMPLATE_*` fields from TEMPLATE_INFO files using safe line-by-line parsing. |
 
+## Brand Scripts
+
+Located in `website/static/img/brand/`. Used to generate website brand assets. See `website/static/img/brand/README.md` for full details.
+
+Requires `dev-imagetools` installed in the devcontainer (`dev-setup` > Image Processing Tools).
+
+| Script | Purpose |
+|--------|---------|
+| `publish-favicon.sh` | Generate `favicon.ico` from the logo SVG |
+
 ## CI/CD Pipeline
 
 GitHub Actions (`.github/workflows/deploy-docs.yml`) runs these scripts automatically on push to main:
