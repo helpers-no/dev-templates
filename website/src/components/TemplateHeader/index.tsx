@@ -46,16 +46,20 @@ export default function TemplateHeader({
           {install}
         </div>
         <div className={styles.links}>
-          <a href={website} target="_blank" rel="noopener noreferrer" className={styles.link}>
-            Website ↗
-          </a>
-          <a href={docs} target="_blank" rel="noopener noreferrer" className={styles.link}>
-            Docs ↗
-          </a>
+          {website && (
+            <a href={website} target="_blank" rel="noopener noreferrer" className={styles.link}>
+              Website ↗
+            </a>
+          )}
+          {docs && (
+            <a href={docs} target="_blank" rel="noopener noreferrer" className={styles.link}>
+              View Source ↗
+            </a>
+          )}
         </div>
         <div className={styles.tags}>
           {tags.map((tag) => (
-            <span key={tag} className={styles.tag}>{tag}</span>
+            <a key={tag} href={`/docs/tags/${tag}`} className={styles.tag}>{tag}</a>
           ))}
         </div>
       </div>

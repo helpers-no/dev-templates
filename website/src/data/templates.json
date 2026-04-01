@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "generated": "2026-04-01T01:33:20Z",
+  "generated": "2026-04-01T11:43:46Z",
   "templates": [
     {
       "id": "csharp-basic-webserver",
@@ -14,8 +14,8 @@
       "readme": "README-csharp-basic-webserver.md",
       "tags": ["csharp","dotnet","aspnet","webserver","api","rest"],
       "logo": "csharp-basic-webserver-logo.svg",
-      "website": "https://dotnet.microsoft.com/apps/aspnet",
-      "docs": "https://learn.microsoft.com/aspnet/core/",
+      "website": "",
+      "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/csharp-basic-webserver",
       "summary": "A minimal ASP.NET Core web server with hot reload via dotnet watch, Docker multi-stage build, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
       "related": ["java-basic-webserver","golang-basic-webserver"]
     }
@@ -32,8 +32,8 @@
       "readme": "README-designsystemet-basic-react-app.md",
       "tags": ["react","typescript","vite","designsystemet","digdir","webapp"],
       "logo": "designsystemet-basic-react-app-logo.svg",
-      "website": "https://designsystemet.no",
-      "docs": "https://storybook.designsystemet.no",
+      "website": "",
+      "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/designsystemet-basic-react-app",
       "summary": "A React application using Designsystemet from Digdir with blog cards, Vite for development, TypeScript support, Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
       "related": ["typescript-basic-webserver"]
     }
@@ -50,8 +50,8 @@
       "readme": "README-golang-basic-webserver.md",
       "tags": ["golang","go","webserver","api","rest"],
       "logo": "golang-basic-webserver-logo.svg",
-      "website": "https://go.dev",
-      "docs": "https://go.dev/doc/",
+      "website": "",
+      "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/golang-basic-webserver",
       "summary": "A minimal web server using Gos standard net/http package with a health check endpoint, Docker multi-stage build, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
       "related": ["typescript-basic-webserver","java-basic-webserver"]
     }
@@ -68,8 +68,8 @@
       "readme": "README-java-basic-webserver.md",
       "tags": ["java","spring-boot","webserver","api","rest"],
       "logo": "java-basic-webserver-logo.svg",
-      "website": "https://spring.io/projects/spring-boot",
-      "docs": "https://docs.spring.io/spring-boot/reference/",
+      "website": "",
+      "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/java-basic-webserver",
       "summary": "A minimal Spring Boot web server with health check endpoints via Actuator, Docker multi-stage build, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
       "related": ["golang-basic-webserver","csharp-basic-webserver"]
     }
@@ -86,8 +86,8 @@
       "readme": "README-php-basic-webserver.md",
       "tags": ["php","webserver","api","rest"],
       "logo": "php-basic-webserver-logo.svg",
-      "website": "https://www.php.net",
-      "docs": "https://www.php.net/docs.php",
+      "website": "",
+      "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/php-basic-webserver",
       "summary": "A minimal PHP web server using PHPs built-in server with a health check endpoint, Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
       "related": ["python-basic-webserver","typescript-basic-webserver"]
     }
@@ -104,8 +104,8 @@
       "readme": "README-python-basic-webserver.md",
       "tags": ["python","flask","webserver","api","rest"],
       "logo": "python-basic-webserver-logo.svg",
-      "website": "https://flask.palletsprojects.com",
-      "docs": "https://flask.palletsprojects.com/en/stable/",
+      "website": "",
+      "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver",
       "summary": "A minimal Python web server using Flask with a health check endpoint, Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow. Ideal for microservices and API backends.",
       "related": ["php-basic-webserver","typescript-basic-webserver"]
     }
@@ -122,8 +122,8 @@
       "readme": "README-typescript-basic-webserver.md",
       "tags": ["typescript","nodejs","express","webserver","api","rest"],
       "logo": "typescript-basic-webserver-logo.svg",
-      "website": "https://www.typescriptlang.org",
-      "docs": "https://www.typescriptlang.org/docs/",
+      "website": "",
+      "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/typescript-basic-webserver",
       "summary": "A minimal Express.js web server written in TypeScript with hot reload via nodemon, Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
       "related": ["designsystemet-basic-react-app","python-basic-webserver"]
     }
@@ -140,8 +140,8 @@
       "readme": "README-plan-based-workflow.md",
       "tags": ["ai","workflow","planning","claude","devcontainer"],
       "logo": "plan-based-workflow-logo.svg",
-      "website": "https://tmp.sovereignsky.no",
-      "docs": "https://tmp.sovereignsky.no/docs/ai-developer",
+      "website": "",
+      "docs": "https://github.com/helpers-no/dev-templates/tree/main/ai-templates/plan-based-workflow",
       "summary": "A structured AI development workflow that guides AI coding assistants through investigation, planning, and phased implementation. Includes CLAUDE.md, 6 portable docs, plan templates, and git safety rules. Designed for human-in-the-loop collaboration.",
       "related": []
     }

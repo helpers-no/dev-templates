@@ -155,12 +155,21 @@ for info_file in "$REPO_ROOT"/templates/*/TEMPLATE_INFO "$REPO_ROOT"/ai-template
     done
     local_tags_mdx+="]"
 
+    # Build tags list for frontmatter
+    local_tags_yaml=""
+    for tag in $T_TAGS; do
+        local_tags_yaml+="  - $tag
+"
+    done
+
     # Write MDX file
     cat > "$page_file" <<MDXEOF
 ---
 title: $T_NAME
 sidebar_label: $T_NAME
----
+description: "$T_DESCRIPTION"
+tags:
+$local_tags_yaml---
 
 import TemplateHeader from '@site/src/components/TemplateHeader';
 

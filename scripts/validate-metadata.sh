@@ -20,8 +20,10 @@ print_section "Validating template metadata"
 ERRORS=0
 TEMPLATES=0
 
-# Mandatory fields (TEMPLATE_TOOLS and TEMPLATE_RELATED can be empty)
-MANDATORY_FIELDS="T_ID T_VER T_NAME T_DESCRIPTION T_CATEGORY T_ABSTRACT T_README T_TAGS T_LOGO T_WEBSITE T_DOCS T_SUMMARY"
+# Mandatory fields — must be non-empty
+MANDATORY_FIELDS="T_ID T_VER T_NAME T_DESCRIPTION T_CATEGORY T_ABSTRACT T_README T_TAGS T_LOGO T_DOCS T_SUMMARY"
+# Fields that must exist but can be empty
+OPTIONAL_VALUE_FIELDS="T_TOOLS T_RELATED T_WEBSITE"
 
 validate_template() {
     local info_file="$1"

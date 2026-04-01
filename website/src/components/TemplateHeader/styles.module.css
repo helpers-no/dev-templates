@@ -99,6 +99,15 @@
   display: inline-block;
   padding: 0.1rem 0.5rem;
   background: var(--ifm-color-emphasis-200);
+  text-decoration: none;
+  color: var(--ifm-color-emphasis-700);
+  cursor: pointer;
+}
+
+.tag:hover {
+  background: var(--ifm-color-emphasis-300);
+  text-decoration: none;
+  color: var(--ifm-color-primary);
   border-radius: 4px;
   font-size: 0.75rem;
   color: var(--ifm-color-emphasis-700);

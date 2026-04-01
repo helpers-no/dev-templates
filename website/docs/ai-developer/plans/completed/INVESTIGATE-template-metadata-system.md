@@ -4,7 +4,9 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Backlog
+## Status: Completed
+
+**Completed**: 2026-04-01
 
 **Goal**: Design and implement a complete template metadata system — aligned with DCT and UIS patterns — that serves the Docusaurus website, template deployment, CLI tooling, and standardised READMEs. This includes enriching TEMPLATE_INFO with mandatory metadata fields, renaming fields for DCT consistency, revising READMEs to a standard structure, and creating the generation scripts (adapted from UIS) that populate the Docusaurus site.
 
@@ -203,7 +205,9 @@ The table compares DCT install scripts, UIS service scripts, and templates. UIS 
 
 **UIS/DCT-only fields** (not needed for templates): Check command, Priority, Helm chart, Namespace, Playbook, Packages, Extensions
 
-**`TEMPLATE_WEBSITE` vs `TEMPLATE_DOCS`**: `TEMPLATE_WEBSITE` is the framework/language homepage (e.g., `https://flask.palletsprojects.com`). `TEMPLATE_DOCS` is the documentation URL (e.g., `https://flask.palletsprojects.com/en/stable/`). For some projects these are the same — in that case use the same URL for both.
+**`TEMPLATE_WEBSITE` vs `TEMPLATE_DOCS`**: `TEMPLATE_WEBSITE` is the framework/language homepage (e.g., `https://flask.palletsprojects.com`). `TEMPLATE_DOCS` is the link to the template source code on GitHub (e.g., `https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver`). On the detail page, this renders as a "View Source" link.
+
+**Done**: All 8 TEMPLATE_INFO files updated to point `TEMPLATE_DOCS` to the GitHub repo source. TemplateHeader component shows "View Source ↗" instead of "Docs ↗".
 
 ### Example: enriched TEMPLATE_INFO
 
@@ -219,7 +223,7 @@ TEMPLATE_README="README-python-basic-webserver.md"
 TEMPLATE_TAGS="python flask webserver api rest"
 TEMPLATE_LOGO="python-basic-webserver-logo.svg"
 TEMPLATE_WEBSITE="https://flask.palletsprojects.com"
-TEMPLATE_DOCS="https://flask.palletsprojects.com/en/stable/"
+TEMPLATE_DOCS="https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver"
 TEMPLATE_SUMMARY="A minimal Python web server using Flask with a health check endpoint, Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow. Ideal for microservices and API backends."
 TEMPLATE_RELATED="typescript-basic-webserver golang-basic-webserver"
 ```
@@ -509,25 +513,28 @@ See `plans/completed/PLAN-template-readme-and-metadata.md`.
 
 **Result:** Docusaurus site auto-generates from metadata. Template cards, category pages, and plan indexes appear on the website. Metadata is validated. Everything works and is testable in this repo alone.
 
-### Phase C: DCT Script Updates (DCT repo — after dev-templates is stable)
+### Additional changes made after Phase B
 
-**Why last:** Only update DCT once the metadata format is finalised and tested in dev-templates. This avoids back-and-forth between repos if field names or formats change.
+These changes were implemented directly without separate plans:
 
-**DCT repo:**
-1. Update `read_template_info()` to read `TEMPLATE_ABSTRACT` (renamed from `TEMPLATE_PURPOSE`) and `TEMPLATE_README`
-2. Update completion message to display README path and `source ~/.bashrc`
-3. Update `dev-template.sh` to read and display extended metadata (tags, website, related)
-4. Update `dev-template-ai.sh` (when implemented) to use the same metadata
-5. Potentially add `dev-template --list` with rich output from metadata
+- **TEMPLATE_DOCS repurposed** — changed from framework documentation URL to template source on GitHub (e.g., `https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver`). TemplateHeader shows "View Source ↗" instead of "Docs ↗". All 8 TEMPLATE_INFO files updated.
+- **TEMPLATE_WEBSITE cleared** — set to empty on all templates. Will be used for live demo URLs in the future. TemplateHeader hides the "Website" link when empty. Validation allows empty value.
+- **Tags made clickable** — added `tags:` to generated MDX frontmatter. Docusaurus auto-generates tag pages at `/docs/tags/<tag>`. TemplateHeader tags link to these pages.
+- **Description in frontmatter** — added `description:` to generated MDX frontmatter (from TEMPLATE_DESCRIPTION) so Docusaurus tag pages show the description instead of raw MDX component text.
+- **Category renamed** — `WEB_SERVER` → `BASIC_WEB_SERVER` to clarify these are basic Hello World templates.
 
-**DCT companion plans:**
-- `PLAN-template-readme-instructions.md` — TEMPLATE_README + ABSTRACT rename in `read_template_info()`
-- `PLAN-template-tools-dct.md` — TEMPLATE_TOOLS support (already completed on dev-templates side)
+### Phase C: DCT Script Updates
+
+Split out to separate investigation: [INVESTIGATE-dct-template-metadata-update.md](INVESTIGATE-dct-template-metadata-update.md)
 
 ---
 
+## Status
+
+All dev-templates work is complete. Phases A and B implemented, plus additional post-Phase B changes. Phase C (DCT updates) is tracked separately.
+
 ## Next Steps
 
-- [x] Create PLAN for Phase A (TEMPLATE_README + README revision + PURPOSE→ABSTRACT rename) ✓ — completed 2026-03-31
-- [x] Create PLAN for Phase B (full metadata + generation scripts) ✓ — completed 2026-03-31
-- [ ] Phase C is tracked in DCT repo
+- [x] Create PLAN for Phase A ✓ — completed 2026-03-31
+- [x] Create PLAN for Phase B ✓ — completed 2026-03-31
+- [x] Phase C split to [INVESTIGATE-dct-template-metadata-update.md](INVESTIGATE-dct-template-metadata-update.md)
