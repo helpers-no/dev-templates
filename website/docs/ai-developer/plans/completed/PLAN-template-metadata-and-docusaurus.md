@@ -8,7 +8,7 @@
 
 **Goal**: Add all remaining metadata fields to TEMPLATE_INFO files, create generation scripts (adapted from UIS), and build the Docusaurus pipeline to auto-generate template pages, category pages, and plan indexes from metadata.
 
-**Investigation**: [INVESTIGATE-template-metadata-system.md](../backlog/INVESTIGATE-template-metadata-system.md)
+**Investigation**: [INVESTIGATE-template-metadata-system.md](INVESTIGATE-template-metadata-system.md)
 
 **Prerequisites**: Phase A completed (TEMPLATE_README + TEMPLATE_ABSTRACT — done 2026-03-31)
 

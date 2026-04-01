@@ -13,7 +13,7 @@
 **Last Updated**: 2026-04-01
 
 **Related**:
-- [INVESTIGATE-template-metadata-system.md](INVESTIGATE-template-metadata-system.md) — the dev-templates investigation that defined the metadata system (completed Phase A + B)
+- [INVESTIGATE-template-metadata-system.md](../completed/INVESTIGATE-template-metadata-system.md) — the dev-templates investigation that defined the metadata system (completed Phase A + B)
 - `helpers-no/devcontainer-toolbox` (DCT) — where the changes need to be made
 - DCT plans already in backlog: `PLAN-template-readme-instructions.md`, `PLAN-template-tools-dct.md`
 
