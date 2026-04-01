@@ -5,7 +5,7 @@
       "order": 0,
       "description": "Minimal web server templates that demonstrate Hello World in multiple languages",
       "tags": "webserver backend hello-world starter",
-      "icon": "server",
+      "icon": "webserver-logo.svg",
       "logo": "webserver-logo.svg"
     }
 ,
@@ -15,7 +15,7 @@
       "order": 1,
       "description": "Frontend web application starter templates",
       "tags": "webapp frontend react vite",
-      "icon": "layout",
+      "icon": "webapp-logo.svg",
       "logo": "webapp-logo.svg"
     }
 ,
@@ -25,7 +25,7 @@
       "order": 2,
       "description": "AI-assisted development workflow templates",
       "tags": "ai workflow planning automation",
-      "icon": "clipboard",
+      "icon": "workflow-logo.svg",
       "logo": "workflow-logo.svg"
     }
 ]}

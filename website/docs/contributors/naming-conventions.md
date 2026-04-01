@@ -25,13 +25,17 @@ TEMPLATE_ID="python-basic-webserver"
 
 ## TEMPLATE_CATEGORY
 
-Uppercase with underscores. Must be a valid category defined in `scripts/lib/categories.sh`.
+Uppercase with underscores. Must be a valid category defined in `scripts/lib/TEMPLATE_CATEGORIES`.
 
-| Category ID | Use for |
-|------------|---------|
-| `BASIC_WEB_SERVER` | Minimal web servers that demonstrate Hello World |
-| `WEB_APP` | Frontend web applications (React, Vue, etc.) |
-| `WORKFLOW` | AI-assisted development workflow templates |
+| Category ID | Use for | Emoji |
+|------------|---------|-------|
+| `BASIC_WEB_SERVER` | Minimal web servers that demonstrate Hello World | 🌐 |
+| `WEB_APP` | Frontend web applications (React, Vue, etc.) | 📱 |
+| `WORKFLOW` | AI-assisted development workflow templates | 🤖 |
+
+### Adding a new category
+
+Edit `scripts/lib/TEMPLATE_CATEGORIES` (the source of truth). Format: `ORDER|ID|NAME|DESCRIPTION|TAGS|LOGO|EMOJI`. CI automatically copies it to `templates/` and `ai-templates/`. Do NOT edit the copies directly — they have an "AUTO-GENERATED" header and will be overwritten.
 
 ## README File
 

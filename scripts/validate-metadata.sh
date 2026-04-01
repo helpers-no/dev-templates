@@ -20,6 +20,61 @@ print_section "Validating template metadata"
 ERRORS=0
 TEMPLATES=0
 
+#------------------------------------------------------------------------------
+# Validate TEMPLATE_CATEGORIES
+#------------------------------------------------------------------------------
+print_subsection "Validating TEMPLATE_CATEGORIES"
+
+CATEGORIES_SRC="$REPO_ROOT/scripts/lib/TEMPLATE_CATEGORIES"
+
+# Check source file exists
+if [[ ! -f "$CATEGORIES_SRC" ]]; then
+    log_error "TEMPLATE_CATEGORIES source not found: $CATEGORIES_SRC"
+    ((ERRORS++)) || true
+else
+    log_success "Source file exists: scripts/lib/TEMPLATE_CATEGORIES"
+
+    # Validate each row has all 7 fields
+    while IFS='|' read -r _order _id _name _desc _tags _logo _emoji; do
+        [[ -z "$_id" ]] && continue
+        local_has_error=false
+
+        [[ -z "$_order" ]] && log_error "Category '$_id': missing ORDER" && local_has_error=true
+        [[ -z "$_name" ]] && log_error "Category '$_id': missing NAME" && local_has_error=true
+        [[ -z "$_desc" ]] && log_error "Category '$_id': missing DESCRIPTION" && local_has_error=true
+        [[ -z "$_tags" ]] && log_error "Category '$_id': missing TAGS" && local_has_error=true
+        [[ -z "$_logo" ]] && log_error "Category '$_id': missing LOGO" && local_has_error=true
+        [[ -z "$_emoji" ]] && log_error "Category '$_id': missing EMOJI" && local_has_error=true
+
+        if [[ "$local_has_error" == "true" ]]; then
+            ((ERRORS++)) || true
+        else
+            log_success "Category '$_id' — all fields valid"
+        fi
+    done <<< "$(grep -v "^$" "$CATEGORIES_SRC" | grep -v "^#" | grep -v "^if " | grep -v "^fi" | grep -v "readonly" | grep "|")"
+
+    # Check copies are in sync
+    for dir in templates ai-templates; do
+        local_copy="$REPO_ROOT/$dir/TEMPLATE_CATEGORIES"
+        if [[ ! -f "$local_copy" ]]; then
+            log_error "$dir/TEMPLATE_CATEGORIES missing — run CI sync or copy manually"
+            ((ERRORS++)) || true
+        else
+            # Compare the TEMPLATE_CATEGORY_TABLE content only
+            local_src_content=$(grep "|" "$CATEGORIES_SRC" || true)
+            local_copy_content=$(grep "|" "$local_copy" || true)
+            if [[ "$local_src_content" != "$local_copy_content" ]]; then
+                log_error "$dir/TEMPLATE_CATEGORIES is out of sync with scripts/lib/TEMPLATE_CATEGORIES"
+                ((ERRORS++)) || true
+            else
+                log_success "$dir/TEMPLATE_CATEGORIES in sync"
+            fi
+        fi
+    done
+fi
+
+echo ""
+
 # Mandatory fields — must be non-empty
 MANDATORY_FIELDS="T_ID T_VER T_NAME T_DESCRIPTION T_CATEGORY T_ABSTRACT T_README T_TAGS T_LOGO T_DOCS T_SUMMARY"
 # Fields that must exist but can be empty

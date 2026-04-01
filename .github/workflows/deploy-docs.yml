@@ -28,6 +28,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Sync TEMPLATE_CATEGORIES to template folders
+        run: |
+          for dir in templates ai-templates; do
+            {
+              echo "# AUTO-GENERATED — DO NOT EDIT"
+              echo "# This file is a copy of scripts/lib/TEMPLATE_CATEGORIES"
+              echo "# Edit the original and it will be synced here automatically by CI."
+              echo "#"
+              cat scripts/lib/TEMPLATE_CATEGORIES
+            } > "$dir/TEMPLATE_CATEGORIES"
+          done
+
       - name: Validate template metadata
         run: bash scripts/validate-metadata.sh
 

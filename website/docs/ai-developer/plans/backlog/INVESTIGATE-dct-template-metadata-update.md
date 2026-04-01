@@ -68,13 +68,15 @@ These plans already exist in `helpers-no/devcontainer-toolbox`:
 
 ### `PLAN-template-tools-dct.md`
 - Covers: `TEMPLATE_TOOLS` auto-install
-- Status: Backlog
-- Updated: 2026-03-30 (dev-templates side completed)
+- Status: **Completed** (2026-03-30)
 
 ### What's NOT covered by existing DCT plans
-- `BASIC_WEB_SERVER` category rename (affects menu grouping in `dev-template.sh`)
-- Extended metadata fields (ID, VER, TAGS, SUMMARY, LOGO, WEBSITE, DOCS, RELATED)
-- `dev-template-ai.sh` implementation
+- `BASIC_WEB_SERVER` category rename (affects menu grouping in `dev-template.sh` — the hardcoded `WEB_SERVER` category in the dialog menu must be updated)
+- Extended metadata fields (ID, VER, TAGS, SUMMARY, LOGO, WEBSITE, DOCS, RELATED) — not urgent, but enables future `dev-template --list` with rich output
+- `dev-template-ai.sh` implementation — tracked separately in DCT's `INVESTIGATE-ai-workflow-installer.md` (completed)
+
+### DCT investigation created
+`INVESTIGATE-template-categories-dynamic.md` created in DCT backlog — covers replacing hardcoded categories with dynamic `TEMPLATE_CATEGORIES` sourcing, including file format, location, and implementation guidance.
 
 ---
 
@@ -84,12 +86,41 @@ These plans already exist in `helpers-no/devcontainer-toolbox`:
 - **dev-templates side is done** — all metadata is stable on `main`, Docusaurus generates from it
 - **DCT changes are independent** — the DCT maintainer can implement at their pace
 - **Test with**: after DCT changes, run `dev-template` inside a devcontainer and verify it reads the new fields correctly from the dev-templates repo
+- **The category rename is critical** — categories are hardcoded in `dev-template.sh` (lines ~120-180) as `CATEGORY_WEB_SERVER`, `CATEGORY_WEB_APP`, and `CATEGORY_OTHER`. The `case` statement on line ~140 matches `WEB_SERVER)` which won't match `BASIC_WEB_SERVER` — templates will fall into "Other". The fix is to update the case statement and associative array variable names. Ideally DCT should stop hardcoding categories and instead read them dynamically from the `TEMPLATE_CATEGORY` values in the downloaded TEMPLATE_INFO files.
+- **Canonical category list** — the source of truth for categories is `scripts/lib/TEMPLATE_CATEGORIES` in the dev-templates repo. Current categories: `BASIC_WEB_SERVER`, `WEB_APP`, `WORKFLOW`.
+
+### How DCT gets the category file — IMPLEMENTED
+
+DCT uses **git sparse-checkout** to download only the `templates/` (or `ai-templates/`) folder — not the full repo. So files in `scripts/lib/` are not available to DCT at runtime.
+
+**Solution (implemented):** The dev-templates repo maintains the category definitions in one place (`scripts/lib/TEMPLATE_CATEGORIES`) and CI automatically copies it into both `templates/` and `ai-templates/` with an "AUTO-GENERATED — DO NOT EDIT" header. This way:
+
+- **Source of truth**: `scripts/lib/TEMPLATE_CATEGORIES` (edit only here)
+- **Auto-copied to**: `templates/TEMPLATE_CATEGORIES` and `ai-templates/TEMPLATE_CATEGORIES` (by CI, with DO NOT EDIT header)
+- **DCT reads**: `$TEMPLATE_REPO_DIR/templates/TEMPLATE_CATEGORIES` (already in the sparse-checkout, no extra download)
+- **Format**: DCT-style `CATEGORY_TABLE` (pipe-delimited, can be sourced as bash)
+- **Fields**: `ORDER|ID|NAME|DESCRIPTION|TAGS|LOGO|EMOJI`
+- **Emoji field**: used by DCT for terminal dialog menus (🌐=Basic Web Server, 📱=Web App, 🤖=Workflow)
+- **`scripts/lib/categories.sh`** sources `TEMPLATE_CATEGORIES` instead of having its own data — one source of truth
+
+**dev-templates tasks — ALL DONE:**
+- [x] Created `scripts/lib/TEMPLATE_CATEGORIES` with DCT-style `CATEGORY_TABLE` format including emoji field
+- [x] CI auto-copies to `templates/` and `ai-templates/` with "DO NOT EDIT" header
+- [x] `scripts/lib/categories.sh` sources from `TEMPLATE_CATEGORIES` — no duplicate data
+- [x] Added `get_category_emoji()` function
+
+**DCT tasks** (dev-templates side is ready):
+- [ ] Update `dev-template.sh` to source `$TEMPLATE_REPO_DIR/templates/TEMPLATE_CATEGORIES`
+- [ ] Update `dev-template-ai.sh` to source `$TEMPLATE_REPO_DIR/ai-templates/TEMPLATE_CATEGORIES` (script exists, also has hardcoded `CATEGORY_WORKFLOW` and `CATEGORY_OTHER`)
+- [ ] Replace hardcoded category `case` statements and associative arrays in both scripts with dynamic grouping from `TEMPLATE_CATEGORY_TABLE`
+- [ ] Use emoji from `TEMPLATE_CATEGORY_TABLE` instead of hardcoded emojis
+- [ ] Consider moving the category parsing to `lib/template-common.sh` since both scripts need it
 
 ---
 
 ## Next Steps
 
 - [ ] DCT maintainer implements `PLAN-template-readme-instructions.md` (TEMPLATE_README + ABSTRACT rename)
-- [ ] DCT maintainer implements `PLAN-template-tools-dct.md` (TEMPLATE_TOOLS auto-install)
-- [ ] DCT maintainer handles BASIC_WEB_SERVER category rename
+- [x] DCT maintainer implements `PLAN-template-tools-dct.md` (TEMPLATE_TOOLS auto-install) ✓ — completed 2026-03-30
+- [ ] DCT maintainer sources `TEMPLATE_CATEGORIES` and replaces hardcoded categories/emojis
 - [ ] DCT maintainer considers extended metadata for future `dev-template --list`

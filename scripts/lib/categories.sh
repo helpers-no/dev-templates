@@ -14,16 +14,18 @@
 [[ -n "${_CATEGORIES_LOADED:-}" ]] && return 0
 _CATEGORIES_LOADED=1
 
-# Category definitions as indexed arrays (bash 3.x compatible)
-# Format: ID|Display Name|Description|tags|icon|logo
-_CATEGORY_DATA=(
-    "BASIC_WEB_SERVER|Basic Web Server Templates|Minimal web server templates that demonstrate Hello World in multiple languages|webserver backend hello-world starter|server|webserver-logo.svg"
-    "WEB_APP|Web Application Templates|Frontend web application starter templates|webapp frontend react vite|layout|webapp-logo.svg"
-    "WORKFLOW|Workflow Templates|AI-assisted development workflow templates|ai workflow planning automation|clipboard|workflow-logo.svg"
-)
+# Source the canonical category definitions
+_CATEGORIES_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_CATEGORIES_SCRIPT_DIR/TEMPLATE_CATEGORIES"
 
-# Category display order (just the IDs)
-CATEGORY_ORDER=(BASIC_WEB_SERVER WEB_APP WORKFLOW)
+# Build indexed arrays from TEMPLATE_CATEGORY_TABLE (bash 3.x compatible)
+_CATEGORY_DATA=()
+CATEGORY_ORDER=()
+while IFS='|' read -r _order _id _name _desc _tags _logo _emoji; do
+    [[ -z "$_id" ]] && continue
+    _CATEGORY_DATA+=("${_id}|${_name}|${_desc}|${_tags}|${_logo}|${_emoji}")
+    CATEGORY_ORDER+=("$_id")
+done <<< "$(echo "$TEMPLATE_CATEGORY_TABLE" | grep -v "^$")"
 
 # Internal: Find category data by ID
 _find_category_data() {
@@ -82,7 +84,20 @@ get_category_icon() {
 }
 
 # Get logo filename for a category
+# Format: ID|Name|Description|Tags|Logo|Emoji — logo is 5th field
 get_category_logo() {
+    local cat_id="$1"
+    local data
+    data=$(_find_category_data "$cat_id") || return 1
+    local rest="${data#*|}"      # Remove ID|
+    rest="${rest#*|}"            # Remove Name|
+    rest="${rest#*|}"            # Remove Description|
+    rest="${rest#*|}"            # Remove Tags|
+    echo "${rest%%|*}"           # Get Logo (before Emoji|)
+}
+
+# Get emoji for a category
+get_category_emoji() {
     local cat_id="$1"
     local data
     data=$(_find_category_data "$cat_id") || return 1
