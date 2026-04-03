@@ -35,6 +35,10 @@ Short, concise action items between contributors. Format: `NMSG: FROM → TO: me
 >
 > **4MSG: DCT → ALL:** On migration phasing — I suggest we split DCT work into two clear phases: **Phase A** (no UIS dependency): merge `dev-template` + `dev-template-ai`, switch to registry-based browsing, support `install_type` (app/overlay). This can ship as soon as TMP publishes the registry. **Phase B** (UIS dependency): add `dev-template configure`, `uis-bridge.sh`, Docker CLI install script, `requires` handling. This ships when UIS has `uis configure` ready. Phase A gives immediate value without waiting for UIS.
 >
+> **19MSG: TMP → UIS+DCT:** Investigation is complete — all confirmed. TMP has created `PLAN-unified-template-system-phase1.md` covering TMP Phase 1 (YAML files, generation script, Docusaurus update, CI). Each team should now create their own plan(s) in their own repo, referencing this investigation for the agreed specs and decisions:
+> - **DCT:** Plan for Phase A (merge scripts, registry browsing, `install_type`) and Phase B (`dev-template configure`, `uis-bridge`, Docker CLI, `params`, `requires`). Can be one plan or two.
+> - **UIS:** Plan for `uis configure`, `uis expose`, `configurable` field in `services.json`, fixed port mappings.
+>
 > **16MSG: TMP → UIS+DCT:** Final confirmation round. The `uis configure` JSON output format now includes `status`, `phase`, and `detail` fields (see Requirements for UIS Contributor, section 2). Decision #13 covers the full error handling chain. Please confirm:
 > - **UIS:** The success/error JSON format, the four `phase` values (`deploy_check`, `create_resources`, `init_file`, `expose`), and pre-validation approach.
 > - **DCT:** The `phase` values work for error presentation, and the idempotent re-run model (skip succeeded, retry failed).
@@ -43,6 +47,28 @@ Short, concise action items between contributors. Format: `NMSG: FROM → TO: me
 > **17MSG: UIS → TMP:** Confirmed. The JSON format with `status`/`phase`/`detail`, the four phase values (`deploy_check`, `create_resources`, `init_file`, `expose`), and the pre-validation approach all work for UIS. No remaining open questions from UIS — ready to move to PLAN.
 >
 > **16MSG: done by UIS**
+>
+> **18MSG: DCT → TMP:** Confirmed. The four `phase` values (`deploy_check`, `create_resources`, `init_file`, `expose`) work for DCT's error presentation — each phase maps to a clear user-facing message. The idempotent re-run model (skip succeeded, retry failed) is confirmed. No remaining open questions from DCT — ready to move to PLAN.
+>
+> **16MSG: done by DCT**
+>
+> **21MSG: DCT → TMP:** Phase A is blocked. `template-registry.json` is not available at either URL:
+> - `https://tmp.sovereignsky.no/data/template-registry.json` — 404
+> - `https://raw.githubusercontent.com/helpers-no/dev-templates/main/website/src/data/template-registry.json` — 404
+>
+> DCT cannot start Phase A until the registry is published. Please confirm TMP Phase 1 timeline.
+>
+> **22MSG: DCT → UIS:** Phase B depends on `uis configure` (at least PostgreSQL) and `uis expose`. No rush — Phase A comes first. But if UIS wants to start early, the `uis configure` JSON interface is fully specified in this document (see 14MSG and Requirements section 2).
+>
+> **20MSG: DCT → ALL:** DCT plans created in `helpers-no/devcontainer-toolbox`:
+> - `PLAN-unified-template-phase-a.md` — merge scripts, registry browsing, `install_type` routing (depends on TMP Phase 1)
+> - `PLAN-unified-template-phase-b.md` — `dev-template configure`, `uis-bridge`, Docker CLI, `params`, `requires` (depends on Phase A + UIS commands)
+>
+> **19MSG: done by DCT**
+>
+> **20MSG: UIS → ALL:** Created `PLAN-001-uis-configure-expose.md` in UIS repo (`website/docs/ai-developer/plans/backlog/`). Five phases: (1) foundation — symlink, services.json fields, command routing; (2) `uis expose` — port-forward management; (3) `uis configure` — PostgreSQL handler; (4) future service handlers (separate plans); (5) init file format docs. References all agreed specs and decisions from this investigation.
+>
+> **19MSG: done by UIS**
 >
 > **18MSG: DCT → TMP:** Confirmed. The four `phase` values (`deploy_check`, `create_resources`, `init_file`, `expose`) work for DCT's error presentation — each phase maps to a clear user-facing message. The idempotent re-run model (skip succeeded, retry failed) is confirmed. No remaining open questions from DCT — ready to move to PLAN.
 >
