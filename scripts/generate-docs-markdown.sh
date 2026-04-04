@@ -1,17 +1,15 @@
 #!/bin/bash
 # generate-docs-markdown.sh - Generate Docusaurus template pages (MDX)
 #
-# Scans TEMPLATE_INFO files and generates MDX detail pages with
+# Reads template-registry.json and generates MDX detail pages with
 # TemplateHeader component and embedded README content.
-# Also generates category index pages and templates overview.
-# Compatible with bash 3.x (macOS default).
+# Also generates category index pages.
 #
 # Usage: bash scripts/generate-docs-markdown.sh [--force]
 #
 # Output:
 #   website/docs/templates/<category>/<template-id>.mdx
 #   website/docs/templates/<category>/index.md
-#   website/docs/templates/index.md
 
 set -e
 
@@ -19,18 +17,19 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 source "$SCRIPT_DIR/lib/logging.sh"
-source "$SCRIPT_DIR/lib/categories.sh"
-source "$SCRIPT_DIR/lib/template-scanner.sh"
 
 FORCE=false
 [[ "${1:-}" == "--force" ]] && FORCE=true
 
+REGISTRY="$REPO_ROOT/website/src/data/template-registry.json"
 DOCS_DIR="$REPO_ROOT/website/docs/templates"
 mkdir -p "$DOCS_DIR"
 
-# Temp file for collecting templates per category
-TMPFILE=$(mktemp)
-trap "rm -f $TMPFILE" EXIT
+if [[ ! -f "$REGISTRY" ]]; then
+    log_error "Registry not found: $REGISTRY"
+    log_error "Run: bash scripts/generate-registry.sh"
+    exit 1
+fi
 
 print_section "Generating template documentation pages"
 
@@ -38,19 +37,19 @@ print_section "Generating template documentation pages"
 # Find README file for a template
 #------------------------------------------------------------------------------
 _find_readme() {
-    local info_file="$1"
-    local template_dir
-    template_dir="$(dirname "$info_file")"
+    local folder="$1"
+    local readme="$2"
+    local template_dir="$REPO_ROOT/$folder"
 
-    # Check if this is an ai-template (has template/ subdirectory)
-    if [[ -f "$template_dir/template/$T_README" ]]; then
-        echo "$template_dir/template/$T_README"
+    # Check if this is an overlay template (has template/ subdirectory)
+    if [[ -f "$template_dir/template/$readme" ]]; then
+        echo "$template_dir/template/$readme"
         return 0
     fi
 
     # App template — README is in the same directory
-    if [[ -f "$template_dir/$T_README" ]]; then
-        echo "$template_dir/$T_README"
+    if [[ -f "$template_dir/$readme" ]]; then
+        echo "$template_dir/$readme"
         return 0
     fi
 
@@ -62,132 +61,90 @@ _find_readme() {
 #------------------------------------------------------------------------------
 _get_readme_content() {
     local readme_file="$1"
-    # Skip the first line if it starts with #
     awk 'NR==1 && /^# /{next} {print}' "$readme_file"
 }
 
 #------------------------------------------------------------------------------
-# Resolve related template ID to link path and name
-#------------------------------------------------------------------------------
-_resolve_related() {
-    local rel_id="$1"
-
-    # Search app templates
-    for info_file in "$REPO_ROOT"/templates/*/TEMPLATE_INFO; do
-        [[ -f "$info_file" ]] || continue
-        local saved_id="$T_ID" saved_name="$T_NAME" saved_cat="$T_CATEGORY"
-
-        extract_template_metadata "$info_file"
-        if [[ "$T_ID" == "$rel_id" ]]; then
-            local cat_dir
-            cat_dir=$(echo "$T_CATEGORY" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
-            echo "[$T_NAME](../$cat_dir/$T_ID)"
-
-            T_ID="$saved_id" T_NAME="$saved_name" T_CATEGORY="$saved_cat"
-            return 0
-        fi
-        T_ID="$saved_id" T_NAME="$saved_name" T_CATEGORY="$saved_cat"
-    done
-
-    # Search ai templates
-    for info_file in "$REPO_ROOT"/ai-templates/*/TEMPLATE_INFO; do
-        [[ -f "$info_file" ]] || continue
-        local saved_id="$T_ID" saved_name="$T_NAME" saved_cat="$T_CATEGORY"
-
-        extract_template_metadata "$info_file"
-        if [[ "$T_ID" == "$rel_id" ]]; then
-            local cat_dir
-            cat_dir=$(echo "$T_CATEGORY" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
-            echo "[$T_NAME](../$cat_dir/$T_ID)"
-
-            T_ID="$saved_id" T_NAME="$saved_name" T_CATEGORY="$saved_cat"
-            return 0
-        fi
-        T_ID="$saved_id" T_NAME="$saved_name" T_CATEGORY="$saved_cat"
-    done
-
-    # Not found — return plain text
-    echo "$rel_id"
-}
-
-#------------------------------------------------------------------------------
-# First pass: generate detail pages and collect category membership
+# First pass: generate detail pages
 #------------------------------------------------------------------------------
 print_subsection "Template detail pages"
 
 page_count=0
-for info_file in "$REPO_ROOT"/templates/*/TEMPLATE_INFO "$REPO_ROOT"/ai-templates/*/TEMPLATE_INFO; do
-    [[ -f "$info_file" ]] || continue
-    extract_template_metadata "$info_file"
-    [[ -z "$T_ID" ]] && continue
+template_count=$(jq '.templates | length' "$REGISTRY")
 
-    # Record category membership
-    echo "$T_CATEGORY|$info_file" >> "$TMPFILE"
+for i in $(seq 0 $((template_count - 1))); do
+    # Extract fields from registry
+    tid=$(jq -r ".templates[$i].id" "$REGISTRY")
+    folder=$(jq -r ".templates[$i].folder" "$REGISTRY")
+    version=$(jq -r ".templates[$i].version" "$REGISTRY")
+    name=$(jq -r ".templates[$i].name" "$REGISTRY")
+    description=$(jq -r ".templates[$i].description" "$REGISTRY")
+    category=$(jq -r ".templates[$i].category" "$REGISTRY")
+    install_type=$(jq -r ".templates[$i].install_type" "$REGISTRY")
+    abstract=$(jq -r ".templates[$i].abstract" "$REGISTRY")
+    tools=$(jq -r ".templates[$i].tools" "$REGISTRY")
+    readme=$(jq -r ".templates[$i].readme" "$REGISTRY")
+    logo=$(jq -r ".templates[$i].logo" "$REGISTRY")
+    website=$(jq -r ".templates[$i].website" "$REGISTRY")
+    docs=$(jq -r ".templates[$i].docs" "$REGISTRY")
+    summary=$(jq -r ".templates[$i].summary" "$REGISTRY")
 
-    # Determine category folder name
-    cat_dir=$(echo "$T_CATEGORY" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
+    [[ -z "$tid" || "$tid" == "null" ]] && continue
+
+    # Category folder name
+    cat_dir=$(echo "$category" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
     page_dir="$DOCS_DIR/$cat_dir"
-    page_file="$page_dir/$T_ID.mdx"
+    page_file="$page_dir/$tid.mdx"
 
     mkdir -p "$page_dir"
 
-    # Also remove old .md file if it exists (we now generate .mdx)
-    [[ -f "$page_dir/$T_ID.md" ]] && rm "$page_dir/$T_ID.md"
+    # Remove old .md file if it exists (we generate .mdx)
+    [[ -f "$page_dir/$tid.md" ]] && rm "$page_dir/$tid.md"
 
     if [[ -f "$page_file" && "$FORCE" != "true" ]]; then
-        log_info "Skipping $T_ID (exists, use --force to overwrite)"
+        log_info "Skipping $tid (exists, use --force to overwrite)"
         continue
     fi
 
-    # Determine install command
-    local_install_cmd="dev-template $T_ID"
-    if [[ "$(dirname "$(dirname "$info_file")")" == *"ai-templates"* || "$(dirname "$info_file")" == *"ai-templates"* ]]; then
-        local_install_cmd="dev-template-ai $T_ID"
-    fi
+    # Install command — always dev-template now (unified command)
+    local_install_cmd="dev-template $tid"
 
-    # Build tags array for MDX
-    local_tags_mdx="["
-    local_tags_first=true
-    for tag in $T_TAGS; do
-        [[ "$local_tags_first" != "true" ]] && local_tags_mdx+=", "
-        local_tags_first=false
-        local_tags_mdx+="\"$tag\""
-    done
-    local_tags_mdx+="]"
+    # Build tags array for MDX component
+    local_tags_mdx=$(jq -r ".templates[$i].tags | @json" "$REGISTRY")
 
     # Build tags list for frontmatter
     local_tags_yaml=""
-    for tag in $T_TAGS; do
+    while IFS= read -r tag; do
         local_tags_yaml+="  - $tag
 "
-    done
+    done < <(jq -r ".templates[$i].tags[]" "$REGISTRY")
 
     # Write MDX file
     cat > "$page_file" <<MDXEOF
 ---
-title: $T_NAME
-sidebar_label: $T_NAME
-description: "$T_DESCRIPTION"
+title: $name
+sidebar_label: $name
+description: "$description"
 tags:
 $local_tags_yaml---
 
 import TemplateHeader from '@site/src/components/TemplateHeader';
 
 <TemplateHeader
-  logo="/img/templates/$T_LOGO"
-  name="$T_NAME"
-  version="$T_VER"
-  description="$T_DESCRIPTION"
+  logo="/img/templates/$logo"
+  name="$name"
+  version="$version"
+  description="$description"
   install="$local_install_cmd"
-  website="$T_WEBSITE"
-  docs="$T_DOCS"
+  website="$website"
+  docs="$docs"
   tags={$local_tags_mdx}
-  tools="$T_TOOLS"
+  tools="$tools"
 />
 
 ## Summary
 
-$(json_escape "$T_SUMMARY")
+$summary
 
 ---
 
@@ -195,30 +152,39 @@ MDXEOF
 
     # Embed README content
     local_readme_file=""
-    local_readme_file=$(_find_readme "$info_file") || true
+    local_readme_file=$(_find_readme "$folder" "$readme") || true
 
     if [[ -n "$local_readme_file" && -f "$local_readme_file" ]]; then
         _get_readme_content "$local_readme_file" >> "$page_file"
         echo "" >> "$page_file"
     else
-        log_warn "$T_ID: README file not found ($T_README)"
+        log_warn "$tid: README file not found ($readme)"
     fi
 
     # Add related templates
-    if [[ -n "$T_RELATED" ]]; then
+    local_related=$(jq -r ".templates[$i].related[]?" "$REGISTRY")
+    if [[ -n "$local_related" ]]; then
         echo "---" >> "$page_file"
         echo "" >> "$page_file"
         echo "## Related Templates" >> "$page_file"
         echo "" >> "$page_file"
-        for rel_id in $T_RELATED; do
-            local_resolved=$(_resolve_related "$rel_id")
-            echo "- $local_resolved" >> "$page_file"
-        done
+        while IFS= read -r rel_id; do
+            [[ -z "$rel_id" ]] && continue
+            # Look up related template name and category from registry
+            rel_name=$(jq -r ".templates[] | select(.id == \"$rel_id\") | .name" "$REGISTRY")
+            rel_cat=$(jq -r ".templates[] | select(.id == \"$rel_id\") | .category" "$REGISTRY")
+            if [[ -n "$rel_name" && "$rel_name" != "null" ]]; then
+                rel_cat_dir=$(echo "$rel_cat" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
+                echo "- [$rel_name](../$rel_cat_dir/$rel_id)" >> "$page_file"
+            else
+                echo "- $rel_id" >> "$page_file"
+            fi
+        done <<< "$local_related"
         echo "" >> "$page_file"
     fi
 
     ((page_count++)) || true
-    log_success "$T_ID → $cat_dir/$T_ID.mdx"
+    log_success "$tid → $cat_dir/$tid.mdx"
 done
 
 #------------------------------------------------------------------------------
@@ -226,17 +192,22 @@ done
 #------------------------------------------------------------------------------
 print_subsection "Category index pages"
 
-for cat_id in "${CATEGORY_ORDER[@]}"; do
-    cat_dir=$(echo "$cat_id" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
-    index_file="$DOCS_DIR/$cat_dir/index.md"
+cat_count=$(jq '.categories | length' "$REGISTRY")
 
-    cat_files=$(grep "^${cat_id}|" "$TMPFILE" 2>/dev/null || true)
-    [[ -z "$cat_files" ]] && continue
+for i in $(seq 0 $((cat_count - 1))); do
+    cat_id=$(jq -r ".categories[$i].id" "$REGISTRY")
+    cat_name=$(jq -r ".categories[$i].name" "$REGISTRY")
+    cat_desc=$(jq -r ".categories[$i].description" "$REGISTRY")
+    cat_order=$(jq -r ".categories[$i].order" "$REGISTRY")
+
+    cat_dir=$(echo "$cat_id" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
+
+    # Check if any templates belong to this category
+    tmpl_in_cat=$(jq -r ".templates[] | select(.category == \"$cat_id\") | .id" "$REGISTRY")
+    [[ -z "$tmpl_in_cat" ]] && continue
 
     mkdir -p "$DOCS_DIR/$cat_dir"
-
-    cat_name=$(get_category_name "$cat_id")
-    cat_desc=$(get_category_description "$cat_id")
+    index_file="$DOCS_DIR/$cat_dir/index.md"
 
     cat > "$index_file" <<EOF
 ---
@@ -252,25 +223,15 @@ $cat_desc
 |----------|-------------|---------|
 EOF
 
-    while IFS='|' read -r _ local_info_file; do
-        [[ -z "$local_info_file" || ! -f "$local_info_file" ]] && continue
-        extract_template_metadata "$local_info_file"
-        [[ -z "$T_ID" ]] && continue
-        local_cmd="dev-template $T_ID"
-        if [[ "$local_info_file" == *"ai-templates"* ]]; then
-            local_cmd="dev-template-ai $T_ID"
-        fi
-        echo "| [$T_NAME]($T_ID) | $T_DESCRIPTION | \`$local_cmd\` |" >> "$index_file"
-    done <<< "$cat_files"
+    while IFS= read -r tmpl_id; do
+        [[ -z "$tmpl_id" ]] && continue
+        tmpl_name=$(jq -r ".templates[] | select(.id == \"$tmpl_id\") | .name" "$REGISTRY")
+        tmpl_desc=$(jq -r ".templates[] | select(.id == \"$tmpl_id\") | .description" "$REGISTRY")
+        echo "| [$tmpl_name]($tmpl_id) | $tmpl_desc | \`dev-template $tmpl_id\` |" >> "$index_file"
+    done <<< "$tmpl_in_cat"
 
     # Generate _category_.json for Docusaurus sidebar
-    local_position=1
-    case "$cat_id" in
-        WEB_SERVER) local_position=1 ;;
-        WEB_APP) local_position=2 ;;
-        WORKFLOW) local_position=3 ;;
-        *) local_position=9 ;;
-    esac
+    local_position=$((cat_order + 1))
 
     cat > "$DOCS_DIR/$cat_dir/_category_.json" <<CATEOF
 {

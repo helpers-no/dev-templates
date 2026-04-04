@@ -121,21 +121,23 @@ CI pipeline runs green. `template-registry.json` is auto-generated and committed
 
 ---
 
-## Phase 5: Cleanup (after DCT Phase A ships)
+## Phase 5: Cleanup (after DCT Phase A ships) — DONE
 
-This phase is **blocked** until DCT confirms their Phase A migration is complete and they no longer read `TEMPLATE_INFO` or `TEMPLATE_CATEGORIES`.
+DCT Phase A confirmed complete (23MSG). Old format files removed.
 
 ### Tasks
 
-- [ ] 5.1 Remove `TEMPLATE_INFO` files from all template directories (8 files)
-- [ ] 5.2 Remove `scripts/lib/TEMPLATE_CATEGORIES`
-- [ ] 5.3 Remove `templates/TEMPLATE_CATEGORIES` and `ai-templates/TEMPLATE_CATEGORIES` (CI-copied files)
-- [ ] 5.4 Remove `website/src/data/templates.json` and `website/src/data/categories.json`
-- [ ] 5.5 Remove `scripts/generate-templates-json.sh` (old generation script)
-- [ ] 5.6 Remove `scripts/lib/categories.sh` (bash category accessor — no longer needed)
-- [ ] 5.7 Remove the CI sync step for TEMPLATE_CATEGORIES if still present
-- [ ] 5.8 Update `website/docs/contributors/naming-conventions.md` to reference `template-info.yaml` instead of `TEMPLATE_INFO`
-- [ ] 5.9 Update any other docs that reference the old formats
+- [x] 5.1 Remove `TEMPLATE_INFO` files from all template directories (8 files)
+- [x] 5.2 Remove `scripts/lib/TEMPLATE_CATEGORIES`
+- [x] 5.3 Remove `templates/TEMPLATE_CATEGORIES` and `ai-templates/TEMPLATE_CATEGORIES` (CI-copied files)
+- [x] 5.4 Remove `website/src/data/templates.json` and `website/src/data/categories.json`
+- [x] 5.5 Remove `scripts/generate-templates-json.sh` (old generation script)
+- [x] 5.6 Remove `scripts/lib/categories.sh` and `scripts/lib/template-scanner.sh` (no longer needed)
+- [x] 5.7 Remove CI sync step for TEMPLATE_CATEGORIES and old JSON generation step
+- [x] 5.8 Update `website/docs/contributors/naming-conventions.md` to reference `template-info.yaml`
+- [x] 5.9 Update `website/docs/contributors/template-metadata.md` to document YAML format
+- [x] 5.10 Update `validate-metadata.sh` to validate YAML files (uses node + js-yaml)
+- [x] 5.11 Update `generate-docs-markdown.sh` to read from `template-registry.json` (uses jq)
 
 ### Validation
 

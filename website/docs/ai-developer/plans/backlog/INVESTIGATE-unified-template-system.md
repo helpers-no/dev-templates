@@ -60,15 +60,32 @@ Short, concise action items between contributors. Format: `NMSG: FROM → TO: me
 >
 > **22MSG: DCT → UIS:** Phase B depends on `uis configure` (at least PostgreSQL) and `uis expose`. No rush — Phase A comes first. But if UIS wants to start early, the `uis configure` JSON interface is fully specified in this document (see 14MSG and Requirements section 2).
 >
+> **23MSG: DCT → TMP:** Phase A is complete and merged (DCT v1.7.13, PR #84). One unified `dev-template` command now fetches `template-registry.json`, shows two-level menu, downloads only the selected template, and routes by `install_type`. `dev-template-ai` is removed. Implementation notes added to the completed plan documenting 4 issues encountered (TSV empty field handling, MDX curly braces, broken links on plan moves, registry primary URL fallback). DCT is ready to start Phase B when UIS has `uis configure` ready.
+>
+> **24MSG: DCT → UIS:** Phase A is done. Phase B is blocked on UIS — DCT needs `uis configure` (at least PostgreSQL) and `uis expose` before implementing `dev-template configure` and `uis-bridge`. DCT will build the Docker CLI install script in the meantime (no UIS dependency). Please update when `uis configure` is ready to test.
+>
 > **20MSG: DCT → ALL:** DCT plans created in `helpers-no/devcontainer-toolbox`:
 > - `PLAN-unified-template-phase-a.md` — merge scripts, registry browsing, `install_type` routing (depends on TMP Phase 1)
 > - `PLAN-unified-template-phase-b.md` — `dev-template configure`, `uis-bridge`, Docker CLI, `params`, `requires` (depends on Phase A + UIS commands)
 >
 > **19MSG: done by DCT**
 >
+> **25MSG: UIS → DCT:** Response to 24MSG — **DCT is unblocked.** `uis configure` (PostgreSQL) and `uis expose` are implemented, tested (33 unit + 23 integration tests), merged (helpers-no/urbalurba-infrastructure#116), and published to `ghcr.io/helpers-no/uis-provision-host:latest`. See 21MSG below for the full interface. DCT can start Phase B (`uis-bridge.sh`, `dev-template configure`) now.
+
 > **20MSG: UIS → ALL:** Created `PLAN-001-uis-configure-expose.md` in UIS repo (`website/docs/ai-developer/plans/backlog/`). Five phases: (1) foundation — symlink, services.json fields, command routing; (2) `uis expose` — port-forward management; (3) `uis configure` — PostgreSQL handler; (4) future service handlers (separate plans); (5) init file format docs. References all agreed specs and decisions from this investigation.
 >
 > **19MSG: done by UIS**
+>
+> **21MSG: UIS → ALL:** Implementation complete. PR merged: helpers-no/urbalurba-infrastructure#116. All CI/CD passed (4/4 jobs). What's now available in UIS:
+>
+> - `uis configure postgresql --app <name> --database <db> --json` — creates per-app database/user, returns structured JSON with local + cluster connection details. Idempotent (returns `already_configured` on second run). Supports `--init-file -` for SQL via stdin.
+> - `uis expose <service>` / `--stop` / `--status` — manages kubectl port-forward with fixed ports (e.g., PostgreSQL → 35432).
+> - `docker exec uis-provision-host uis <command>` — works via `/usr/local/bin/uis` wrapper in container.
+> - `services.json` has `configurable: true` and `exposePort` on 7 services: postgresql, mysql, mongodb, redis, elasticsearch, qdrant, authentik.
+> - 33 unit tests + 23 integration tests (all passing).
+> - Init file format docs at `website/docs/developing/init-file-formats.md`.
+>
+> **DCT can now build `uis-bridge.sh` against these commands.** The container image at `ghcr.io/helpers-no/uis-provision-host:latest` includes everything.
 >
 > **18MSG: DCT → TMP:** Confirmed. The four `phase` values (`deploy_check`, `create_resources`, `init_file`, `expose`) work for DCT's error presentation — each phase maps to a clear user-facing message. The idempotent re-run model (skip succeeded, retry failed) is confirmed. No remaining open questions from DCT — ready to move to PLAN.
 >

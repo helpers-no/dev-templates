@@ -1,8 +1,9 @@
 #!/bin/bash
-# validate-metadata.sh - Validate all TEMPLATE_INFO files
+# validate-metadata.sh - Validate template-info.yaml and template-categories.yaml files
 #
 # Checks that all mandatory fields are present and valid.
 # Exits non-zero if any validation fails (blocks CI build).
+# Uses node + js-yaml from website/node_modules for YAML parsing.
 #
 # Usage: bash scripts/validate-metadata.sh
 
@@ -12,118 +13,169 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 source "$SCRIPT_DIR/lib/logging.sh"
-source "$SCRIPT_DIR/lib/categories.sh"
-source "$SCRIPT_DIR/lib/template-scanner.sh"
 
 print_section "Validating template metadata"
 
 ERRORS=0
 TEMPLATES=0
+CATEGORIES=0
+
+# Helper: read a YAML field using node + js-yaml
+_yaml_field() {
+    local file="$1"
+    local field="$2"
+    node -e "
+        const yaml = require('$REPO_ROOT/website/node_modules/js-yaml');
+        const fs = require('fs');
+        const d = yaml.load(fs.readFileSync('$file', 'utf8'));
+        const v = $field;
+        if (Array.isArray(v)) { v.forEach(i => console.log(i)); }
+        else { console.log(v === undefined || v === null ? '' : v); }
+    " 2>/dev/null
+}
+
+# Helper: check YAML parses
+_yaml_valid() {
+    local file="$1"
+    node -e "
+        const yaml = require('$REPO_ROOT/website/node_modules/js-yaml');
+        const fs = require('fs');
+        yaml.load(fs.readFileSync('$file', 'utf8'));
+    " 2>/dev/null
+}
 
 #------------------------------------------------------------------------------
-# Validate TEMPLATE_CATEGORIES
+# Validate template-categories.yaml files
 #------------------------------------------------------------------------------
-print_subsection "Validating TEMPLATE_CATEGORIES"
+print_subsection "Validating template-categories.yaml files"
 
-CATEGORIES_SRC="$REPO_ROOT/scripts/lib/TEMPLATE_CATEGORIES"
+CATEGORY_IDS=()
 
-# Check source file exists
-if [[ ! -f "$CATEGORIES_SRC" ]]; then
-    log_error "TEMPLATE_CATEGORIES source not found: $CATEGORIES_SRC"
+for cat_file in "$REPO_ROOT"/*/template-categories.yaml; do
+    [[ -f "$cat_file" ]] || continue
+    local_dir="$(dirname "$cat_file")"
+    local_name="$(basename "$local_dir")"
+
+    if ! _yaml_valid "$cat_file"; then
+        log_error "$local_name/template-categories.yaml: invalid YAML syntax"
+        ((ERRORS++)) || true
+        continue
+    fi
+
+    context=$(_yaml_field "$cat_file" "d.context")
+    name=$(_yaml_field "$cat_file" "d.name")
+
+    if [[ "$context" != "dct" && "$context" != "uis" ]]; then
+        log_error "$local_name/template-categories.yaml: context must be 'dct' or 'uis', got '$context'"
+        ((ERRORS++)) || true
+    fi
+    if [[ -z "$name" ]]; then
+        log_error "$local_name/template-categories.yaml: missing name"
+        ((ERRORS++)) || true
+    fi
+
+    # Validate each category
+    cat_count=$(_yaml_field "$cat_file" "(d.categories || []).length")
+
+    if [[ "$cat_count" == "0" ]]; then
+        log_error "$local_name/template-categories.yaml: no categories defined"
+        ((ERRORS++)) || true
+    else
+        ids=$(_yaml_field "$cat_file" "(d.categories || []).map(c => c.id)")
+        while IFS= read -r cid; do
+            [[ -z "$cid" ]] && continue
+            for existing in "${CATEGORY_IDS[@]}"; do
+                if [[ "$existing" == "$cid" ]]; then
+                    log_error "Duplicate category ID '$cid' in $local_name/template-categories.yaml"
+                    ((ERRORS++)) || true
+                fi
+            done
+            CATEGORY_IDS+=("$cid")
+            ((CATEGORIES++)) || true
+        done <<< "$ids"
+
+        log_success "$local_name/template-categories.yaml — $cat_count categories valid"
+    fi
+done
+
+if [[ ${#CATEGORY_IDS[@]} -eq 0 ]]; then
+    log_error "No template-categories.yaml files found"
     ((ERRORS++)) || true
-else
-    log_success "Source file exists: scripts/lib/TEMPLATE_CATEGORIES"
-
-    # Validate each row has all 7 fields
-    while IFS='|' read -r _order _id _name _desc _tags _logo _emoji; do
-        [[ -z "$_id" ]] && continue
-        local_has_error=false
-
-        [[ -z "$_order" ]] && log_error "Category '$_id': missing ORDER" && local_has_error=true
-        [[ -z "$_name" ]] && log_error "Category '$_id': missing NAME" && local_has_error=true
-        [[ -z "$_desc" ]] && log_error "Category '$_id': missing DESCRIPTION" && local_has_error=true
-        [[ -z "$_tags" ]] && log_error "Category '$_id': missing TAGS" && local_has_error=true
-        [[ -z "$_logo" ]] && log_error "Category '$_id': missing LOGO" && local_has_error=true
-        [[ -z "$_emoji" ]] && log_error "Category '$_id': missing EMOJI" && local_has_error=true
-
-        if [[ "$local_has_error" == "true" ]]; then
-            ((ERRORS++)) || true
-        else
-            log_success "Category '$_id' — all fields valid"
-        fi
-    done <<< "$(grep -v "^$" "$CATEGORIES_SRC" | grep -v "^#" | grep -v "^if " | grep -v "^fi" | grep -v "readonly" | grep "|")"
-
-    # Check copies are in sync
-    for dir in templates ai-templates; do
-        local_copy="$REPO_ROOT/$dir/TEMPLATE_CATEGORIES"
-        if [[ ! -f "$local_copy" ]]; then
-            log_error "$dir/TEMPLATE_CATEGORIES missing — run CI sync or copy manually"
-            ((ERRORS++)) || true
-        else
-            # Compare the TEMPLATE_CATEGORY_TABLE content only
-            local_src_content=$(grep "|" "$CATEGORIES_SRC" || true)
-            local_copy_content=$(grep "|" "$local_copy" || true)
-            if [[ "$local_src_content" != "$local_copy_content" ]]; then
-                log_error "$dir/TEMPLATE_CATEGORIES is out of sync with scripts/lib/TEMPLATE_CATEGORIES"
-                ((ERRORS++)) || true
-            else
-                log_success "$dir/TEMPLATE_CATEGORIES in sync"
-            fi
-        fi
-    done
 fi
 
 echo ""
 
-# Mandatory fields — must be non-empty
-MANDATORY_FIELDS="T_ID T_VER T_NAME T_DESCRIPTION T_CATEGORY T_ABSTRACT T_README T_TAGS T_LOGO T_DOCS T_SUMMARY"
-# Fields that must exist but can be empty
-OPTIONAL_VALUE_FIELDS="T_TOOLS T_RELATED T_WEBSITE"
+#------------------------------------------------------------------------------
+# Validate template-info.yaml files
+#------------------------------------------------------------------------------
+print_subsection "Validating template-info.yaml files"
 
-validate_template() {
+MANDATORY_FIELDS="id version name description category install_type abstract readme logo docs summary"
+
+validate_template_yaml() {
     local info_file="$1"
     local template_dir
     template_dir="$(dirname "$info_file")"
     local template_name
     template_name="$(basename "$template_dir")"
 
-    extract_template_metadata "$info_file"
+    if ! _yaml_valid "$info_file"; then
+        log_error "$template_name: invalid YAML syntax in template-info.yaml"
+        ((ERRORS++)) || true
+        return
+    fi
 
     local has_error=false
 
-    # Check mandatory fields
     for field in $MANDATORY_FIELDS; do
-        local value="${!field}"
+        local value
+        value=$(_yaml_field "$info_file" "d['$field']")
         if [[ -z "$value" ]]; then
             log_error "$template_name: missing $field"
             has_error=true
         fi
     done
 
-    # Validate category
-    if [[ -n "$T_CATEGORY" ]] && ! is_valid_category "$T_CATEGORY"; then
-        log_error "$template_name: invalid TEMPLATE_CATEGORY '$T_CATEGORY'"
+    local tid category install_type readme
+    tid=$(_yaml_field "$info_file" "d.id")
+    category=$(_yaml_field "$info_file" "d.category")
+    install_type=$(_yaml_field "$info_file" "d.install_type")
+    readme=$(_yaml_field "$info_file" "d.readme")
+
+    if [[ -n "$tid" && "$tid" != "$template_name" ]]; then
+        log_error "$template_name: id '$tid' does not match directory name"
         has_error=true
     fi
 
-    # Validate ID matches directory name
-    if [[ -n "$T_ID" && "$T_ID" != "$template_name" ]]; then
-        log_warn "$template_name: TEMPLATE_ID '$T_ID' does not match directory name"
+    if [[ -n "$category" ]]; then
+        local found=false
+        for cid in "${CATEGORY_IDS[@]}"; do
+            [[ "$cid" == "$category" ]] && found=true && break
+        done
+        if [[ "$found" != "true" ]]; then
+            log_error "$template_name: category '$category' not defined in any template-categories.yaml"
+            has_error=true
+        fi
     fi
 
-    # Validate README file exists
-    if [[ -n "$T_README" ]]; then
+    if [[ -n "$install_type" && "$install_type" != "app" && "$install_type" != "overlay" && "$install_type" != "stack" ]]; then
+        log_error "$template_name: install_type must be 'app', 'overlay', or 'stack', got '$install_type'"
+        has_error=true
+    fi
+
+    local tags_type
+    tags_type=$(_yaml_field "$info_file" "Array.isArray(d.tags) ? 'list' : typeof d.tags")
+    if [[ "$tags_type" != "list" ]]; then
+        log_error "$template_name: tags must be a YAML list"
+        has_error=true
+    fi
+
+    if [[ -n "$readme" ]]; then
         local readme_found=false
-        # Check app template path
-        if [[ -f "$template_dir/$T_README" ]]; then
-            readme_found=true
-        fi
-        # Check ai template path (template/ subdirectory)
-        if [[ -f "$template_dir/template/$T_README" ]]; then
-            readme_found=true
-        fi
+        [[ -f "$template_dir/$readme" ]] && readme_found=true
+        [[ -f "$template_dir/template/$readme" ]] && readme_found=true
         if [[ "$readme_found" != "true" ]]; then
-            log_error "$template_name: README file '$T_README' not found"
+            log_error "$template_name: README file '$readme' not found"
             has_error=true
         fi
     fi
@@ -137,24 +189,22 @@ validate_template() {
     ((TEMPLATES++)) || true
 }
 
-# Scan app templates
-for info_file in "$REPO_ROOT"/templates/*/TEMPLATE_INFO; do
-    [[ -f "$info_file" ]] || continue
-    validate_template "$info_file"
-done
+for cat_file in "$REPO_ROOT"/*/template-categories.yaml; do
+    [[ -f "$cat_file" ]] || continue
+    local_dir="$(dirname "$cat_file")"
 
-# Scan AI templates
-for info_file in "$REPO_ROOT"/ai-templates/*/TEMPLATE_INFO; do
-    [[ -f "$info_file" ]] || continue
-    validate_template "$info_file"
+    for info_file in "$local_dir"/*/template-info.yaml; do
+        [[ -f "$info_file" ]] || continue
+        validate_template_yaml "$info_file"
+    done
 done
 
 echo ""
-log_info "Validated $TEMPLATES templates"
+log_info "Validated $CATEGORIES categories, $TEMPLATES templates"
 
 if [[ $ERRORS -gt 0 ]]; then
-    log_error "$ERRORS template(s) have validation errors"
+    log_error "$ERRORS validation error(s)"
     exit 1
 fi
 
-log_success "All templates valid"
+log_success "All metadata valid"

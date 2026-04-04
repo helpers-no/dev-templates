@@ -14,18 +14,18 @@ Consistent naming across templates, files, and identifiers.
 
 App templates go in `templates/`. AI workflow templates go in `ai-templates/`.
 
-## TEMPLATE_ID
+## Template ID
 
-Must exactly match the directory name.
+Must exactly match the directory name. Defined in `template-info.yaml`:
 
-```bash
+```yaml
 # Directory: templates/python-basic-webserver/
-TEMPLATE_ID="python-basic-webserver"
+id: python-basic-webserver
 ```
 
-## TEMPLATE_CATEGORY
+## Template Category
 
-Uppercase with underscores. Must be a valid category defined in `scripts/lib/TEMPLATE_CATEGORIES`.
+Uppercase with underscores. Must match a category `id` in the parent folder's `template-categories.yaml`.
 
 | Category ID | Use for | Emoji |
 |------------|---------|-------|
@@ -35,7 +35,7 @@ Uppercase with underscores. Must be a valid category defined in `scripts/lib/TEM
 
 ### Adding a new category
 
-Edit `scripts/lib/TEMPLATE_CATEGORIES` (the source of truth). Format: `ORDER|ID|NAME|DESCRIPTION|TAGS|LOGO|EMOJI`. CI automatically copies it to `templates/` and `ai-templates/`. Do NOT edit the copies directly — they have an "AUTO-GENERATED" header and will be overwritten.
+Edit `template-categories.yaml` in the relevant template folder (e.g., `templates/template-categories.yaml`). Each folder defines its own categories — no central file.
 
 ## README File
 

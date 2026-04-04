@@ -9,4 +9,4 @@ AI-assisted development workflow templates
 
 | Template | Description | Install |
 |----------|-------------|---------|
-| [Plan-Based AI Workflow](plan-based-workflow) | Structured AI development with plans, phases, and validation | `dev-template-ai plan-based-workflow` |
+| [Plan-Based AI Workflow](plan-based-workflow) | Structured AI development with plans, phases, and validation | `dev-template plan-based-workflow` |
