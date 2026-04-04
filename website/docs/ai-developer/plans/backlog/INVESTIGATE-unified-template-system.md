@@ -205,7 +205,7 @@ Short, concise action items between contributors. Format: `NMSG: FROM → TO: me
 > - **On 2UIS (per-app credentials):** Clear — DCT persists credentials in `.env`, UIS does not store them. `uis configure` idempotency uses option (b): detect "already configured" and tell DCT to use stored credentials.
 
 **Related**:
-- [INVESTIGATE-dct-template-metadata-update.md](INVESTIGATE-dct-template-metadata-update.md) — DCT metadata changes needed
+- [INVESTIGATE-dct-template-metadata-update.md](../completed/INVESTIGATE-dct-template-metadata-update.md) — DCT metadata changes (completed)
 - `helpers-no/devcontainer-toolbox` → `INVESTIGATE-template-categories-dynamic.md` — DCT dynamic categories
 - `helpers-no/devcontainer-toolbox` → `INVESTIGATE-advanced-templates.md` — DCT investigation covering advanced templates with backend dependencies, infrastructure templates, documentation templates, and coding rules templates. Contains detailed analysis of multiple future template types.
 

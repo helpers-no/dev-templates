@@ -525,7 +525,7 @@ These changes were implemented directly without separate plans:
 
 ### Phase C: DCT Script Updates
 
-Split out to separate investigation: [INVESTIGATE-dct-template-metadata-update.md](../backlog/INVESTIGATE-dct-template-metadata-update.md)
+Split out to separate investigation: [INVESTIGATE-dct-template-metadata-update.md](../completed/INVESTIGATE-dct-template-metadata-update.md)
 
 ---
 
@@ -537,4 +537,4 @@ All dev-templates work is complete. Phases A and B implemented, plus additional 
 
 - [x] Create PLAN for Phase A ✓ — completed 2026-03-31
 - [x] Create PLAN for Phase B ✓ — completed 2026-03-31
-- [x] Phase C split to [INVESTIGATE-dct-template-metadata-update.md](../backlog/INVESTIGATE-dct-template-metadata-update.md)
+- [x] Phase C split to [INVESTIGATE-dct-template-metadata-update.md](../completed/INVESTIGATE-dct-template-metadata-update.md)

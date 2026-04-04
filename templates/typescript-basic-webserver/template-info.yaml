@@ -1,0 +1,28 @@
+id: typescript-basic-webserver
+version: "1.0.0"
+name: TypeScript Basic Webserver
+description: Express.js server with TypeScript, health endpoint, and Docker support
+category: BASIC_WEB_SERVER
+install_type: app
+abstract: >
+  Provides a minimal starting point for developers who want to
+  build a Node.js web server using Express and TypeScript.
+tools: dev-typescript
+readme: README-typescript-basic-webserver.md
+tags:
+  - typescript
+  - nodejs
+  - express
+  - webserver
+  - api
+  - rest
+logo: typescript-basic-webserver-logo.svg
+website: ""
+docs: https://github.com/helpers-no/dev-templates/tree/main/templates/typescript-basic-webserver
+summary: >
+  A minimal Express.js web server written in TypeScript with hot reload
+  via nodemon, Docker containerization, Kubernetes deployment manifests,
+  and GitHub Actions CI/CD workflow.
+related:
+  - designsystemet-basic-react-app
+  - python-basic-webserver

@@ -4,7 +4,7 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Backlog
+## Status: Active
 
 **Goal**: Migrate template metadata from bash `TEMPLATE_INFO` + `TEMPLATE_CATEGORIES` to YAML (`template-info.yaml` + `template-categories.yaml`), generate a unified `template-registry.json`, and update Docusaurus to consume it.
 
@@ -38,15 +38,15 @@ TMP Phase 1 is the foundation that enables everything else. It replaces the curr
 
 ---
 
-## Phase 1: Create YAML metadata files
+## Phase 1: Create YAML metadata files — DONE
 
 ### Tasks
 
-- [ ] 1.1 Create `templates/template-categories.yaml` with `context: dct`, categories `BASIC_WEB_SERVER` and `WEB_APP` (migrate from `TEMPLATE_CATEGORIES`)
-- [ ] 1.2 Create `ai-templates/template-categories.yaml` with `context: dct`, category `WORKFLOW`
-- [ ] 1.3 Create `template-info.yaml` for all 7 app templates (python, typescript, php, golang, java, csharp, designsystemet) — migrate fields from `TEMPLATE_INFO`, add `install_type: app`
-- [ ] 1.4 Create `template-info.yaml` for `plan-based-workflow` — migrate fields from `TEMPLATE_INFO`, add `install_type: overlay`
-- [ ] 1.5 Validate all YAML files parse correctly (no syntax errors)
+- [x] 1.1 Create `templates/template-categories.yaml` with `context: dct`, categories `BASIC_WEB_SERVER` and `WEB_APP` (migrate from `TEMPLATE_CATEGORIES`)
+- [x] 1.2 Create `ai-templates/template-categories.yaml` with `context: dct`, category `WORKFLOW`
+- [x] 1.3 Create `template-info.yaml` for all 7 app templates (python, typescript, php, golang, java, csharp, designsystemet) — migrate fields from `TEMPLATE_INFO`, add `install_type: app`
+- [x] 1.4 Create `template-info.yaml` for `plan-based-workflow` — migrate fields from `TEMPLATE_INFO`, add `install_type: overlay`
+- [x] 1.5 Validate all YAML files parse correctly (no syntax errors)
 
 ### Validation
 
@@ -54,15 +54,15 @@ All 10 YAML files exist and are valid. Field values match current `TEMPLATE_INFO
 
 ---
 
-## Phase 2: TypeScript generation script
+## Phase 2: TypeScript generation script — DONE
 
 ### Tasks
 
-- [ ] 2.1 Create `scripts/generate-registry.ts` that scans `*/template-categories.yaml` + `*/*/template-info.yaml` and outputs `website/src/data/template-registry.json`
-- [ ] 2.2 The script validates: category IDs are unique across folders, each template's `category` matches a defined category, required fields are present, `id` matches directory name
-- [ ] 2.3 The generated `template-registry.json` contains both `categories` and `templates` arrays (format as defined in the investigation spec)
-- [ ] 2.4 Create `scripts/generate-registry.sh` as a wrapper that runs the TypeScript script (matching pattern of existing bash wrappers)
-- [ ] 2.5 Run the script and verify the output matches the current `templates.json` + `categories.json` content (same data, new format)
+- [x] 2.1 Create `scripts/generate-registry.ts` that scans `*/template-categories.yaml` + `*/*/template-info.yaml` and outputs `website/src/data/template-registry.json`
+- [x] 2.2 The script validates: category IDs are unique across folders, each template's `category` matches a defined category, required fields are present, `id` matches directory name
+- [x] 2.3 The generated `template-registry.json` contains both `categories` and `templates` arrays (format as defined in the investigation spec)
+- [x] 2.4 Create `scripts/generate-registry.sh` as a wrapper that runs the TypeScript script (matching pattern of existing bash wrappers)
+- [x] 2.5 Run the script and verify the output matches the current `templates.json` + `categories.json` content (same data, new format)
 
 ### Implementation Notes
 
@@ -77,15 +77,15 @@ All 10 YAML files exist and are valid. Field values match current `TEMPLATE_INFO
 
 ---
 
-## Phase 3: Update Docusaurus components
+## Phase 3: Update Docusaurus components — DONE
 
 ### Tasks
 
-- [ ] 3.1 Update `website/src/utils/data.ts` to import from `template-registry.json` instead of `templates.json` + `categories.json`
-- [ ] 3.2 Update or add accessor functions for any new fields (`install_type`, `abstract`, `summary` — verify which fields the components actually use)
-- [ ] 3.3 Update `generate-docs-markdown.sh` to read template metadata from `template-registry.json` instead of scanning `TEMPLATE_INFO` files
-- [ ] 3.4 Verify all Docusaurus pages render correctly (template cards, detail pages, category pages)
-- [ ] 3.5 Run `npm run build` in website/ to verify no build errors
+- [x] 3.1 Update `website/src/utils/data.ts` to import from `template-registry.json` instead of `templates.json` + `categories.json`
+- [x] 3.2 Update types: `Template` (added `folder`, `install_type`, `context`, removed `type`), `Category` (added `emoji`, `context`, removed `icon`)
+- [ ] 3.3 Update `generate-docs-markdown.sh` to read from registry — **deferred to Phase 5** (still works with old TEMPLATE_INFO files during transition)
+- [x] 3.4 Fixed broken links to moved investigation file (INVESTIGATE-dct-template-metadata-update.md)
+- [x] 3.5 Run `npm run build` in devcontainer — builds successfully
 
 ### Implementation Notes
 
@@ -99,15 +99,16 @@ All 10 YAML files exist and are valid. Field values match current `TEMPLATE_INFO
 
 ---
 
-## Phase 4: Update CI pipeline
+## Phase 4: Update CI pipeline — DONE
 
 ### Tasks
 
-- [ ] 4.1 Add `generate-registry.sh` step to `.github/workflows/deploy-docs.yml` (replaces `generate-templates-json.sh`)
-- [ ] 4.2 Remove the "Sync TEMPLATE_CATEGORIES" step (no longer needed — each folder has its own YAML)
-- [ ] 4.3 Update the "Commit generated files" step to include `template-registry.json` instead of `templates.json` + `categories.json`
-- [ ] 4.4 Update `validate-metadata.sh` to validate `template-info.yaml` files (in addition to or instead of `TEMPLATE_INFO`)
-- [ ] 4.5 Push to main and verify CI runs successfully
+- [x] 4.1 Add `npx tsx scripts/generate-registry.ts` step to CI (runs after old JSON generation)
+- [x] 4.2 Keep "Sync TEMPLATE_CATEGORIES" step — still needed during transition (deferred removal to Phase 5)
+- [x] 4.3 Add Node.js setup + `npm ci` to the `generate` job (needed for tsx and js-yaml)
+- [x] 4.4 Add YAML trigger paths (`template-info.yaml`, `template-categories.yaml`) to workflow
+- [ ] 4.5 Push to main and verify CI runs successfully — **after PR merge**
+- [ ] 4.4 Update `validate-metadata.sh` — **deferred to Phase 5** (old validation still works during transition)
 
 ### Implementation Notes
 

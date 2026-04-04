@@ -7,7 +7,11 @@ on:
     paths:
       - 'website/**'
       - 'templates/**/TEMPLATE_INFO'
+      - 'templates/**/template-info.yaml'
+      - 'templates/template-categories.yaml'
       - 'ai-templates/**/TEMPLATE_INFO'
+      - 'ai-templates/**/template-info.yaml'
+      - 'ai-templates/template-categories.yaml'
       - 'scripts/**'
       - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
@@ -27,6 +31,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: website/package-lock.json
+
+      - name: Install dependencies
+        working-directory: website
+        run: npm ci
 
       - name: Sync TEMPLATE_CATEGORIES to template folders
         run: |
@@ -49,6 +64,9 @@ jobs:
       - name: Generate templates.json and categories.json
         run: bash scripts/generate-templates-json.sh
 
+      - name: Generate template-registry.json
+        run: npx tsx scripts/generate-registry.ts
+
       - name: Generate template documentation pages
         run: bash scripts/generate-docs-markdown.sh --force
 
@@ -69,7 +87,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add website/src/data/ website/docs/templates/ website/docs/ai-developer/plans/*/index.md
+          git add website/src/data/ website/docs/templates/ website/docs/ai-developer/plans/*/index.md templates/TEMPLATE_CATEGORIES ai-templates/TEMPLATE_CATEGORIES
           git commit -m "Auto-generate template docs and plan indexes [skip ci]" || true
           git push
 

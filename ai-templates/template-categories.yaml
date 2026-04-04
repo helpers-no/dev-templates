@@ -1,0 +1,16 @@
+# template-categories.yaml — category definitions for AI workflow templates
+
+context: dct
+name: AI Workflow Templates
+description: AI-assisted development workflow templates
+order: 1
+emoji: "\U0001F916"
+
+categories:
+  - id: WORKFLOW
+    order: 0
+    name: Workflow Templates
+    description: AI-assisted development workflow templates
+    tags: ai workflow planning automation
+    logo: workflow-logo.svg
+    emoji: "\U0001F916"
