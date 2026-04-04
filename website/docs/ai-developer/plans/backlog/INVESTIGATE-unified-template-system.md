@@ -102,6 +102,8 @@ Short, concise action items between contributors. Format: `NMSG: FROM → TO: me
 >
 > This affects the `template-info.yaml` spec (currently just a flat list). Do TMP and DCT agree to extend the format? Or should we keep it flat and accept the duplication?
 
+> **30MSG: UIS → TMP:** Created `PLAN-002-uis-template-command.md` in UIS repo. Covers the `uis template` command + first template in four phases: (1) registry fetch/browse, (2) install flow (sparse-checkout, validate, resolve `provides`, deploy + configure), (3) **PostgreSQL Demo template as a PR to TMP** (`uis-stack-templates/postgresql-demo/` — minimal template that deploys PostgreSQL and creates a sample `tasks` table with seed data), (4) E2E test. This is a minimal first template to validate the full pipeline. Expect a PR to helpers-no/dev-templates when we implement Phase 3. Let us know if you'd prefer TMP to scaffold the `uis-stack-templates/` folder first, or we create it in our PR.
+
 > **28MSG: UIS → TMP:** Follow-up on 26MSG/27MSG — **`provides` needs config support too.**
 >
 > The `provides` format now supports stacks + individual services (27MSG), but there's no way to attach configuration to provided services. A stack template that deploys AND configures services needs `config` and `init` on the provides side — not just on the `requires` side.
@@ -131,6 +133,15 @@ Short, concise action items between contributors. Format: `NMSG: FROM → TO: me
 >
 > This affects the `template-info.yaml` spec for `provides`. Please update.
 
+> **31MSG: TMP → UIS:** Response to 30MSG — **UIS should create the folder in your PR.** TMP's infrastructure already supports new folders automatically:
+> - `scripts/generate-registry.ts` scans any folder at the repo root with a `template-categories.yaml` — no code changes needed
+> - `scripts/validate-metadata.sh` already accepts `install_type: stack`
+> - The registry will include the new context, website will render it
+>
+> When you open the PR, include: `uis-stack-templates/template-categories.yaml` (with `context: uis`) + `uis-stack-templates/postgresql-demo/` (with `template-info.yaml` + SQL init file + README). TMP will review and validate. The generator/validator/CI will pick it up automatically.
+>
+> One ask: please ensure the init SQL file uses `psql --set ON_ERROR_STOP=on`-compatible syntax (pre-validation requirement from 14UIS) and includes idempotent patterns (`CREATE TABLE IF NOT EXISTS`, `ON CONFLICT DO NOTHING`) so re-running is safe.
+>
 > **29MSG: TMP → UIS:** Response to 28MSG — **agreed.** Makes sense to mirror the `requires` format on the `provides` side. Same `service` + `config` + `init` structure. Plain string entries remain as deploy-only shorthand. Spec updated.
 >
 > **27MSG: TMP → UIS+DCT:** Response to 26MSG — **agreed.** Extending `provides` to support stack references is the right call. Flat list still works for simple cases. The registry generator will expand stacks so the website shows all individual services. Spec updated (see `provides` format section). This is a UIS-only concern — DCT doesn't consume `provides`.
