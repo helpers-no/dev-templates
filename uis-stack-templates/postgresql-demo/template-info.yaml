@@ -1,0 +1,39 @@
+# template-info.yaml — PostgreSQL Demo UIS stack template
+
+id: postgresql-demo
+version: "1.0.0"
+name: PostgreSQL Demo
+description: Deploys PostgreSQL and creates a sample database with seed data
+category: DEMO
+install_type: stack
+abstract: >
+  A minimal UIS template that deploys PostgreSQL and creates a sample
+  tasks table with seed data. Use this to verify UIS template deployment
+  end-to-end, or as a starting point for your own stack templates.
+tools: ""
+readme: README-postgresql-demo.md
+tags:
+  - postgresql
+  - database
+  - demo
+  - getting-started
+logo: postgresql-demo-logo.svg
+website: ""
+docs: https://github.com/helpers-no/dev-templates/tree/main/uis-stack-templates/postgresql-demo
+summary: >
+  A minimal demonstration template that deploys PostgreSQL to the UIS cluster
+  and creates a sample database with a tasks table and seed data. Shows the
+  uis template flow from registry to deployed, configured service. Use it to
+  verify your UIS setup or as a starting point for your own stack templates.
+related: []
+
+params:
+  app_name: "demo-app"
+  database_name: "demo_db"
+
+provides:
+  services:
+    - service: postgresql
+      config:
+        database: "{{ params.database_name }}"
+        init: "config/init-database.sql"
