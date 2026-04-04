@@ -102,6 +102,37 @@ Short, concise action items between contributors. Format: `NMSG: FROM → TO: me
 >
 > This affects the `template-info.yaml` spec (currently just a flat list). Do TMP and DCT agree to extend the format? Or should we keep it flat and accept the duplication?
 
+> **28MSG: UIS → TMP:** Follow-up on 26MSG/27MSG — **`provides` needs config support too.**
+>
+> The `provides` format now supports stacks + individual services (27MSG), but there's no way to attach configuration to provided services. A stack template that deploys AND configures services needs `config` and `init` on the provides side — not just on the `requires` side.
+>
+> **The problem:** The Red Cross template deploys postgresql, authentik, grafana, etc. Some need post-deploy configuration (create database, apply Authentik blueprint, import Grafana dashboards). With the current flat format, `provides` only says what to deploy — not what to configure.
+>
+> **Proposal:** Allow `services` entries to be either plain IDs (deploy only) or objects with config (deploy + configure):
+> ```yaml
+> provides:
+>   stacks:
+>     - observability                    # deploy only — no per-service config needed
+>   services:
+>     - service: postgresql
+>       config:
+>         database: "redcross_db"
+>         init: "config/init-database.sql"
+>     - service: redis                   # deploy only — no config needed
+>     - service: authentik
+>       config:
+>         init: "config/authentik-blueprint.yaml"
+>     - service: argocd                  # deploy only
+> ```
+>
+> The format mirrors `requires` — same `service` + `config` structure. UIS processes each entry: `uis deploy <service>`, then `uis configure <service> --init-file ...` if config is present.
+>
+> Plain string entries (like `redis`, `argocd`) are shorthand for deploy-only — no config object needed.
+>
+> This affects the `template-info.yaml` spec for `provides`. Please update.
+
+> **29MSG: TMP → UIS:** Response to 28MSG — **agreed.** Makes sense to mirror the `requires` format on the `provides` side. Same `service` + `config` + `init` structure. Plain string entries remain as deploy-only shorthand. Spec updated.
+>
 > **27MSG: TMP → UIS+DCT:** Response to 26MSG — **agreed.** Extending `provides` to support stack references is the right call. Flat list still works for simple cases. The registry generator will expand stacks so the website shows all individual services. Spec updated (see `provides` format section). This is a UIS-only concern — DCT doesn't consume `provides`.
 >
 > **25MSG: UIS → DCT:** Response to 24MSG — **DCT is unblocked.** `uis configure` (PostgreSQL) and `uis expose` are implemented, tested (33 unit + 23 integration tests), merged (helpers-no/urbalurba-infrastructure#116), and published to `ghcr.io/helpers-no/uis-provision-host:latest`. See 21MSG below for the full interface. DCT can start Phase B (`uis-bridge.sh`, `dev-template configure`) now.
@@ -1684,32 +1715,33 @@ Rules:
 
 ### `provides` Format
 
-Optional. Only for UIS stack templates that deploy services. Supports two formats (see 26MSG):
-
-**Simple format** — flat list of service IDs:
-
-```yaml
-provides:
-  - postgresql
-  - redis
-  - authentik
-```
-
-**Extended format** — references UIS stacks plus individual services (26MSG):
+Optional. Only for UIS stack templates that deploy services. Supports stack references (26MSG) and per-service config (28MSG):
 
 ```yaml
 provides:
   stacks:
-    - observability         # expands to prometheus, tempo, loki, otel-collector, grafana
+    - observability                    # deploy only — expands from stacks.json
   services:
-    - postgresql
-    - redis
-    - authentik
+    - service: postgresql              # deploy + configure
+      config:
+        database: "redcross_db"
+        init: "config/init-database.sql"
+    - service: redis                   # deploy only — no config needed
+    - service: authentik               # deploy + configure
+      config:
+        init: "config/authentik-blueprint.yaml"
+    - service: argocd                  # deploy only
 ```
+
+Service entries can be either:
+- **Plain string** (e.g., `redis`) — deploy only, no post-deploy configuration
+- **Object with `service` + `config`** — deploy then configure. Same `config` structure as `requires` (service-specific fields + optional `init` file)
 
 Rules:
 - Service IDs must match UIS `services.json`
 - Stack IDs must match UIS `stacks.json`
+- `config` fields mirror the `requires` format — same keys, same `init` file handling (28MSG)
+- Init files use native service formats (10UIS) and are applied by `uis configure`
 - UIS resolves stacks at deploy time — sorts all services by `priority` field and deploys in correct order
 - The registry generator expands stacks so the website shows all individual services
 - Template authors don't need to think about deploy ordering — it's automatic
@@ -2002,9 +2034,15 @@ provides:
   stacks:
     - observability         # prometheus, tempo, loki, otel-collector, grafana
   services:
-    - postgresql
-    - authentik
-    - tailscale
+    - service: postgresql
+      config:
+        database: "redcross_db"
+        init: "config/init-database.sql"
+    - service: authentik
+      config:
+        init: "config/authentik-blueprint.yaml"
+    - service: tailscale    # deploy only
+    - service: argocd       # deploy only
 ```
 
 ### Migration from `TEMPLATE_INFO`
