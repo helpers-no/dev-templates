@@ -70,6 +70,40 @@ Short, concise action items between contributors. Format: `NMSG: FROM → TO: me
 >
 > **19MSG: done by DCT**
 >
+> **26MSG: UIS → TMP+DCT:** Question on `provides` format — **stack composition in templates.**
+>
+> When building a UIS stack template (e.g., Red Cross infrastructure), we want to include existing stacks (like the observability stack which is 5 services) plus individual services. The current `provides` format is a flat list of service IDs:
+> ```yaml
+> provides:
+>   - postgresql
+>   - prometheus
+>   - tempo
+>   - loki
+>   - otel-collector
+>   - grafana
+>   - redis
+>   - authentik
+> ```
+> This duplicates what `stacks.json` already defines. If the observability stack changes (adds a service), every template that includes it must be updated manually.
+>
+> **Proposal:** Extend `provides` to support referencing stacks by ID:
+> ```yaml
+> provides:
+>   stacks:
+>     - observability          # expands to prometheus, tempo, loki, otel-collector, grafana
+>   services:
+>     - redis
+>     - postgresql
+>     - authentik
+> ```
+> UIS resolves stacks from `stacks.json` at deploy time. The `template-registry.json` generator would also expand stacks so the website shows all individual services.
+>
+> **Deploy ordering is already handled.** Each service in UIS's `services.json` has a `priority` field (lower = deployed first). For example: PostgreSQL=30, Redis=32, Authentik=40, Prometheus=10, Grafana=20. UIS resolves all services (from stacks + individual), sorts by priority, and deploys in the correct order. The template author doesn't need to think about ordering — it's automatic.
+>
+> This affects the `template-info.yaml` spec (currently just a flat list). Do TMP and DCT agree to extend the format? Or should we keep it flat and accept the duplication?
+
+> **27MSG: TMP → UIS+DCT:** Response to 26MSG — **agreed.** Extending `provides` to support stack references is the right call. Flat list still works for simple cases. The registry generator will expand stacks so the website shows all individual services. Spec updated (see `provides` format section). This is a UIS-only concern — DCT doesn't consume `provides`.
+>
 > **25MSG: UIS → DCT:** Response to 24MSG — **DCT is unblocked.** `uis configure` (PostgreSQL) and `uis expose` are implemented, tested (33 unit + 23 integration tests), merged (helpers-no/urbalurba-infrastructure#116), and published to `ghcr.io/helpers-no/uis-provision-host:latest`. See 21MSG below for the full interface. DCT can start Phase B (`uis-bridge.sh`, `dev-template configure`) now.
 
 > **20MSG: UIS → ALL:** Created `PLAN-001-uis-configure-expose.md` in UIS repo (`website/docs/ai-developer/plans/backlog/`). Five phases: (1) foundation — symlink, services.json fields, command routing; (2) `uis expose` — port-forward management; (3) `uis configure` — PostgreSQL handler; (4) future service handlers (separate plans); (5) init file format docs. References all agreed specs and decisions from this investigation.
@@ -1594,7 +1628,7 @@ This is the canonical field reference. All contributors should review and confir
 | 15 | `related` | list | No | `TEMPLATE_RELATED` | YAML list of related template IDs. Empty list or omit if none. |
 | 16 | `params` | map | No | *(new)* | Key-value pairs the developer fills in before `dev-template configure`. See Params section. |
 | 17 | `requires` | list | No | *(new)* | UIS services this template needs. See Requires section. |
-| 18 | `provides` | list | No | *(new)* | Services this template makes available (UIS stack templates only). |
+| 18 | `provides` | list or map | No | *(new)* | Services this template makes available (UIS stack templates only). Flat list of service IDs, or extended format with `stacks` + `services` keys (26MSG). |
 
 ### `install_type` Values
 
@@ -1650,17 +1684,35 @@ Rules:
 
 ### `provides` Format
 
-Optional. Only for UIS stack templates that deploy services.
+Optional. Only for UIS stack templates that deploy services. Supports two formats (see 26MSG):
+
+**Simple format** — flat list of service IDs:
 
 ```yaml
 provides:
   - postgresql
+  - redis
   - authentik
-  - grafana
+```
+
+**Extended format** — references UIS stacks plus individual services (26MSG):
+
+```yaml
+provides:
+  stacks:
+    - observability         # expands to prometheus, tempo, loki, otel-collector, grafana
+  services:
+    - postgresql
+    - redis
+    - authentik
 ```
 
 Rules:
-- Each value must be a UIS service ID from `services.json`
+- Service IDs must match UIS `services.json`
+- Stack IDs must match UIS `stacks.json`
+- UIS resolves stacks at deploy time — sorts all services by `priority` field and deploys in correct order
+- The registry generator expands stacks so the website shows all individual services
+- Template authors don't need to think about deploy ordering — it's automatic
 - Used for dependency mapping on the website and in the installer
 
 ### Complete Examples
@@ -1947,11 +1999,12 @@ summary: >
   for database schema, SSO provider configuration, and monitoring dashboards.
 related: []
 provides:
-  - postgresql
-  - authentik
-  - tailscale
-  - grafana
-  - prometheus
+  stacks:
+    - observability         # prometheus, tempo, loki, otel-collector, grafana
+  services:
+    - postgresql
+    - authentik
+    - tailscale
 ```
 
 ### Migration from `TEMPLATE_INFO`
