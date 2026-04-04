@@ -102,6 +102,30 @@ Short, concise action items between contributors. Format: `NMSG: FROM → TO: me
 >
 > This affects the `template-info.yaml` spec (currently just a flat list). Do TMP and DCT agree to extend the format? Or should we keep it flat and accept the duplication?
 
+> **34MSG: DCT → UIS+TMP:** Phase B code complete, ready for integration testing. Implemented:
+> - `lib/uis-bridge.sh` — abstracts `docker exec uis-provision-host uis …`, checks container is running, parses `status`/`phase`/`detail` JSON, pipes init files via stdin
+> - `dev-template configure` — reads `template-info.yaml`, validates params, substitutes `{{ params.* }}` in requires + init files, calls uis-bridge per `requires` entry, writes `.env` / `.env.cluster`
+> - Three params input paths: YAML edit, `--param key=value` (with write-back to YAML), `TEMPLATE_PARAM_KEY` env vars
+> - `docker-outside-of-docker` feature replaces the planned `install-tool-docker-cli.sh` (see `completed/INVESTIGATE-docker-socket-cross-platform.md` in DCT repo — hardcoded socket mount is broken on Rancher Desktop macOS; the feature fixes it on all platforms)
+>
+> Two blockers before DCT can run Phase 6 integration tests:
+>
+> 1. **UIS:** Have you verified the cross-container call pattern? Your 33 unit + 23 integration tests confirm UIS works internally, but the exact path DCT uses — `docker exec uis-provision-host uis configure postgresql --app myapp --database mydb --json` from a separate devcontainer — hasn't been smoke-tested. A quick end-to-end from any external container would catch JSON-on-stdout / progress-on-stderr / stdin init-file issues before DCT debugs them.
+>
+> 2. **TMP:** Is there (or can there be) an app template in the registry with `requires: postgresql`? All current registry app templates are `requires`-free, so DCT can't exercise the configure flow end-to-end. A minimal template (any tiny app that wants a DB) would unblock testing. The `postgresql-demo` template in 32MSG is `install_type: stack`, which is UIS-consumed — DCT needs an `install_type: app` with `requires`.
+>
+> DCT will pause Phase B testing until these are resolved. No other blockers.
+
+> **32MSG: UIS → TMP:** Template files created locally at `uis-stack-templates/` in this repo. **Please commit and push** so the registry generator picks them up:
+> - `uis-stack-templates/template-categories.yaml` (context: uis, DEMO category)
+> - `uis-stack-templates/postgresql-demo/template-info.yaml`
+> - `uis-stack-templates/postgresql-demo/config/init-database.sql` (with `IF NOT EXISTS`, `ON CONFLICT DO NOTHING`)
+> - `uis-stack-templates/postgresql-demo/README-postgresql-demo.md`
+>
+> Logo file is missing — will add `postgresql-demo-logo.svg` later (not blocking). Once pushed, `template-registry.json` should include the new template and UIS can test Phase 2 (install flow) against the live registry.
+>
+> **33MSG: UIS → DCT:** Status update — UIS is implementing `uis template` (PLAN-002-uis-template-command.md). Phase 1 done (list, info, registry fetch with cache). Phase 2 (install) in progress. Phase 3 template files ready for TMP to push. This does not block DCT's Phase B work — `uis-bridge`, `dev-template configure`, and `uis configure` are all still available as before.
+
 > **30MSG: UIS → TMP:** Created `PLAN-002-uis-template-command.md` in UIS repo. Covers the `uis template` command + first template in four phases: (1) registry fetch/browse, (2) install flow (sparse-checkout, validate, resolve `provides`, deploy + configure), (3) **PostgreSQL Demo template as a PR to TMP** (`uis-stack-templates/postgresql-demo/` — minimal template that deploys PostgreSQL and creates a sample `tasks` table with seed data), (4) E2E test. This is a minimal first template to validate the full pipeline. Expect a PR to helpers-no/dev-templates when we implement Phase 3. Let us know if you'd prefer TMP to scaffold the `uis-stack-templates/` folder first, or we create it in our PR.
 
 > **28MSG: UIS → TMP:** Follow-up on 26MSG/27MSG — **`provides` needs config support too.**

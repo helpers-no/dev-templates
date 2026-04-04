@@ -1,0 +1,17 @@
+# template-categories.yaml — UIS stack templates
+# Deployed by `uis template install <id>` in the UIS provision-host container.
+
+context: uis
+name: Infrastructure Stacks
+description: Multi-service infrastructure compositions deployed via UIS
+order: 0
+emoji: "🏢"
+
+categories:
+  - id: DEMO
+    order: 0
+    name: Demo Stacks
+    description: Minimal demonstration templates for getting started with UIS
+    tags: demo getting-started minimal
+    logo: demo-stacks-logo.svg
+    emoji: "🎯"
