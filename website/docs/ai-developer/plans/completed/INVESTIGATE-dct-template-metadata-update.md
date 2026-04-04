@@ -4,7 +4,9 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Backlog
+## Status: Completed
+
+**Completed**: 2026-04-02
 
 **Goal**: Update the DCT template installer scripts (`dev-template.sh`, `dev-template-ai.sh`) to work with the finalised template metadata fields from dev-templates.
 
@@ -109,18 +111,18 @@ DCT uses **git sparse-checkout** to download only the `templates/` (or `ai-templ
 - [x] `scripts/lib/categories.sh` sources from `TEMPLATE_CATEGORIES` — no duplicate data
 - [x] Added `get_category_emoji()` function
 
-**DCT tasks** (dev-templates side is ready):
-- [ ] Update `dev-template.sh` to source `$TEMPLATE_REPO_DIR/templates/TEMPLATE_CATEGORIES`
-- [ ] Update `dev-template-ai.sh` to source `$TEMPLATE_REPO_DIR/ai-templates/TEMPLATE_CATEGORIES` (script exists, also has hardcoded `CATEGORY_WORKFLOW` and `CATEGORY_OTHER`)
-- [ ] Replace hardcoded category `case` statements and associative arrays in both scripts with dynamic grouping from `TEMPLATE_CATEGORY_TABLE`
-- [ ] Use emoji from `TEMPLATE_CATEGORY_TABLE` instead of hardcoded emojis
-- [ ] Consider moving the category parsing to `lib/template-common.sh` since both scripts need it
+**DCT tasks — ALL DONE:**
+- [x] Updated `dev-template.sh` to source `TEMPLATE_CATEGORIES` dynamically ✓
+- [x] Updated `dev-template-ai.sh` similarly ✓
+- [x] Replaced hardcoded category case statements with dynamic grouping from `TEMPLATE_CATEGORY_TABLE` ✓
+- [x] Category parsing moved to `lib/template-common.sh` ✓
+- [x] `TEMPLATE_ABSTRACT` and `TEMPLATE_README` read in `read_template_info()` ✓
 
 ---
 
 ## Next Steps
 
-- [ ] DCT maintainer implements `PLAN-template-readme-instructions.md` (TEMPLATE_README + ABSTRACT rename)
+- [x] DCT maintainer implements `PLAN-template-readme-instructions.md` (TEMPLATE_README + ABSTRACT rename) ✓ — completed 2026-04-01
 - [x] DCT maintainer implements `PLAN-template-tools-dct.md` (TEMPLATE_TOOLS auto-install) ✓ — completed 2026-03-30
-- [ ] DCT maintainer sources `TEMPLATE_CATEGORIES` and replaces hardcoded categories/emojis
-- [ ] DCT maintainer considers extended metadata for future `dev-template --list`
+- [x] DCT maintainer sources `TEMPLATE_CATEGORIES` and replaces hardcoded categories/emojis ✓ — implemented in `template-common.sh`
+- [ ] DCT maintainer considers extended metadata for future `dev-template --list` (tracked in INVESTIGATE-unified-template-system)

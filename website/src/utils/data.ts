@@ -1,14 +1,13 @@
 import type {Template} from '../types/template';
 import type {Category} from '../types/category';
-import templatesData from '../data/templates.json';
-import categoriesData from '../data/categories.json';
+import registryData from '../data/template-registry.json';
 
 export function getTemplates(): Template[] {
-  return templatesData.templates as Template[];
+  return registryData.templates as Template[];
 }
 
 export function getCategories(): Category[] {
-  return (categoriesData.categories as Category[]).sort((a, b) => a.order - b.order);
+  return (registryData.categories as Category[]).sort((a, b) => a.order - b.order);
 }
 
 export function getTemplatesByCategory(categoryId: string): Template[] {

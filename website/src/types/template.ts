@@ -1,10 +1,11 @@
 export interface Template {
   id: string;
+  folder: string;
   version: string;
-  type: 'app' | 'ai';
   name: string;
   description: string;
   category: string;
+  install_type: 'app' | 'overlay' | 'stack';
   abstract: string;
   tools: string;
   readme: string;
@@ -14,4 +15,5 @@ export interface Template {
   docs: string;
   summary: string;
   related: string[];
+  context: string;
 }

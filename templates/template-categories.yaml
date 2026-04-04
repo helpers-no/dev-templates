@@ -1,0 +1,24 @@
+# template-categories.yaml — category definitions for app templates
+
+context: dct
+name: App Templates
+description: App project templates (web servers, web apps)
+order: 0
+emoji: "\U0001F310"
+
+categories:
+  - id: BASIC_WEB_SERVER
+    order: 0
+    name: Basic Web Server Templates
+    description: Minimal web server templates that demonstrate Hello World in multiple languages
+    tags: webserver backend hello-world starter
+    logo: webserver-logo.svg
+    emoji: "\U0001F310"
+
+  - id: WEB_APP
+    order: 1
+    name: Web Application Templates
+    description: Frontend web application starter templates
+    tags: webapp frontend react vite
+    logo: webapp-logo.svg
+    emoji: "\U0001F4F1"

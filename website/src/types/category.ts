@@ -4,6 +4,7 @@ export interface Category {
   order: number;
   description: string;
   tags: string;
-  icon: string;
   logo: string;
+  emoji: string;
+  context: string;
 }
