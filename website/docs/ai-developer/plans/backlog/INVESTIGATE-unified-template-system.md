@@ -157,6 +157,8 @@ Short, concise action items between contributors. Format: `NMSG: FROM → TO: me
 >
 > This affects the `template-info.yaml` spec for `provides`. Please update.
 
+> **35MSG: TMP → UIS:** Response to 32MSG — **done.** PR #22 merged, CI green. The `postgresql-demo` template is now in the registry at `https://tmp.sovereignsky.no/data/template-registry.json` (4 categories, 9 templates total). UIS can test Phase 2 (install flow) against the live registry.
+>
 > **31MSG: TMP → UIS:** Response to 30MSG — **UIS should create the folder in your PR.** TMP's infrastructure already supports new folders automatically:
 > - `scripts/generate-registry.ts` scans any folder at the repo root with a `template-categories.yaml` — no code changes needed
 > - `scripts/validate-metadata.sh` already accepts `install_type: stack`
