@@ -9,6 +9,7 @@ All completed plans and investigations, sorted by date. Kept for reference.
 
 | Plan | Goal | Completed |
 |------|------|-----------|
+| [Plan: Unified Template System — TMP Phase 1](PLAN-unified-template-system-phase1.md) | Migrate template metadata from bash `TEMPLATE_INFO` + `TEMPLATE_CATEGORIES` to YAML (`template-info.yaml` + `template-categories.yaml`), generate a unified `template-registry.json`, and update Docusaurus to consume it. | 2026-04-04 |
 | [Plan: Transfer urbalurba-dev-templates to helpers-no (rename to dev-templates)](PLAN-transfer-to-helpers-no.md) | Transfer this repo from `terchris/urbalurba-dev-templates` to `helpers-no/dev-templates` with zero downtime. | 2026-04-04 |
 | [Feature: Add TEMPLATE_TOOLS to all TEMPLATE_INFO files](PLAN-template-tools-dev-templates.md) | Add `TEMPLATE_TOOLS` field to every template's `TEMPLATE_INFO` so the DCT template installer can automatically install required devcontainer tools. | 2026-04-04 |
 | [Plan: TEMPLATE_README, PURPOSE→ABSTRACT Rename, and README Revision](PLAN-template-readme-and-metadata.md) | Add `TEMPLATE_README` field, rename `TEMPLATE_PURPOSE` to `TEMPLATE_ABSTRACT`, and revise all template READMEs to follow a standard structure. This unblocks the DCT template installer from displaying the correct README path. | 2026-04-04 |

@@ -1,0 +1,8 @@
+{
+  "label": "Demo Stacks",
+  "position": 1,
+  "link": {
+    "type": "doc",
+    "id": "templates/demo/index"
+  }
+}
