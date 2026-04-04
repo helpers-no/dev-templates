@@ -4,59 +4,71 @@ sidebar_position: 3
 
 # Template Metadata Reference
 
-Every template must have a `TEMPLATE_INFO` file with all mandatory metadata fields. This file is read by the `dev-template.sh` installer and by the Docusaurus generation scripts.
+Every template must have a `template-info.yaml` file with metadata fields. This file is read by the generation script to produce `template-registry.json`, which serves both the Docusaurus website and the DCT installer.
 
 ## Fields
 
-All fields are mandatory.
+| Field | Required | Type | Description | Example |
+|-------|----------|------|-------------|---------|
+| `id` | Yes | string | Unique identifier. Must match the directory name. | `python-basic-webserver` |
+| `version` | Yes | string | Version number (semver). Must be quoted. | `"1.0.0"` |
+| `name` | Yes | string | Human-readable display name. | `Python Basic Webserver` |
+| `description` | Yes | string | One-line description (shown in tables and cards). | `Minimal Flask server with health endpoint` |
+| `category` | Yes | string | Category ID from parent folder's `template-categories.yaml`. | `BASIC_WEB_SERVER` |
+| `install_type` | Yes | string | How the installer copies files: `app`, `overlay`, or `stack`. | `app` |
+| `abstract` | Yes | string | 1-2 sentence description for menus and cards. | `Provides a minimal starting point...` |
+| `tools` | No | string | Space-separated DCT install script IDs. | `dev-python` |
+| `readme` | Yes | string | README filename (must exist in the template directory). | `README-python-basic-webserver.md` |
+| `tags` | Yes | list | YAML list of keywords for search and filtering. | `[python, flask, webserver]` |
+| `logo` | Yes | string | Logo filename (SVG in `website/static/img/templates/`). | `python-basic-webserver-logo.svg` |
+| `website` | No | string | External website URL. Empty string if none. | `""` |
+| `docs` | Yes | string | URL to the template source on GitHub. | `https://github.com/helpers-no/...` |
+| `summary` | Yes | string | Detailed description for the template detail page. | `A minimal Python web server...` |
+| `related` | No | list | YAML list of related template IDs. | `[php-basic-webserver]` |
 
-| Field | Description | Example |
-|-------|-------------|---------|
-| `TEMPLATE_ID` | Unique identifier. Must match the directory name. | `python-basic-webserver` |
-| `TEMPLATE_VER` | Version number (semver). | `1.0.0` |
-| `TEMPLATE_NAME` | Human-readable display name. | `Python Basic Webserver` |
-| `TEMPLATE_DESCRIPTION` | One-line description (shown in tables and cards). | `Minimal Flask server with health endpoint and Docker support` |
-| `TEMPLATE_CATEGORY` | Category ID. Must be a valid category. | `BASIC_WEB_SERVER` |
-| `TEMPLATE_ABSTRACT` | 1-2 sentence description for menus and cards. | `Provides a minimal starting point for developers who want to build a Python web server using Flask` |
-| `TEMPLATE_TOOLS` | Space-separated DCT install script IDs. Empty string if none needed. | `dev-python` |
-| `TEMPLATE_README` | README filename (must exist in the template directory). | `README-python-basic-webserver.md` |
-| `TEMPLATE_TAGS` | Space-separated keywords for search and filtering. | `python flask webserver api rest` |
-| `TEMPLATE_LOGO` | Logo filename (SVG in `website/static/img/templates/`). | `python-basic-webserver-logo.svg` |
-| `TEMPLATE_WEBSITE` | Framework/language homepage URL. | `https://flask.palletsprojects.com` |
-| `TEMPLATE_DOCS` | Framework/language documentation URL. | `https://flask.palletsprojects.com/en/stable/` |
-| `TEMPLATE_SUMMARY` | 3-5 sentence detailed description for the template detail page. | `A minimal Python web server using Flask with a health check endpoint, Docker containerization...` |
-| `TEMPLATE_RELATED` | Space-separated TEMPLATE_IDs of related templates. Empty string if none. | `php-basic-webserver typescript-basic-webserver` |
+Future fields (for templates with service dependencies): `params`, `requires`, `provides`. See the [unified template system investigation](../ai-developer/plans/backlog/INVESTIGATE-unified-template-system.md) for the full specification.
 
 ## Valid Categories
 
-| Category ID | Display Name |
-|------------|-------------|
-| `BASIC_WEB_SERVER` | Basic Web Server Templates |
-| `WEB_APP` | Web Application Templates |
-| `WORKFLOW` | Workflow Templates |
+Defined in `template-categories.yaml` in each template folder.
+
+| Category ID | Display Name | Folder |
+|------------|-------------|--------|
+| `BASIC_WEB_SERVER` | Basic Web Server Templates | `templates/` |
+| `WEB_APP` | Web Application Templates | `templates/` |
+| `WORKFLOW` | Workflow Templates | `ai-templates/` |
 
 ## Complete Example
 
-```bash
-TEMPLATE_ID="python-basic-webserver"
-TEMPLATE_VER="1.0.0"
-TEMPLATE_NAME="Python Basic Webserver"
-TEMPLATE_DESCRIPTION="Minimal Flask server with health endpoint and Docker support"
-TEMPLATE_CATEGORY="BASIC_WEB_SERVER"
-TEMPLATE_ABSTRACT="Provides a minimal starting point for developers who want to build a Python web server using Flask"
-TEMPLATE_TOOLS="dev-python"
-TEMPLATE_README="README-python-basic-webserver.md"
-TEMPLATE_TAGS="python flask webserver api rest"
-TEMPLATE_LOGO="python-basic-webserver-logo.svg"
-TEMPLATE_WEBSITE="https://flask.palletsprojects.com"
-TEMPLATE_DOCS="https://flask.palletsprojects.com/en/stable/"
-TEMPLATE_SUMMARY="A minimal Python web server using Flask with a health check endpoint, Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow. Ideal for microservices and API backends."
-TEMPLATE_RELATED="php-basic-webserver typescript-basic-webserver"
+```yaml
+id: python-basic-webserver
+version: "1.0.0"
+name: Python Basic Webserver
+description: Minimal Flask server with health endpoint and Docker support
+category: BASIC_WEB_SERVER
+install_type: app
+abstract: >
+  Provides a minimal starting point for developers who want to
+  build a Python web server using Flask.
+tools: dev-python
+readme: README-python-basic-webserver.md
+tags:
+  - python
+  - flask
+  - webserver
+  - api
+  - rest
+logo: python-basic-webserver-logo.svg
+website: ""
+docs: https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver
+summary: >
+  A minimal Python web server using Flask with a health check endpoint,
+  Docker containerization, Kubernetes deployment manifests, and GitHub
+  Actions CI/CD workflow. Ideal for microservices and API backends.
+related:
+  - php-basic-webserver
+  - typescript-basic-webserver
 ```
-
-## Naming Convention
-
-Field names follow the `TEMPLATE_*` pattern, mirroring the `SCRIPT_*` convention used in DCT (devcontainer-toolbox) and UIS (urbalurba-infrastructure). This consistency makes it easier to share tooling across projects.
 
 ## Validation
 
