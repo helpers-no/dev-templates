@@ -1,0 +1,5 @@
+# filename: templates/python-basic-webserver-database/requirements.txt
+# Python dependencies for the Flask web application with PostgreSQL
+Flask==2.3.3               # Web framework
+psycopg2-binary==2.9.9     # PostgreSQL driver
+python-dotenv==1.0.1       # Load DATABASE_URL from .env

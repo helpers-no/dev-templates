@@ -1,0 +1,21 @@
+# filename: templates/python-basic-webserver-database/manifests/kustomization.yaml
+# Kustomization configuration for Kubernetes resources
+#
+# Template variables:
+# {{GITHUB_USERNAME}} - Replaced with the GitHub username
+# {{REPO_NAME}} - Replaced with the repository name
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+
+commonLabels:
+  app: "{{REPO_NAME}}"
+  owner: "{{GITHUB_USERNAME}}"
+  managed-by: argocd
+
+commonAnnotations:
+  description: "Deployed via Urbalurba infrastructure"
+  repository: "https://github.com/{{GITHUB_USERNAME}}/{{REPO_NAME}}"

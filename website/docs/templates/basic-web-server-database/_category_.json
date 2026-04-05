@@ -1,0 +1,8 @@
+{
+  "label": "Basic Webserver with Database",
+  "position": 3,
+  "link": {
+    "type": "doc",
+    "id": "templates/basic-web-server-database/index"
+  }
+}
