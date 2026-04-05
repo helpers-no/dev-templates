@@ -22,3 +22,11 @@ categories:
     tags: webapp frontend react vite
     logo: webapp-logo.svg
     emoji: "\U0001F4F1"
+
+  - id: BASIC_WEB_SERVER_DATABASE
+    order: 2
+    name: Basic Webserver with Database
+    description: Minimal web server templates that connect to a UIS-deployed database
+    tags: webserver backend database postgresql starter
+    logo: webserver-logo.svg
+    emoji: "\U0001F5C4\uFE0F"

@@ -54,6 +54,9 @@ interface TemplateInfoYaml {
   docs: string;
   summary: string;
   related: string[];
+  params?: Record<string, string>;
+  requires?: Array<Record<string, unknown>>;
+  provides?: unknown;
 }
 
 // --- Scanning ---
@@ -198,7 +201,7 @@ for (const catFile of categoryFiles) {
     const raw = yaml.load(readFileSync(file, 'utf8')) as TemplateInfoYaml;
     validateTemplate(raw, file, dirName, categoryIdSet);
 
-    allTemplates.push({
+    const entry: Record<string, unknown> = {
       id: raw.id,
       folder: `${folderName}/${dirName}`,
       version: raw.version,
@@ -216,7 +219,14 @@ for (const catFile of categoryFiles) {
       summary: raw.summary?.trim(),
       related: Array.isArray(raw.related) ? raw.related : [],
       context,
-    });
+    };
+
+    // Optional fields — only include if present
+    if (raw.params) entry.params = raw.params;
+    if (raw.requires) entry.requires = raw.requires;
+    if (raw.provides) entry.provides = raw.provides;
+
+    allTemplates.push(entry);
   }
 }
 

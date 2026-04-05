@@ -1,0 +1,59 @@
+# filename: templates/python-basic-webserver-database/manifests/deployment.yaml
+# Kubernetes deployment for the Flask + PostgreSQL app
+# Template variables:
+# {{GITHUB_USERNAME}} - Replaced with the GitHub username
+# {{REPO_NAME}} - Replaced with the repository name
+#
+# The DATABASE_URL must be created as a Kubernetes Secret before deploying:
+#   kubectl create secret generic {{REPO_NAME}}-db \
+#     --from-literal=DATABASE_URL='postgresql://user:pass@postgresql.default.svc.cluster.local:5432/db'
+#
+# The cluster DATABASE_URL is returned by `uis configure postgresql --json` in
+# the `cluster.database_url` field.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{REPO_NAME}}-deployment"
+  labels:
+    app: "{{REPO_NAME}}"
+    owner: "{{GITHUB_USERNAME}}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{REPO_NAME}}"
+  template:
+    metadata:
+      labels:
+        app: "{{REPO_NAME}}"
+    spec:
+      containers:
+        - name: "{{REPO_NAME}}"
+          image: ghcr.io/{{GITHUB_USERNAME}}/{{REPO_NAME}}:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: "{{REPO_NAME}}-db"
+                  key: DATABASE_URL
+          resources:
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{REPO_NAME}}-service"
+spec:
+  selector:
+    app: "{{REPO_NAME}}"
+  ports:
+    - port: 80
+      targetPort: 3000

@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-04T23:48:23.656Z",
+  "generated": "2026-04-05T00:09:10.764Z",
   "categories": [
     {
       "id": "WORKFLOW",
@@ -39,6 +39,16 @@
       "tags": "webapp frontend react vite",
       "logo": "webapp-logo.svg",
       "emoji": "📱",
+      "context": "dct"
+    },
+    {
+      "id": "BASIC_WEB_SERVER_DATABASE",
+      "order": 2,
+      "name": "Basic Webserver with Database",
+      "description": "Minimal web server templates that connect to a UIS-deployed database",
+      "tags": "webserver backend database postgresql starter",
+      "logo": "webserver-logo.svg",
+      "emoji": "🗄️",
       "context": "dct"
     }
   ],
@@ -237,6 +247,49 @@
       "context": "dct"
     },
     {
+      "id": "python-basic-webserver-database",
+      "folder": "templates/python-basic-webserver-database",
+      "version": "1.0.0",
+      "name": "Python Basic Webserver with Database",
+      "description": "Flask server that connects to PostgreSQL and reads from a tasks table",
+      "category": "BASIC_WEB_SERVER_DATABASE",
+      "install_type": "app",
+      "abstract": "A minimal Flask web server that connects to a PostgreSQL database and reads from a tasks table. Demonstrates the full producer/consumer flow — UIS deploys PostgreSQL, dev-template configure creates the database and wires the connection into .env, and the app reads from it.",
+      "tools": "dev-python",
+      "readme": "README-python-basic-webserver-database.md",
+      "tags": [
+        "python",
+        "flask",
+        "postgresql",
+        "database",
+        "webserver",
+        "requires",
+        "demo"
+      ],
+      "logo": "python-basic-webserver-logo.svg",
+      "website": "",
+      "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver-database",
+      "summary": "A Flask web server that reads from a PostgreSQL database via DATABASE_URL. Includes a sample tasks table, Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow. This is the consumer-side companion to the postgresql-demo UIS stack template — run that first to deploy PostgreSQL, then dev-template configure on this template to create the database and wire up the connection.",
+      "related": [
+        "python-basic-webserver",
+        "postgresql-demo"
+      ],
+      "context": "dct",
+      "params": {
+        "app_name": "my-app",
+        "database_name": "my_app_db"
+      },
+      "requires": [
+        {
+          "service": "postgresql",
+          "config": {
+            "database": "{{ params.database_name }}",
+            "init": "config/init-database.sql"
+          }
+        }
+      ]
+    },
+    {
       "id": "typescript-basic-webserver",
       "folder": "templates/typescript-basic-webserver",
       "version": "1.0.0",
@@ -287,7 +340,22 @@
       "docs": "https://github.com/helpers-no/dev-templates/tree/main/uis-stack-templates/postgresql-demo",
       "summary": "A minimal demonstration template that deploys PostgreSQL to the UIS cluster and creates a sample database with a tasks table and seed data. Shows the uis template flow from registry to deployed, configured service. Use it to verify your UIS setup or as a starting point for your own stack templates.",
       "related": [],
-      "context": "uis"
+      "context": "uis",
+      "params": {
+        "app_name": "demo-app",
+        "database_name": "demo_db"
+      },
+      "provides": {
+        "services": [
+          {
+            "service": "postgresql",
+            "config": {
+              "database": "{{ params.database_name }}",
+              "init": "config/init-database.sql"
+            }
+          }
+        ]
+      }
     }
   ]
 }

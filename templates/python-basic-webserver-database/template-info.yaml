@@ -1,0 +1,44 @@
+id: python-basic-webserver-database
+version: "1.0.0"
+name: Python Basic Webserver with Database
+description: Flask server that connects to PostgreSQL and reads from a tasks table
+category: BASIC_WEB_SERVER_DATABASE
+install_type: app
+abstract: >
+  A minimal Flask web server that connects to a PostgreSQL database and
+  reads from a tasks table. Demonstrates the full producer/consumer flow —
+  UIS deploys PostgreSQL, dev-template configure creates the database
+  and wires the connection into .env, and the app reads from it.
+tools: dev-python
+readme: README-python-basic-webserver-database.md
+tags:
+  - python
+  - flask
+  - postgresql
+  - database
+  - webserver
+  - requires
+  - demo
+logo: python-basic-webserver-logo.svg
+website: ""
+docs: https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver-database
+summary: >
+  A Flask web server that reads from a PostgreSQL database via DATABASE_URL.
+  Includes a sample tasks table, Docker containerization, Kubernetes deployment
+  manifests, and GitHub Actions CI/CD workflow. This is the consumer-side
+  companion to the postgresql-demo UIS stack template — run that first to
+  deploy PostgreSQL, then dev-template configure on this template to create
+  the database and wire up the connection.
+related:
+  - python-basic-webserver
+  - postgresql-demo
+
+params:
+  app_name: "my-app"
+  database_name: "my_app_db"
+
+requires:
+  - service: postgresql
+    config:
+      database: "{{ params.database_name }}"
+      init: "config/init-database.sql"
