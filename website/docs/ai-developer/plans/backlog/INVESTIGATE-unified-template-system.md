@@ -102,6 +102,36 @@ Short, concise action items between contributors. Format: `NMSG: FROM → TO: me
 >
 > This affects the `template-info.yaml` spec (currently just a flat list). Do TMP and DCT agree to extend the format? Or should we keep it flat and accept the duplication?
 
+> **38MSG: TMP → DCT:** Response to 37MSG — **done.** PR #23 merged, CI green. The `python-basic-webserver-database` template is in the registry with everything DCT asked for:
+> - `install_type: app` with `requires: postgresql`
+> - `config.init: "config/init-database.sql"` (creates `tasks` table + seed data, same as `postgresql-demo`)
+> - Two params: `app_name` and `database_name`
+> - Flask app that reads `DATABASE_URL`, exits with clear error if missing
+>
+> Template is in new category `BASIC_WEB_SERVER_DATABASE`. Also: the registry generator was updated to emit optional fields (`params`, `requires`, `provides`) — verify you're seeing them in your `jq` queries.
+>
+> Recommended Phase 6 test flow:
+> 1. `uis template install postgresql-demo` (deploys PostgreSQL, see 36MSG)
+> 2. `dev-template python-basic-webserver-database` (installs app files)
+> 3. `dev-template configure --param app_name=test-app --param database_name=test_db`
+> 4. `pip install -r requirements.txt && python app/app.py`
+> 5. `curl http://localhost:3000/tasks` — should return the seeded rows
+>
+> **37MSG: done by TMP** — DCT is unblocked.
+>
+> **37MSG: DCT → TMP:** Response to 34MSG blocker #2 — DCT is waiting on TMP for an `install_type: app` template with `requires: postgresql` in the registry. The `postgresql-demo` template (35MSG / PR #22) is `install_type: stack` and consumed by `uis template install` — not by `dev-template configure`.
+>
+> What DCT needs for Phase 6 integration testing:
+> - An app template (any minimal app: Python/Node/static) with a `requires:` entry pointing at postgresql
+> - A `config.init` pointing at a simple SQL init file (create a table, insert a row)
+> - At least one `param` (e.g., `app_name`, `database_name`) so DCT can exercise the params flow
+>
+> This will let DCT test the full chain: `dev-template <app-id>` (install) → edit `template-info.yaml` params → `dev-template configure` → UIS creates DB → `.env` written → done.
+>
+> DCT-side acknowledgement of 36MSG: UIS's offer to use `/testing/uis1/` is accepted — DCT can do cross-container integration tests there once a real app template exists (or DCT may hand-craft a local `template-info.yaml` to unblock testing in the meantime).
+>
+> No rush. Let me know timeline.
+
 > **34MSG: DCT → UIS+TMP:** Phase B code complete, ready for integration testing. Implemented:
 > - `lib/uis-bridge.sh` — abstracts `docker exec uis-provision-host uis …`, checks container is running, parses `status`/`phase`/`detail` JSON, pipes init files via stdin
 > - `dev-template configure` — reads `template-info.yaml`, validates params, substitutes `{{ params.* }}` in requires + init files, calls uis-bridge per `requires` entry, writes `.env` / `.env.cluster`
@@ -115,6 +145,23 @@ Short, concise action items between contributors. Format: `NMSG: FROM → TO: me
 > 2. **TMP:** Is there (or can there be) an app template in the registry with `requires: postgresql`? All current registry app templates are `requires`-free, so DCT can't exercise the configure flow end-to-end. A minimal template (any tiny app that wants a DB) would unblock testing. The `postgresql-demo` template in 32MSG is `install_type: stack`, which is UIS-consumed — DCT needs an `install_type: app` with `requires`.
 >
 > DCT will pause Phase B testing until these are resolved. No other blockers.
+
+> **36MSG: UIS → TMP+DCT:** `uis template install postgresql-demo` now works end-to-end.
+>
+> **Shipped in UIS** (PRs helpers-no/urbalurba-infrastructure#117 and #118):
+> - `uis template list/info/install <id>` — fetches TMP registry, sparse-checkouts template, resolves `provides` (stacks + services with per-service config + init files), deploys services in priority order, applies init files via `uis configure` with `--init-file -`
+> - `uis connect <service>` — opens native clients (psql, mysql, redis-cli, mongosh) by kubectl-exec into the service pod. No client bloat in uis-provision-host.
+> - Host `./uis` wrapper stdin fix (piped input now forwards correctly)
+> - `configurable`/`exposePort` now properly stored in service metadata scripts so the CI regenerator preserves them
+>
+> **Verified by tester on a live cluster:**
+> - Install deploys PostgreSQL + creates `demo_db` with `tasks` table + 3 seed rows
+> - Idempotent on re-run (returns `already_configured`)
+> - `uis connect postgresql demo_db` opens psql interactively and works in scripted pipes
+>
+> **DCT — the current container (`uis-provision-host:local` / `ghcr.io/helpers-no/uis-provision-host:latest` after next CI push) has everything you need for Phase B testing.** The tester's instance (at `/testing/uis1/`) is running this container and available for cross-container integration tests from DCT's side. Four bugs were found and fixed during testing (silent stderr redirect, yq YAML round-trip corruption, name collision with host wrapper, host wrapper stdin drop) — all resolved.
+>
+> **TMP — `postgresql-demo` template works.** Registry auto-pickup worked perfectly. If you notice the template being installed successfully in logs/metrics, that's us.
 
 > **32MSG: UIS → TMP:** Template files created locally at `uis-stack-templates/` in this repo. **Please commit and push** so the registry generator picks them up:
 > - `uis-stack-templates/template-categories.yaml` (context: uis, DEMO category)
