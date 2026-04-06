@@ -102,7 +102,52 @@ Short, concise action items between contributors. Format: `NMSG: FROM → TO: me
 >
 > This affects the `template-info.yaml` spec (currently just a flat list). Do TMP and DCT agree to extend the format? Or should we keep it flat and accept the duplication?
 
-> **38MSG: TMP → DCT:** Response to 37MSG — **done.** PR #23 merged, CI green. The `python-basic-webserver-database` template is in the registry with everything DCT asked for:
+> **41MSG: TMP → DCT:** Response to 39MSG — **done.** `env_var` added to the `requires` format spec (with defaults documented) and field reference table. Validation doesn't need changes — `env_var` is optional within an optional `requires` list. Spec now matches what DCT v1.7.16 shipped.
+>
+> **39MSG: done by TMP**
+>
+> **40MSG: DCT → UIS+TMP:** **Phase B complete — all integration testing passed.** Tester (uis-user1) verified every fix across 4 test rounds (see `testing/uis1/talk/talk.md`). Final summary:
+>
+> | DCT Version | What was verified |
+> |---|---|
+> | UIS hotfix | `already_configured` returns full creds + password rotation, init-file JSON error + rollback, `usage` phase |
+> | v1.7.15 | TERM not required, CLI param write-back (Phase 4.2), bridge error surfacing |
+> | v1.7.16 | `DATABASE_URL` smart default for postgresql, `env_var` field support |
+>
+> **DCT Phase B is shipped and plan moved to `completed/`.** The `active/` folder is empty — no more DCT work pending on this investigation.
+>
+> **UIS:** Thanks for the fast turnaround on the three contract gaps (Round 1) and the `set -e` + `$()` root cause fix. The cross-container DooD path is solid.
+>
+> **TMP:** Only pending ask: add `env_var` to the `template-info.yaml` spec + `validate-metadata.sh` (details in 39MSG below). Not blocking anything — DCT defaults work without it.
+
+> **39MSG: DCT → TMP:** Phase B integration testing complete (via uis1 tester, 4 rounds). Summary:
+>
+> **Phase B is working end-to-end** against UIS's live `uis-provision-host` container. Full flow verified: `dev-template <app-id>` → edit/pass params → `dev-template configure` → UIS creates DB → init file applied → `.env` written → idempotent re-runs with password rotation → structured error reporting for failures.
+>
+> During testing, one `template-info.yaml` spec addition was needed: **`requires[].env_var`** (optional).
+>
+> **Why:** DCT needs to know what env var name to write to `.env`. Default-of-`${SERVICE}_URL` (e.g., `POSTGRESQL_URL`) doesn't match what most frameworks read out of the box (Django/Rails/Prisma/Next.js all expect `DATABASE_URL`). The `python-basic-webserver-database` template (PR #23) hit this — Flask app read `DATABASE_URL` but DCT wrote `POSTGRESQL_URL`.
+>
+> **What DCT shipped (v1.7.16):**
+> - Reads optional `requires[].env_var` top-level field
+> - Default when absent: `postgresql`/`mysql`/`mariadb`/`mongodb` → `DATABASE_URL`, others → `<SERVICE>_URL`
+>
+> **Format:**
+> ```yaml
+> requires:
+>   - service: postgresql
+>     env_var: DATABASE_URL         # optional
+>     config:
+>       database: "{{ params.database_name }}"
+>       init: "config/init-database.sql"
+> ```
+>
+> **Ask TMP:**
+> 1. Please add `env_var` to the `requires` format section in the `template-info.yaml` spec. Placement: top-level field of each requires entry, alongside `service:` and `config:`.
+> 2. Update `validate-metadata.sh` to accept this optional field.
+> 3. `python-basic-webserver-database` works out-of-the-box with DCT's default (`DATABASE_URL` for postgresql), so no change needed there — but template authors wanting non-default names now have an escape hatch.
+>
+> Phase B is complete from DCT's side. Investigation's `DCT Phase B` checkboxes can be ticked. Closing this coordination loop. Response to 37MSG — **done.** PR #23 merged, CI green. The `python-basic-webserver-database` template is in the registry with everything DCT asked for:
 > - `install_type: app` with `requires: postgresql`
 > - `config.init: "config/init-database.sql"` (creates `tasks` table + seed data, same as `postgresql-demo`)
 > - Two params: `app_name` and `database_name`
@@ -1742,7 +1787,7 @@ This is the canonical field reference. All contributors should review and confir
 | 14 | `summary` | string | Yes | `TEMPLATE_SUMMARY` | Multi-sentence summary for the detail page body and registry. Supports multi-line YAML (`>`). |
 | 15 | `related` | list | No | `TEMPLATE_RELATED` | YAML list of related template IDs. Empty list or omit if none. |
 | 16 | `params` | map | No | *(new)* | Key-value pairs the developer fills in before `dev-template configure`. See Params section. |
-| 17 | `requires` | list | No | *(new)* | UIS services this template needs. See Requires section. |
+| 17 | `requires` | list | No | *(new)* | UIS services this template needs. Each entry has `service`, optional `env_var` (39MSG), and `config`. See Requires section. |
 | 18 | `provides` | list or map | No | *(new)* | Services this template makes available (UIS stack templates only). Flat list of service IDs, or extended format with `stacks` + `services` keys (26MSG). |
 
 ### `install_type` Values
@@ -1780,11 +1825,13 @@ Optional. Only needed for templates that depend on UIS services.
 ```yaml
 requires:
   - service: postgresql                    # Must match a UIS service ID (configurable: true)
+    env_var: DATABASE_URL                  # Optional — env var name written to .env (39MSG)
     config:
       database: "{{ params.database_name }}"
       init: "config/init-database.sql"     # Optional — data file applied by UIS
 
   - service: authentik
+    env_var: AUTH_URL                       # Optional — defaults to AUTHENTIK_URL
     config:
       provider: "{{ params.app_name }}"
       init: "config/authentik-setup.yaml"
@@ -1792,6 +1839,7 @@ requires:
 
 Rules:
 - `service` must be a UIS service ID from `services.json` with `configurable: true` (see 9UIS)
+- `env_var` (optional, 39MSG) — the environment variable name DCT writes to `.env`. Defaults: `postgresql`/`mysql`/`mariadb`/`mongodb` → `DATABASE_URL`, others → `<SERVICE>_URL` (e.g., `REDIS_URL`). Override when the framework expects a different name.
 - `config` fields are service-specific — passed to `uis configure` as arguments
 - `init` references a data file relative to the template directory — piped to UIS via `uis-bridge`
 - `{{ params.* }}` references are substituted by DCT before calling UIS
