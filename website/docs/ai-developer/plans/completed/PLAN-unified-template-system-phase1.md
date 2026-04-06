@@ -10,7 +10,7 @@
 
 **Goal**: Migrate template metadata from bash `TEMPLATE_INFO` + `TEMPLATE_CATEGORIES` to YAML (`template-info.yaml` + `template-categories.yaml`), generate a unified `template-registry.json`, and update Docusaurus to consume it.
 
-**Investigation**: [INVESTIGATE-unified-template-system.md](../backlog/INVESTIGATE-unified-template-system.md)
+**Investigation**: [INVESTIGATE-unified-template-system.md](../completed/INVESTIGATE-unified-template-system.md)
 
 **Priority**: High
 

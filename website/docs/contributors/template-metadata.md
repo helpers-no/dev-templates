@@ -26,7 +26,7 @@ Every template must have a `template-info.yaml` file with metadata fields. This 
 | `summary` | Yes | string | Detailed description for the template detail page. | `A minimal Python web server...` |
 | `related` | No | list | YAML list of related template IDs. | `[php-basic-webserver]` |
 
-Future fields (for templates with service dependencies): `params`, `requires`, `provides`. See the [unified template system investigation](../ai-developer/plans/backlog/INVESTIGATE-unified-template-system.md) for the full specification.
+Future fields (for templates with service dependencies): `params`, `requires`, `provides`. See the [unified template system investigation](../ai-developer/plans/completed/INVESTIGATE-unified-template-system.md) for the full specification.
 
 ## Valid Categories
 
