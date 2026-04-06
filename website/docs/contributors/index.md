@@ -27,14 +27,14 @@ git checkout -b feature/my-new-template
 
 # 3. Create your template (see guide below)
 mkdir templates/my-new-template
-# ... add TEMPLATE_INFO, app code, README, Dockerfile, manifests
+# ... add template-info.yaml, app code, README, Dockerfile, manifests
 
 # 4. Validate locally
 bash scripts/validate-metadata.sh
 bash scripts/validate-docs.sh
 
-# 5. Test the Docusaurus build
-bash scripts/generate-templates-json.sh
+# 5. Generate and test
+bash scripts/generate-registry.sh
 bash scripts/generate-docs-markdown.sh --force
 npm run build --prefix website
 
@@ -45,7 +45,7 @@ git push origin feature/my-new-template
 ## Guides
 
 - [Creating a Template](creating-a-template.md) — step-by-step guide for the most common contribution
-- [Template Metadata Reference](template-metadata.md) — all TEMPLATE_INFO fields explained
+- [Template Metadata Reference](template-metadata.md) — all template-info.yaml fields explained
 - [Naming Conventions](naming-conventions.md) — how to name files, folders, and IDs
 - [Scripts Reference](scripts-reference.md) — validation and generation scripts
 - [README Structure](readme-structure.md) — standard sections for template READMEs
