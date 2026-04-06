@@ -10,17 +10,22 @@ All scripts live in `scripts/` at the repository root. They are used both locall
 
 ### validate-metadata.sh
 
-Checks that all `TEMPLATE_INFO` files have the required fields and valid values.
+Validates all `template-info.yaml` and `template-categories.yaml` files.
 
 ```bash
 bash scripts/validate-metadata.sh
 ```
 
 **Checks:**
+- YAML syntax is valid (uses node + js-yaml)
 - All mandatory fields are present and non-empty
-- `TEMPLATE_CATEGORY` is a valid category ID (defined in `scripts/lib/categories.sh`)
-- `TEMPLATE_ID` matches the directory name (warning if not)
-- README file referenced by `TEMPLATE_README` exists
+- `category` matches a category ID defined in the parent folder's `template-categories.yaml`
+- `install_type` is one of `app`, `overlay`, `stack`
+- `id` matches the directory name
+- `tags` is a YAML list
+- README file referenced by `readme` exists
+- Category IDs are unique across all folders
+- `context` is `dct` or `uis`
 
 **Exit code:** 0 if all valid, 1 if any errors.
 
@@ -52,39 +57,49 @@ Configuration file that defines what `validate-docs.sh` checks. Easy to edit wit
 README-*.md|required_heading|Quick Start|error
 ```
 
-To add a new check, add a line to this file.
-
 ## Generation Scripts
 
-### generate-templates-json.sh
+### generate-registry.ts / generate-registry.sh
 
-Scans all `TEMPLATE_INFO` files and generates JSON data for the Docusaurus website.
+Scans all `template-categories.yaml` and `template-info.yaml` files and generates the unified registry.
 
 ```bash
-bash scripts/generate-templates-json.sh
+bash scripts/generate-registry.sh
 ```
 
-**Output:**
-- `website/src/data/templates.json` — all template metadata
-- `website/src/data/categories.json` — category definitions
+**How it works:**
+1. Finds all `*/template-categories.yaml` files at the repo root
+2. Finds all `*/*/template-info.yaml` files within those folders
+3. Validates: unique category IDs, valid categories, required fields, id matches directory name
+4. Outputs `website/src/data/template-registry.json`
 
-Validates output with `jq` if available.
+**Output:** `website/src/data/template-registry.json` — contains both `categories` and `templates` arrays. This single file serves:
+- **Docusaurus website** — React components import it directly
+- **DCT installer** — `dev-template` fetches it via curl to build the selection menu
+- **UIS installer** — `uis template` fetches it for infrastructure template browsing
+
+The bash wrapper (`generate-registry.sh`) runs the TypeScript script via `tsx`. Requires `node`, `tsx`, and `js-yaml` (from `website/node_modules`).
 
 ### generate-docs-markdown.sh
 
-Generates Docusaurus pages from template metadata and README files.
+Generates Docusaurus pages from the registry and template README files.
 
 ```bash
 bash scripts/generate-docs-markdown.sh [--force]
 ```
 
+**How it works:**
+1. Reads `template-registry.json` with `jq`
+2. For each template: generates an MDX detail page with TemplateHeader component + embedded README content
+3. For each category: generates an index page with a table of templates
+4. Generates sidebar configuration (`_category_.json` files)
+
 **Output:**
-- `website/docs/templates/<category>/<template-id>.mdx` — detail pages with TemplateHeader + embedded README
+- `website/docs/templates/<category>/<template-id>.mdx` — detail pages
 - `website/docs/templates/<category>/index.md` — category index tables
 - `website/docs/templates/<category>/_category_.json` — Docusaurus sidebar config
-- `website/docs/templates/_category_.json` — top-level category config
 
-Use `--force` to overwrite existing files.
+Use `--force` to overwrite existing files. Requires `jq`.
 
 ### generate-plan-indexes.sh
 
@@ -102,13 +117,11 @@ bash scripts/generate-plan-indexes.sh [plans-dir]
 
 ## Library Scripts
 
-Located in `scripts/lib/`. Sourced by the scripts above.
+Located in `scripts/lib/`. Sourced by the validation script.
 
 | Script | Purpose |
 |--------|---------|
 | `logging.sh` | Colored output functions (`log_info`, `log_success`, `log_warn`, `log_error`) |
-| `categories.sh` | Template category definitions and accessor functions. Includes JSON generation. |
-| `template-scanner.sh` | Reads `TEMPLATE_*` fields from TEMPLATE_INFO files using safe line-by-line parsing. |
 
 ## Brand Scripts
 
@@ -125,7 +138,9 @@ Requires `dev-imagetools` installed in the devcontainer (`dev-setup` > Image Pro
 GitHub Actions (`.github/workflows/deploy-docs.yml`) runs these scripts automatically on push to main:
 
 ```
-validate-metadata.sh → validate-docs.sh → generate-templates-json.sh
+validate-metadata.sh → validate-docs.sh → generate-registry.ts
 → generate-docs-markdown.sh → generate-plan-indexes.sh
 → auto-commit generated files → npm run build → deploy to GitHub Pages
 ```
+
+**Triggers:** Changes to `website/**`, `templates/**/template-info.yaml`, `templates/template-categories.yaml`, `ai-templates/**/template-info.yaml`, `ai-templates/template-categories.yaml`, `scripts/**`, or the workflow file itself.

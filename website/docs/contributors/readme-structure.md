@@ -67,7 +67,7 @@ After installation, your project contains:
 │   └── workflows/
 │       └── urbalurba-build-and-push.yaml  # CI/CD pipeline
 ├── Dockerfile                             # Container build
-├── TEMPLATE_INFO                          # Template metadata
+├── template-info.yaml                     # Template metadata
 └── README-<template-name>.md              # This file
 `​``
 
