@@ -25,7 +25,8 @@ summary: >
   and creates a sample database with a tasks table and seed data. Shows the
   uis template flow from registry to deployed, configured service. Use it to
   verify your UIS setup or as a starting point for your own stack templates.
-related: []
+related:
+  - python-basic-webserver-database
 
 params:
   app_name: "demo-app"

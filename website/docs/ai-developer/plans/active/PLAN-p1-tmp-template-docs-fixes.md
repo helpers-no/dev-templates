@@ -78,33 +78,17 @@ No external dependencies. Can ship as a single PR while DCT and UIS work in para
 
 ---
 
-## Phase 2: README rewrite — `postgresql-demo`
+## Phase 2: README rewrite — `postgresql-demo` — DONE
 
-**Blocked on**: DCT 1.8 (uis shim) shipping. Once the shim is available, `postgresql-demo`'s README can use bare `uis ...` commands.
+**Blocked on**: DCT 1.8 (uis shim) shipping. ✓ DCT v1.7.34 is live.
 
 ### Tasks
 
-- [ ] 2.1 Drop the misleading "From the UIS provision-host:" prefix throughout the README
-  - The `uis template install postgresql-demo` command itself is correct — it works from DCT, host, and UIS provision-host once the DCT shim ships
-  - Just remove the contextual prefix that tells users to shell into the wrong container
-  - Solves: A3
-
-- [ ] 2.2 Add a "Try this with" or "Related templates" section linking to `python-basic-webserver-database`
-  - Recommended approach: populate the `related: []` field in `template-info.yaml` with `[python-basic-webserver-database]` so the auto-generated "Related Templates" section appears
-  - Alternatively, add a markdown section in the README — but `related:` is the canonical place
-  - Solves: A4
-
-- [ ] 2.3 Add a "Before you start" prerequisite section explaining the UIS provision-host requirement
-  - Same template as the new requirement in 3.5 below
-  - Verify UIS is running with `docker ps --filter name=uis-provision-host --format '{{.Status}}'`
-  - Or `uis status` (after the shim ships)
-  - Solves: C5 (for postgresql-demo)
-
-- [ ] 2.4 Update the "Verify it worked" section to use bare `uis` commands
-  - Replace the current `psql -h host.docker.internal -p 35432 ...` example with `uis connect postgresql demo_db` (works after the shim ships)
-  - Keep the manual approach as a secondary option for users who don't have the shim yet
-
-- [ ] 2.5 Regenerate docs and verify the build
+- [x] 2.1 Drop the misleading "From the UIS provision-host:" prefix throughout the README ✓
+- [x] 2.2 Populate `related:` in `template-info.yaml` with `[python-basic-webserver-database]` — auto-generated "Related Templates" section now appears ✓
+- [x] 2.3 Add a "Before you start" prerequisite section ✓
+- [x] 2.4 Update the "Verify it worked" section to use `uis connect postgresql demo_db` ✓
+- [x] 2.5 Regenerate docs and verify the build ✓ (validate-docs passes, npm run build SUCCESS)
 
 ### Validation
 
