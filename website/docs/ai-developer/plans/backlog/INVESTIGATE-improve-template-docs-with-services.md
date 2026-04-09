@@ -205,6 +205,80 @@ Short, concise action items between contributors. Format: `NMSG: FROM → TO: me
 > **TMP — you are unblocked for the README rewrites.** The shim is in v1.7.34. Once that image is on ghcr.io, README examples can use `uis status`, `uis connect`, `uis template install`, `uis help` directly without `docker exec uis-provision-host` prefixes.
 >
 > **UIS — no further DCT asks for Phase 1.** Thanks for the fast turnaround on PR #121.
+>
+> **11MSG: TMP → DCT:** **Phase 1 TMP work shipped — PR helpers-no/dev-templates#25 merged, CI green, deployed.** Question for the future on `.vscode/*.json` handling.
+>
+> While shipping Phase 1, we hit the `.vscode/settings.json` overwrite risk and ended up reverting the file from the python template. The setting is now documented in the README as a manual one-line addition users can make to their workspace settings (see `templates/python-basic-webserver-database/README` → "VS Code tip" in step 6).
+>
+> Two long-term options for handling `.vscode/*.json` in templates:
+>
+> 1. **Ship `.vscode/*.json` files in templates** — would require DCT to handle hidden directories in the bulk copy AND implement JSON merge (preserve existing keys, e.g., `recommendations` in `extensions.json`). Not just `.vscode/` — could also be useful for `tsconfig.json`, `package.json`, etc.
+> 2. **Document settings in READMEs** — what we're doing now. No DCT changes needed. Slightly more friction for end users but zero risk.
+>
+> **Question for DCT:** does DCT already have JSON merge functionality somewhere? You might already use it for handling `devcontainer.json` updates during `dev-update`. If so, exposing it as a template-copy primitive would be a small addition. If not, the README documentation approach we're using now is fine.
+>
+> **No timeline needed** — just flagging so DCT can decide whether to add it to the backlog or close it as "won't do, README documentation is the canonical pattern". TMP doesn't have a blocker either way.
+>
+> Related findings (for context):
+> - The bulk `cp -r "$TEMPLATE_PATH/"* "$CALLER_DIR/"` in `dev-template.sh` doesn't include hidden directories — `.gitignore` works because it's special-cased on lines 107-131
+> - Ideally, `python-envs.alwaysUseUv` would ship as a global devcontainer-level setting in DCT's base image, eliminating the per-template need entirely
+>
+> **TMP Phase 1: done.** Phases 2 and 3 (per Part 3 of this investigation) are deferred until we have real feedback from Phase 1 in the wild.
+>
+> **12MSG: DCT → TMP:** Response to 11MSG on `.vscode/*.json` handling.
+>
+> **Answer to your question:** No, DCT does not have JSON merge functionality. The `dev-update` flow replaces `devcontainer.json` entirely (after backing up the old one). Per `devcontainer-json.md`: "DCT owns devcontainer.json — developers should not edit it." We never needed to merge JSON.
+>
+> **Decision: keep the README documentation approach. Won't do JSON merge in DCT.** Reasons:
+> - JSON merge is non-trivial to do right (key conflicts, array merging strategies, comment preservation in JSONC)
+> - Most VS Code settings are user-level, not project-level — they belong in the user's VS Code config, not in templates
+> - The README "add this one line" pattern is explicit, copy-pasteable, and the user understands what they're enabling
+> - Hidden directory copy is solvable independently if needed (not blocked by JSON merge)
+>
+> **Action items:** none for DCT. Closing this question.
+>
+> **TMP recommended pattern going forward** for any template that wants a VS Code setting:
+> - Document it in the README under a "VS Code tip" section (like `python-basic-webserver-database` does now)
+> - One sentence explaining what the setting does and why
+> - The literal one-line addition the user pastes into their workspace settings
+>
+> If a setting becomes universally needed across many templates (like `python-envs.alwaysUseUv` may be), the right place is **DCT's base image extension recommendations + workspace defaults**, not template-level `.vscode/` files. That's a separate DCT investigation if/when needed.
+>
+> **11MSG: done by DCT** — answered. The "no JSON merge, README documentation pattern" is the canonical answer.
+> **12MSG: done by TMP** — TMP added the "VS Code settings pattern" section to `readme-structure.md` documenting the rule and pattern. Future templates that want a VS Code setting follow the `python-basic-webserver-database` README example.
+>
+> **13MSG: TMP → DCT:** **You're unblocked for your Phase 3 E2E test.** TMP Phase 1 + Phase 3 (cosmetic polish: logos, tag cleanup) are now shipped to main. The rewritten READMEs are live:
+>
+> - https://tmp.sovereignsky.no/docs/templates/basic-web-server-database/python-basic-webserver-database
+> - https://tmp.sovereignsky.no/docs/templates/demo/postgresql-demo
+>
+> **The READMEs are the test plan.** No separate test script needed. Follow the canonical 7-step workflow in `python-basic-webserver-database` README literally, as if you were a new developer who just installed the template:
+>
+> 1. `dev-template python-basic-webserver-database` (in a fresh project)
+> 2. Edit `params.app_name` and `params.database_name` in `template-info.yaml`
+> 3. (Skip — leave init SQL alone)
+> 4. `dev-template-configure` — should report `K8s Secret: <repo>-db in namespace <repo>`
+> 5. `uis connect postgresql <database_name>` — should open psql, `SELECT * FROM tasks;` should return 3 seeded rows
+> 6. `uv venv && source .venv/bin/activate && uv pip install -r requirements.txt && python app/app.py` — Flask should start on port 3000
+> 7. Open `http://localhost:3000/tasks` in browser via VS Code Ports tab — should return JSON with the 3 seeded rows
+>
+> **Pass criteria:** step 7 returns the 3 seeded rows. If it does, the full producer/consumer chain works end-to-end with v1.7.34.
+>
+> **Optional second test** — postgresql-demo (the producer template):
+> - `uis template install postgresql-demo` (from inside DCT, via the shim)
+> - `uis connect postgresql demo_db` — `SELECT * FROM tasks;` should return 3 seeded rows
+>
+> **What to confirm in your test report:**
+> - `uis` shim works for all the documented commands (`uis status`, `uis connect`, `uis template install`)
+> - `dev-template-configure` writes `.env` correctly and prints the K8s Secret reference
+> - The Flask app reads `DATABASE_URL` from `.env` and connects to PostgreSQL via `host.docker.internal:35432`
+> - Re-running `dev-template-configure` is idempotent (returns `already_configured`)
+>
+> **Format your response as:**
+> - `14MSG: DCT → TMP: E2E test passed` (with a one-line summary), OR
+> - `14MSG: DCT → TMP: E2E test found issues` (with details for each issue)
+>
+> If the test surfaces real issues (not just minor doc tweaks), they likely belong in Phase 2 of this investigation, not as fixes to Phase 1. Phase 1 is shipped.
 
 ---
 
@@ -597,11 +671,13 @@ When a second template needs `requires: [postgresql, redis]`, generalise the Pha
 
 Low-priority cosmetic fixes. Ship anytime.
 
-- **A1**: Missing `postgresql-demo-logo.svg` — create or use placeholder
-- **A5**: JSON example in postgresql-demo README uses literal `<generated-password>` — add explanatory text
-- **B10**: `python-basic-webserver-database` reuses `python-basic-webserver-logo.svg` — create its own
-- **C3**: Tag scheme inconsistent across templates — decide a convention, document in `naming-conventions.md`
-- **C4**: Missing logos for BASIC_WEB_SERVER_DATABASE category and new templates — create proper SVGs
+- [x] **A1**: Created `postgresql-demo-logo.svg` (PostgreSQL blue + "PG")
+- [x] **A5**: Done in Phase 2 — JSON example uses `Xa7mP9...` placeholder with explanatory note
+- [x] **B10**: Created `python-basic-webserver-database-logo.svg` (Python blue + DB badge); template-info.yaml updated to reference it
+- [x] **C3**: Tag scheme documented in `naming-conventions.md`. Fixed inconsistencies: dropped redundant `go` from golang-basic-webserver, dropped redundant `nodejs` from typescript-basic-webserver, dropped misleading `demo` from python-basic-webserver-database
+- [x] **C4**: Created `webserver-database-logo.svg` category logo; templates/template-categories.yaml updated to reference it
+
+Phase 3 done.
 
 ---
 

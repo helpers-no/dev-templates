@@ -25,6 +25,34 @@ These are recommended but not enforced:
 | **Development** | How to edit, test, and debug the app |
 | **CI/CD** | How the GitHub Actions workflow works |
 | **Try this with** | Cross-references to related/companion templates |
+| **VS Code tip** | One-line workspace setting the user can paste into their existing `.vscode/settings.json` (see "VS Code settings pattern" below) |
+
+## VS Code settings pattern (do not ship `.vscode/` files)
+
+**Templates must not ship `.vscode/settings.json` or `.vscode/extensions.json` files.** Per [12MSG in INVESTIGATE-improve-template-docs-with-services.md](../ai-developer/plans/backlog/INVESTIGATE-improve-template-docs-with-services.md), DCT does not implement JSON merge for template files. A template that ships `.vscode/settings.json` would risk overwriting the user's existing VS Code config (including the devcontainer extension recommendation in `extensions.json` that the project needs to start).
+
+**If your template benefits from a specific VS Code workspace setting**, document it in the README under a "VS Code tip" section. The pattern (used by `python-basic-webserver-database`):
+
+```markdown
+**VS Code tip (optional):** if you see "Error refreshing packages" from VS Code's Python extension, add this to your workspace `.vscode/settings.json`:
+
+`​``json
+{
+  "python-envs.alwaysUseUv": true
+}
+`​``
+
+The error happens because <one-sentence reason>. The setting tells <which extension> to <what it does instead>. If your project's `.vscode/settings.json` already exists with other keys, just add this one — don't replace the file.
+```
+
+**The three rules:**
+
+1. **One sentence explaining the symptom** — what error/problem the user might see
+2. **One sentence explaining the fix** — what the setting does
+3. **The literal one-line addition** — copy-pasteable JSON
+4. **A "don't replace the file" reminder** — protects users with existing VS Code config
+
+**If a setting becomes universally needed across many templates**, the right home is DCT's base devcontainer image (extension recommendations + workspace defaults), not template-level files. That's a DCT investigation, not a template change.
 
 ## Required Sections for templates with `requires`
 

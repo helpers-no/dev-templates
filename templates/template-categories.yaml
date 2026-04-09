@@ -28,5 +28,5 @@ categories:
     name: Basic Webserver with Database
     description: Minimal web server templates that connect to a UIS-deployed database
     tags: webserver backend database postgresql starter
-    logo: webserver-logo.svg
+    logo: webserver-database-logo.svg
     emoji: "\U0001F5C4\uFE0F"
