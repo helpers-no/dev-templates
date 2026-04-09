@@ -4,11 +4,11 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Backlog
+## Status: Active
 
 **Goal**: Ship the TMP-side Phase 1 work from `INVESTIGATE-improve-template-docs-with-services.md`. Fix the bugs real-user testing surfaced in `python-basic-webserver-database` and `postgresql-demo`, plus the cross-cutting MDX generator and template hygiene issues.
 
-**Investigation**: [INVESTIGATE-improve-template-docs-with-services.md](INVESTIGATE-improve-template-docs-with-services.md)
+**Investigation**: [INVESTIGATE-improve-template-docs-with-services.md](../backlog/INVESTIGATE-improve-template-docs-with-services.md)
 
 **Cross-team dependencies**:
 - **DCT**: shipping `PLAN-p1-dct-shim.md` (items 1.8 + 1.9 in the investigation) — DCT shim + `--namespace`/`--secret-name-prefix` pass-through
@@ -35,52 +35,29 @@ The plan is structured so that workstream 1 ships first as a single PR, then 2 a
 
 ---
 
-## Phase 1: Independent TMP fixes (start immediately)
+## Phase 1: Independent TMP fixes (start immediately) — DONE
 
 No external dependencies. Can ship as a single PR while DCT and UIS work in parallel.
 
 ### Tasks
 
-- [ ] 1.1 Update `scripts/generate-docs-markdown.sh` to route the install command by template `context`
-  - Read the `context` field from the registry (already present in `template-registry.json`)
-  - For `context: uis` → `install_cmd="uis template install $tid"`
-  - For `context: dct` → `install_cmd="dev-template $tid"` (existing behavior)
-  - Solves: A2 (postgresql-demo's TemplateHeader showing the wrong command)
+- [x] 1.1 Update `scripts/generate-docs-markdown.sh` to route the install command by template `context` ✓
+- [x] 1.2 Stop the generator from emitting a duplicated "## Summary" section ✓
 
-- [ ] 1.2 Stop the generator from emitting a duplicated "## Summary" section
-  - Currently `generate-docs-markdown.sh` writes both the TemplateHeader description AND a separate `## Summary` section using the `summary` field. Then the README adds its own intro paragraph — same content three times.
-  - Drop the standalone `## Summary` section. Let TemplateHeader + README intro carry the content.
-  - Solves: C1
-
-- [ ] 1.3 Add `.gitignore` to `templates/python-basic-webserver-database/`
-  - Create file with at minimum:
-    ```
-    .env
-    .env.*
-    .venv/
-    __pycache__/
-    *.pyc
-    ```
-  - Solves: C6 (immediate), unblocks B5/B6 cleanup
-  - Note: this is the project root `.gitignore`. Phase 2 work (C7) moves `.env*` into `.devcontainer.secrets/env-vars/`, which makes the `.env*` rules redundant — but they should stay as belt-and-suspenders.
-
-- [ ] 1.4 Add `.gitignore` to `uis-stack-templates/postgresql-demo/`
-  - Even though the stack template doesn't generate `.env` files today, ship the `.gitignore` to set the standard for future stack templates
-  - Same minimal content as 1.3
-
-- [ ] 1.5 Add `.vscode/settings.json` to `templates/python-basic-webserver-database/`
-  - Create file with:
-    ```json
-    {
-      "python-envs.alwaysUseUv": true
-    }
-    ```
-  - Solves: B6 (VS Code Python extension default-pip-list error on uv-created venvs)
-  - Note: this is the template's `.vscode/`, which will get copied into the user's project on `dev-template install`. Confirm the existing copy logic in `dev-template.sh` includes hidden directories like `.vscode/`.
-
-- [ ] 1.6 Verify the `dev-template install` copy logic includes `.vscode/` and `.gitignore`
-  - Quick test: install python-basic-webserver-database into a scratch project, confirm both files appear at the project root
-  - If they're missing, that's a bug in `dev-template.sh` (DCT) — flag it to DCT, not blocking this PR
+- [x] 1.3 Add `.gitignore` to `templates/python-basic-webserver-database/`
+- [x] 1.4 Add `.gitignore` to `uis-stack-templates/postgresql-demo/`
+- [x] 1.5 Add `.vscode/settings.json` to `templates/python-basic-webserver-database/`
+- [x] 1.6 Verify the `dev-template install` copy logic includes `.vscode/` and `.gitignore`
+  - **Finding (DCT bug to flag):** Reviewed `helpers-no/devcontainer-toolbox/.devcontainer/manage/dev-template.sh` lines 88-131:
+    - ✅ `.gitignore` is handled explicitly (lines 107-131) — DCT merges it intelligently
+    - ✅ `.github/` is handled explicitly (lines 98-105)
+    - ✅ `template-info.yaml` is copied explicitly (lines 93-96)
+    - ❌ **`.vscode/` is NOT handled** — the bulk copy `cp -r "$TEMPLATE_PATH/"* "$CALLER_DIR/"` uses a glob `*` which by default does NOT match hidden directories. The `.vscode/settings.json` we just created in 1.5 will not be copied to user projects.
+  - **Action:** flag to DCT as a follow-up. Either:
+    - Add an explicit copy step for `.vscode/` (matching the `.github/` pattern), OR
+    - Use `cp -rT` with `shopt -s dotglob` to include hidden files in the bulk copy, OR
+    - Use `rsync -a` instead of `cp -r`
+  - **Not blocking this PR** — we ship the template files; DCT fixes their copy logic separately. Once DCT ships the fix, the `.vscode/settings.json` will start appearing in new projects without us having to do anything.
 
 - [ ] 1.7 Regenerate the registry and docs locally
   - `bash scripts/generate-registry.sh`
@@ -89,15 +66,15 @@ No external dependencies. Can ship as a single PR while DCT and UIS work in para
   - Confirm the postgresql-demo page now shows `uis template install postgresql-demo` as the install command (1.1)
   - Confirm the duplicated `## Summary` is gone (1.2)
 
-### Validation
+### Validation — DONE
 
-- `bash scripts/validate-metadata.sh` passes (5 categories, 10 templates)
-- `bash scripts/validate-docs.sh` passes (no broken links, no MDX errors)
-- `npm run build --prefix website` succeeds inside the devcontainer
-- Spot-check both template pages on the local Docusaurus build:
-  - postgresql-demo: install command shows `uis template install postgresql-demo`
-  - python-basic-webserver-database: no duplicated summary
-- User confirms phase is complete before moving to the dependent phases
+- [x] `bash scripts/validate-metadata.sh` passes — 5 categories, 10 templates
+- [x] `bash scripts/validate-docs.sh` passes — 0 errors, 4 warnings (optional headings only)
+- [x] `npm run build --prefix website` succeeds in devcontainer
+- [x] postgresql-demo MDX page shows `install="uis template install postgresql-demo"` (1.1 verified)
+- [x] python-basic-webserver-database MDX page uses `install="dev-template python-basic-webserver-database"` (existing behavior preserved)
+- [x] No `## Summary` section emitted by generator (1.2 verified)
+- [ ] User confirms Phase 1 complete before moving to dependent phases
 
 ---
 
@@ -313,7 +290,7 @@ This phase can run in parallel with Phase 3 (it doesn't depend on the DCT shim o
 
 ## Cross-references
 
-- **Investigation**: [INVESTIGATE-improve-template-docs-with-services.md](INVESTIGATE-improve-template-docs-with-services.md)
+- **Investigation**: [INVESTIGATE-improve-template-docs-with-services.md](../backlog/INVESTIGATE-improve-template-docs-with-services.md)
 - **DCT plan** (cross-team): `helpers-no/devcontainer-toolbox` → `PLAN-p1-dct-shim.md`
 - **UIS plan** (cross-team): `helpers-no/urbalurba-infrastructure` → `PLAN-p1-uis-secret-namespace.md`
 - **Coordination items in the investigation**:
