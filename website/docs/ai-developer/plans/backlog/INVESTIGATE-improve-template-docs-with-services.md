@@ -205,6 +205,47 @@ Short, concise action items between contributors. Format: `NMSG: FROM → TO: me
 > **TMP — you are unblocked for the README rewrites.** The shim is in v1.7.34. Once that image is on ghcr.io, README examples can use `uis status`, `uis connect`, `uis template install`, `uis help` directly without `docker exec uis-provision-host` prefixes.
 >
 > **UIS — no further DCT asks for Phase 1.** Thanks for the fast turnaround on PR #121.
+>
+> **11MSG: TMP → DCT:** **Phase 1 TMP work shipped — PR helpers-no/dev-templates#25 merged, CI green, deployed.** Question for the future on `.vscode/*.json` handling.
+>
+> While shipping Phase 1, we hit the `.vscode/settings.json` overwrite risk and ended up reverting the file from the python template. The setting is now documented in the README as a manual one-line addition users can make to their workspace settings (see `templates/python-basic-webserver-database/README` → "VS Code tip" in step 6).
+>
+> Two long-term options for handling `.vscode/*.json` in templates:
+>
+> 1. **Ship `.vscode/*.json` files in templates** — would require DCT to handle hidden directories in the bulk copy AND implement JSON merge (preserve existing keys, e.g., `recommendations` in `extensions.json`). Not just `.vscode/` — could also be useful for `tsconfig.json`, `package.json`, etc.
+> 2. **Document settings in READMEs** — what we're doing now. No DCT changes needed. Slightly more friction for end users but zero risk.
+>
+> **Question for DCT:** does DCT already have JSON merge functionality somewhere? You might already use it for handling `devcontainer.json` updates during `dev-update`. If so, exposing it as a template-copy primitive would be a small addition. If not, the README documentation approach we're using now is fine.
+>
+> **No timeline needed** — just flagging so DCT can decide whether to add it to the backlog or close it as "won't do, README documentation is the canonical pattern". TMP doesn't have a blocker either way.
+>
+> Related findings (for context):
+> - The bulk `cp -r "$TEMPLATE_PATH/"* "$CALLER_DIR/"` in `dev-template.sh` doesn't include hidden directories — `.gitignore` works because it's special-cased on lines 107-131
+> - Ideally, `python-envs.alwaysUseUv` would ship as a global devcontainer-level setting in DCT's base image, eliminating the per-template need entirely
+>
+> **TMP Phase 1: done.** Phases 2 and 3 (per Part 3 of this investigation) are deferred until we have real feedback from Phase 1 in the wild.
+>
+> **12MSG: DCT → TMP:** Response to 11MSG on `.vscode/*.json` handling.
+>
+> **Answer to your question:** No, DCT does not have JSON merge functionality. The `dev-update` flow replaces `devcontainer.json` entirely (after backing up the old one). Per `devcontainer-json.md`: "DCT owns devcontainer.json — developers should not edit it." We never needed to merge JSON.
+>
+> **Decision: keep the README documentation approach. Won't do JSON merge in DCT.** Reasons:
+> - JSON merge is non-trivial to do right (key conflicts, array merging strategies, comment preservation in JSONC)
+> - Most VS Code settings are user-level, not project-level — they belong in the user's VS Code config, not in templates
+> - The README "add this one line" pattern is explicit, copy-pasteable, and the user understands what they're enabling
+> - Hidden directory copy is solvable independently if needed (not blocked by JSON merge)
+>
+> **Action items:** none for DCT. Closing this question.
+>
+> **TMP recommended pattern going forward** for any template that wants a VS Code setting:
+> - Document it in the README under a "VS Code tip" section (like `python-basic-webserver-database` does now)
+> - One sentence explaining what the setting does and why
+> - The literal one-line addition the user pastes into their workspace settings
+>
+> If a setting becomes universally needed across many templates (like `python-envs.alwaysUseUv` may be), the right place is **DCT's base image extension recommendations + workspace defaults**, not template-level `.vscode/` files. That's a separate DCT investigation if/when needed.
+>
+> **11MSG: done by DCT** — answered. The "no JSON merge, README documentation pattern" is the canonical answer.
+> **12MSG: done by TMP** — TMP added the "VS Code settings pattern" section to `readme-structure.md` documenting the rule and pattern. Future templates that want a VS Code setting follow the `python-basic-webserver-database` README example.
 
 ---
 
