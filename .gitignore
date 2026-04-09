@@ -14,3 +14,7 @@ website-backup/
 # DevContainer Toolbox - credentials folder (NEVER commit)
 .devcontainer.secrets/
 website/static/img/brand/tmp/
+
+# DevContainer Toolbox - devcontainer.json backups from dev-update
+.devcontainer/backup/
+.claude/
