@@ -183,7 +183,15 @@ uv run python app/app.py
 
 The Flask debug server starts on port 3000.
 
-The shipped `.vscode/settings.json` enables `python-envs.alwaysUseUv` so VS Code's Python extension uses `uv` for package operations and works seamlessly with the venv.
+**VS Code tip (optional):** if you see "Error refreshing packages" from VS Code's Python extension, add this to your workspace `.vscode/settings.json`:
+
+```json
+{
+  "python-envs.alwaysUseUv": true
+}
+```
+
+The error happens because `uv venv` doesn't install `pip` into the venv (it doesn't need to), and VS Code's Python extension defaults to `pip list` for package enumeration. The setting tells it to use `uv` instead. If your project's `.vscode/settings.json` already exists with other keys, just add this one — don't replace the whole file.
 
 ### 7. Open in your browser
 
@@ -210,8 +218,6 @@ After installation, your project contains:
 ├── .github/
 │   └── workflows/
 │       └── urbalurba-build-and-push.yaml           # CI/CD pipeline
-├── .vscode/
-│   └── settings.json                               # python-envs.alwaysUseUv: true
 ├── .gitignore                                      # Excludes .env*, .venv/, etc.
 ├── Dockerfile                                      # Container build
 ├── requirements.txt                                # Flask, psycopg2-binary, python-dotenv

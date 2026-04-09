@@ -48,18 +48,20 @@ No external dependencies. Can ship as a single PR while DCT and UIS work in para
 
 - [x] 1.3 Add `.gitignore` to `templates/python-basic-webserver-database/`
 - [x] 1.4 Add `.gitignore` to `uis-stack-templates/postgresql-demo/`
-- [x] 1.5 Add `.vscode/settings.json` to `templates/python-basic-webserver-database/`
+- [~] 1.5 ~~Add `.vscode/settings.json` to `templates/python-basic-webserver-database/`~~ — **REVERTED**
+  - Initial implementation shipped a `.vscode/settings.json` with `python-envs.alwaysUseUv: true`. This was reverted because it would risk overwriting the user's existing `.vscode/settings.json` (or `extensions.json`) which contains the devcontainer recommendation needed for the project to start.
+  - **New approach:** the README documents the setting as a one-line manual addition users can make to their workspace settings if they hit the VS Code "Error refreshing packages" cosmetic error. Doesn't risk overwriting anything.
+  - **DCT follow-up:** ideally DCT ships `python-envs.alwaysUseUv: true` as a global devcontainer-level setting in the base image (per the open question in B6 of the investigation). Then no template needs to ship it. Tracked as a DCT ask.
+  - Solves: B6 (via documentation, not via template file)
 - [x] 1.6 Verify the `dev-template install` copy logic includes `.vscode/` and `.gitignore`
-  - **Finding (DCT bug to flag):** Reviewed `helpers-no/devcontainer-toolbox/.devcontainer/manage/dev-template.sh` lines 88-131:
+  - **Finding (still relevant for future templates):** Reviewed `helpers-no/devcontainer-toolbox/.devcontainer/manage/dev-template.sh` lines 88-131:
     - ✅ `.gitignore` is handled explicitly (lines 107-131) — DCT merges it intelligently
     - ✅ `.github/` is handled explicitly (lines 98-105)
     - ✅ `template-info.yaml` is copied explicitly (lines 93-96)
-    - ❌ **`.vscode/` is NOT handled** — the bulk copy `cp -r "$TEMPLATE_PATH/"* "$CALLER_DIR/"` uses a glob `*` which by default does NOT match hidden directories. The `.vscode/settings.json` we just created in 1.5 will not be copied to user projects.
-  - **Action:** flag to DCT as a follow-up. Either:
-    - Add an explicit copy step for `.vscode/` (matching the `.github/` pattern), OR
-    - Use `cp -rT` with `shopt -s dotglob` to include hidden files in the bulk copy, OR
-    - Use `rsync -a` instead of `cp -r`
-  - **Not blocking this PR** — we ship the template files; DCT fixes their copy logic separately. Once DCT ships the fix, the `.vscode/settings.json` will start appearing in new projects without us having to do anything.
+    - ❌ **`.vscode/` is NOT handled** — the bulk copy `cp -r "$TEMPLATE_PATH/"* "$CALLER_DIR/"` uses a glob `*` which by default does NOT match hidden directories.
+    - ⚠️ **Even if DCT fixes the hidden-directory bug**, naively copying `.vscode/` would overwrite the user's existing `.vscode/extensions.json` with the devcontainer recommendation, breaking the project. DCT would need a JSON merge strategy similar to the `.gitignore` line-merge.
+  - **DCT follow-up:** if DCT wants to support `.vscode/` in templates, they need both (a) include hidden directories in the bulk copy AND (b) implement JSON-merge for `.vscode/*.json` files (preserving existing keys). Until then, templates can't safely ship `.vscode/` files.
+  - **Decision for this PR:** don't ship `.vscode/` from any template. Document VS Code settings in the README as manual additions instead.
 
 - [ ] 1.7 Regenerate the registry and docs locally
   - `bash scripts/generate-registry.sh`
@@ -147,7 +149,7 @@ No external dependencies. Can ship as a single PR while DCT and UIS work in para
 - [x] Generator routes install commands by `context` (postgresql-demo shows `uis template install`)
 - [x] Generator no longer emits duplicated `## Summary` sections
 - [x] Both templates have `.gitignore` files preventing `.env*` from being committed
-- [x] python-basic-webserver-database has `.vscode/settings.json` enabling `python-envs.alwaysUseUv`
+- [x] python-basic-webserver-database README documents the `python-envs.alwaysUseUv` setting as a manual workspace addition (not shipped as a file — see 1.5 reverted)
 - [x] postgresql-demo README uses bare `uis ...` commands (no "From the UIS provision-host:" prefix)
 - [x] postgresql-demo README links to python-basic-webserver-database via `related:`
 - [x] python-basic-webserver-database README follows the canonical workflow from the investigation
