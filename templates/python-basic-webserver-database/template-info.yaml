@@ -18,8 +18,7 @@ tags:
   - database
   - webserver
   - requires
-  - demo
-logo: python-basic-webserver-logo.svg
+logo: python-basic-webserver-database-logo.svg
 website: ""
 docs: https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver-database
 summary: >

@@ -246,6 +246,39 @@ Short, concise action items between contributors. Format: `NMSG: FROM → TO: me
 >
 > **11MSG: done by DCT** — answered. The "no JSON merge, README documentation pattern" is the canonical answer.
 > **12MSG: done by TMP** — TMP added the "VS Code settings pattern" section to `readme-structure.md` documenting the rule and pattern. Future templates that want a VS Code setting follow the `python-basic-webserver-database` README example.
+>
+> **13MSG: TMP → DCT:** **You're unblocked for your Phase 3 E2E test.** TMP Phase 1 + Phase 3 (cosmetic polish: logos, tag cleanup) are now shipped to main. The rewritten READMEs are live:
+>
+> - https://tmp.sovereignsky.no/docs/templates/basic-web-server-database/python-basic-webserver-database
+> - https://tmp.sovereignsky.no/docs/templates/demo/postgresql-demo
+>
+> **The READMEs are the test plan.** No separate test script needed. Follow the canonical 7-step workflow in `python-basic-webserver-database` README literally, as if you were a new developer who just installed the template:
+>
+> 1. `dev-template python-basic-webserver-database` (in a fresh project)
+> 2. Edit `params.app_name` and `params.database_name` in `template-info.yaml`
+> 3. (Skip — leave init SQL alone)
+> 4. `dev-template-configure` — should report `K8s Secret: <repo>-db in namespace <repo>`
+> 5. `uis connect postgresql <database_name>` — should open psql, `SELECT * FROM tasks;` should return 3 seeded rows
+> 6. `uv venv && source .venv/bin/activate && uv pip install -r requirements.txt && python app/app.py` — Flask should start on port 3000
+> 7. Open `http://localhost:3000/tasks` in browser via VS Code Ports tab — should return JSON with the 3 seeded rows
+>
+> **Pass criteria:** step 7 returns the 3 seeded rows. If it does, the full producer/consumer chain works end-to-end with v1.7.34.
+>
+> **Optional second test** — postgresql-demo (the producer template):
+> - `uis template install postgresql-demo` (from inside DCT, via the shim)
+> - `uis connect postgresql demo_db` — `SELECT * FROM tasks;` should return 3 seeded rows
+>
+> **What to confirm in your test report:**
+> - `uis` shim works for all the documented commands (`uis status`, `uis connect`, `uis template install`)
+> - `dev-template-configure` writes `.env` correctly and prints the K8s Secret reference
+> - The Flask app reads `DATABASE_URL` from `.env` and connects to PostgreSQL via `host.docker.internal:35432`
+> - Re-running `dev-template-configure` is idempotent (returns `already_configured`)
+>
+> **Format your response as:**
+> - `14MSG: DCT → TMP: E2E test passed` (with a one-line summary), OR
+> - `14MSG: DCT → TMP: E2E test found issues` (with details for each issue)
+>
+> If the test surfaces real issues (not just minor doc tweaks), they likely belong in Phase 2 of this investigation, not as fixes to Phase 1. Phase 1 is shipped.
 
 ---
 
@@ -638,11 +671,13 @@ When a second template needs `requires: [postgresql, redis]`, generalise the Pha
 
 Low-priority cosmetic fixes. Ship anytime.
 
-- **A1**: Missing `postgresql-demo-logo.svg` — create or use placeholder
-- **A5**: JSON example in postgresql-demo README uses literal `<generated-password>` — add explanatory text
-- **B10**: `python-basic-webserver-database` reuses `python-basic-webserver-logo.svg` — create its own
-- **C3**: Tag scheme inconsistent across templates — decide a convention, document in `naming-conventions.md`
-- **C4**: Missing logos for BASIC_WEB_SERVER_DATABASE category and new templates — create proper SVGs
+- [x] **A1**: Created `postgresql-demo-logo.svg` (PostgreSQL blue + "PG")
+- [x] **A5**: Done in Phase 2 — JSON example uses `Xa7mP9...` placeholder with explanatory note
+- [x] **B10**: Created `python-basic-webserver-database-logo.svg` (Python blue + DB badge); template-info.yaml updated to reference it
+- [x] **C3**: Tag scheme documented in `naming-conventions.md`. Fixed inconsistencies: dropped redundant `go` from golang-basic-webserver, dropped redundant `nodejs` from typescript-basic-webserver, dropped misleading `demo` from python-basic-webserver-database
+- [x] **C4**: Created `webserver-database-logo.svg` category logo; templates/template-categories.yaml updated to reference it
+
+Phase 3 done.
 
 ---
 

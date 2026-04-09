@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-09T10:54:21.147Z",
+  "generated": "2026-04-09T11:47:31.108Z",
   "categories": [
     {
       "id": "WORKFLOW",
@@ -47,7 +47,7 @@
       "name": "Basic Webserver with Database",
       "description": "Minimal web server templates that connect to a UIS-deployed database",
       "tags": "webserver backend database postgresql starter",
-      "logo": "webserver-logo.svg",
+      "logo": "webserver-database-logo.svg",
       "emoji": "🗄️",
       "context": "dct"
     }
@@ -148,7 +148,6 @@
       "readme": "README-golang-basic-webserver.md",
       "tags": [
         "golang",
-        "go",
         "webserver",
         "api",
         "rest"
@@ -263,10 +262,9 @@
         "postgresql",
         "database",
         "webserver",
-        "requires",
-        "demo"
+        "requires"
       ],
-      "logo": "python-basic-webserver-logo.svg",
+      "logo": "python-basic-webserver-database-logo.svg",
       "website": "",
       "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver-database",
       "summary": "A Flask web server that reads from a PostgreSQL database via DATABASE_URL. Includes a sample tasks table, Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow. This is the consumer-side companion to the postgresql-demo UIS stack template — run that first to deploy PostgreSQL, then dev-template configure on this template to create the database and wire up the connection.",
@@ -302,7 +300,6 @@
       "readme": "README-typescript-basic-webserver.md",
       "tags": [
         "typescript",
-        "nodejs",
         "express",
         "webserver",
         "api",
