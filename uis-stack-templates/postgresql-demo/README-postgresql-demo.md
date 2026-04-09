@@ -1,6 +1,6 @@
 # PostgreSQL Demo
 
-A minimal UIS stack template that deploys PostgreSQL and creates a sample database with seed data. Use this to verify your UIS setup or as a starting point for your own stack templates.
+A minimal UIS stack template that deploys PostgreSQL and creates a sample database with seed data. Use it to verify your UIS setup, or as a starting point for your own UIS stack templates.
 
 ## What it deploys
 
@@ -8,17 +8,27 @@ A minimal UIS stack template that deploys PostgreSQL and creates a sample databa
 
 ## What it configures
 
-- Creates a per-app user (derived from `app_name` param)
-- Creates a database (from `database_name` param)
-- Applies the init SQL file — creates a `tasks` table with 3 seed rows
+- A per-app user (derived from `app_name` param)
+- A database (from `database_name` param)
+- The init SQL — creates a `tasks` table with 3 seed rows
 
-## Usage
+## Before you start
 
-From the UIS provision-host:
+This template uses UIS. Verify the UIS provision-host container is running:
+
+```bash
+docker ps --filter name=uis-provision-host --format '{{.Status}}'
+```
+
+You should see `Up X minutes`. If not, start UIS from the `urbalurba-infrastructure` repo. Inside DCT (devcontainer-toolbox v1.7.34 or later) you also have the `uis` shim, which lets you run UIS commands directly.
+
+## Install
 
 ```bash
 uis template install postgresql-demo
 ```
+
+This works from inside the DCT devcontainer (via the `uis` shim), from the host (via `./uis` from the urbalurba-infrastructure repo), and from inside the UIS provision-host. Same command, three contexts.
 
 With custom params:
 
@@ -28,7 +38,7 @@ uis template install postgresql-demo --param app_name=myapp --param database_nam
 
 ## What you get
 
-After install, `uis template install` returns JSON with connection details:
+After install, `uis template install` returns JSON with connection details (passwords are randomly generated — your actual values will be different):
 
 ```json
 {
@@ -37,41 +47,49 @@ After install, `uis template install` returns JSON with connection details:
   "local": {
     "host": "host.docker.internal",
     "port": 35432,
-    "database_url": "postgresql://demo_app:<generated-password>@host.docker.internal:35432/demo_db"
+    "database_url": "postgresql://demo_app:Xa7mP9...@host.docker.internal:35432/demo_db"
   },
   "cluster": {
     "host": "postgresql.default.svc.cluster.local",
-    "port": 5432,
-    "database_url": "postgresql://demo_app:<generated-password>@postgresql.default.svc.cluster.local:5432/demo_db"
+    "port": 5432
   },
   "database": "demo_db",
   "username": "demo_app",
-  "password": "<generated-password>"
+  "password": "Xa7mP9...",
+  "secret_name": "<repo>-db",
+  "secret_namespace": "<repo>"
 }
 ```
 
+The `local` URL works from your DCT devcontainer (Flask, psql, etc.) via the host port-forward.
+The `cluster` connection is what K8s pods use — UIS also creates a Kubernetes Secret in your app's namespace so deployments can read it via `secretKeyRef`.
+
 ## Verify it worked
 
-Expose the service and connect:
+The simplest way to inspect the seeded data:
 
 ```bash
-uis expose postgresql
+uis connect postgresql demo_db
 ```
 
-Then from any container with psql:
-
-```bash
-psql -h host.docker.internal -p 35432 -U demo_app -d demo_db
-# Enter the password from the JSON output above
-```
-
-Query the tasks table:
+Inside psql:
 
 ```sql
 SELECT * FROM tasks;
+\q
 ```
 
 You should see 3 rows. Re-running `uis template install postgresql-demo` is safe — it detects the existing database and returns `already_configured`.
+
+## Try this with
+
+Once PostgreSQL is running and you've installed this demo template, scaffold a Flask app on top with the consumer-side template:
+
+```bash
+dev-template python-basic-webserver-database
+```
+
+That template's `dev-template-configure` step will create its own per-app database (separate from `demo_db`) and write `DATABASE_URL` to `.env` for local dev. Run the app with `uv run python app/app.py` and curl `/tasks` to see the full producer/consumer chain working end-to-end.
 
 ## Extending this template
 
@@ -81,3 +99,5 @@ This template is the minimum viable example. To build your own:
 2. Edit `template-info.yaml` — change `id`, `name`, add more services to `provides`
 3. Add more init files in `config/` (SQL, Authentik blueprints, Grafana dashboards)
 4. Reference UIS stacks (like `observability`) in `provides.stacks` to include multi-service stacks
+
+See the [contributor docs](https://tmp.sovereignsky.no/docs/contributors/creating-a-template) for the full template authoring guide.

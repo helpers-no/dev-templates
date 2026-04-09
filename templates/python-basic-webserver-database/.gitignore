@@ -1,0 +1,24 @@
+# Environment files (credentials — never commit)
+.env
+.env.*
+
+# Python virtualenv (created by `uv venv` or `python -m venv`)
+.venv/
+
+# Python bytecode and caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+# Test/build artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+
+# IDE/editor (but keep .vscode/settings.json which the template ships)
+.idea/
+*.swp

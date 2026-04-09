@@ -1,0 +1,7 @@
+# Environment files (credentials — never commit)
+.env
+.env.*
+
+# Editor swap files
+*.swp
+.idea/

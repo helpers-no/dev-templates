@@ -12,9 +12,9 @@ These sections must be present (checked by `validate-docs.sh`):
 
 | Section | Purpose |
 |---------|---------|
-| **Quick Start** | Numbered copy-paste steps to run the app |
-| **Prerequisites** | What's needed (tools are auto-installed) |
-| **Project Structure** | Directory tree showing deployed layout |
+| **Quick Start** | Numbered copy-paste steps to install, configure, and run the template |
+| **Prerequisites** | What needs to exist before the template works (DCT, UIS provision-host running, services deployed in cluster) |
+| **Project Structure** | Directory tree showing the layout the user sees after `dev-template <id>` |
 
 ## Optional Sections
 
@@ -22,12 +22,29 @@ These are recommended but not enforced:
 
 | Section | Purpose |
 |---------|---------|
-| **Development** | How to edit, test, and debug |
-| **Docker Build** | How to build the container image |
-| **Kubernetes Deployment** | How to deploy to K8s |
+| **Development** | How to edit, test, and debug the app |
 | **CI/CD** | How the GitHub Actions workflow works |
+| **Try this with** | Cross-references to related/companion templates |
 
-## Template
+## Required Sections for templates with `requires`
+
+If your template declares `requires:` in `template-info.yaml` (i.e., it needs UIS services like PostgreSQL, Redis, Authentik), the README must include these additional sections:
+
+| Section | Purpose |
+|---------|---------|
+| **What this is** | Brief description of the app — what it does, what endpoints it has, what the user will see when it runs |
+| **Prerequisites** (UIS-aware) | Verify the UIS provision-host container is running. Mention that DCT v1.7.34+ provides the `uis` shim so commands like `uis status` and `uis connect` work from inside DCT. |
+| **Inline file content** | Embed `template-info.yaml` (at minimum the `params:` and `requires:` sections) and the init file(s) (e.g., `config/init-database.sql`) directly in the README so users see the format without opening files |
+| **Verify it worked** | A DB-level (or service-level) verify command that doesn't require running the app — for PostgreSQL, `uis connect <service> <db>` is the canonical pattern |
+
+## Removed sections
+
+These sections used to be optional but should NOT be added to new templates:
+
+- **~~Docker Build~~** — manual `docker build` and `docker run` bypass the GitHub Actions pipeline. New templates should not document the manual flow.
+- **~~Kubernetes Deployment~~** — manual `kubectl apply` bypasses ArgoCD. New templates should use a single "Deploy" section that walks through `git push` → GitHub Actions → ArgoCD.
+
+## Template — basic app (no `requires`)
 
 ```markdown
 # Template Display Name
@@ -36,9 +53,9 @@ Brief one-line description of what this template provides.
 
 ## Quick Start
 
-1. Update your terminal (tools were installed):
+1. Create the project from this template:
    `​``bash
-   source ~/.bashrc
+   dev-template <template-id>
    `​``
 
 2. Run the app:
@@ -77,30 +94,134 @@ After installation, your project contains:
 - Describe hot reload behavior if applicable
 - The `/` endpoint returns "Hello World" with template name and time/date
 
-## Docker Build
+## Deploy to your local cluster
+
+1. `git push` — GitHub Actions builds and pushes the image
+2. `./uis argocd register <app-name> <repo-url>` — register with ArgoCD (one-time)
+3. Access the app at `http://<app-name>.localhost`
+```
+
+## Template — app with `requires` (database, auth, etc.)
+
+For templates that depend on UIS services, follow the pattern from `python-basic-webserver-database`:
+
+```markdown
+# Template Display Name
+
+Brief one-line description.
+
+## What this is
+
+A small but complete <framework> application:
+
+| Endpoint | Method | Returns |
+|---|---|---|
+| `/` | GET | ... |
+| `/items` | GET | ... |
+
+The app **requires** `<ENV_VAR>` and exits if it's missing.
+
+## Prerequisites
+
+This template uses UIS to configure <service>. Verify the UIS provision-host container is running:
 
 `​``bash
-docker build -t <template-name> .
-docker run -p <port>:<port> <template-name>
+docker ps --filter name=uis-provision-host --format '{{.Status}}'
 `​``
 
-## Kubernetes Deployment
+Inside DCT v1.7.34+ you also have the `uis` shim. If `<service>` isn't deployed, `dev-template-configure` will tell you what to run.
 
+## Quick Start
+
+### 1. Install the template
 `​``bash
-kubectl apply -k manifests/
+dev-template <template-id>
 `​``
 
-The app will be accessible at `http://<app-name>.localhost` after ArgoCD registration.
+### 2. Edit `template-info.yaml`
+Open `template-info.yaml`, find the `params:` section, set your values:
 
-## CI/CD
+`​``yaml
+params:
+  app_name: "my-cool-app"
+  database_name: "my_cool_app_db"
+`​``
 
-The GitHub Actions workflow automatically builds and pushes the Docker image
-to GitHub Container Registry when changes are pushed to the main branch.
+The full `template-info.yaml` declares the dependency:
+`​``yaml
+requires:
+  - service: <service>
+    config:
+      ...
+      init: "config/init-<service>.<ext>"
+`​``
+
+### 3. (Optional) Customise `config/init-<service>.<ext>`
+`​``<lang>
+-- The init file content goes here, embedded in the README
+`​``
+
+All statements should be idempotent so re-running configure is safe.
+
+### 4. Run `dev-template-configure`
+`​``bash
+dev-template-configure
+`​``
+
+### 5. Verify the database (or service)
+`​``bash
+uis connect <service> <db-or-resource>
+`​``
+
+### 6. Run the app
+`​``bash
+uv venv
+source .venv/bin/activate
+uv pip install -r requirements.txt
+python app/app.py
+`​``
+
+### 7. Open in your browser
+VS Code's Ports tab auto-forwards the port. Click the globe icon next to it.
+
+## Project Structure
+
+After installation, your project contains:
+
+`​``plaintext
+├── app/
+├── config/
+│   └── init-<service>.<ext>     # Schema/config (applied by dev-template-configure)
+├── manifests/
+├── .vscode/
+│   └── settings.json            # IDE settings
+├── .gitignore                   # Excludes .env*, .venv/, etc.
+├── template-info.yaml           # Template metadata
+└── README-<template-name>.md    # This file
+`​``
+
+## Development
+
+...
+
+## Deploy to your local cluster
+
+1. `git push` — GitHub Actions builds and pushes the image
+2. `./uis argocd register <app-name> <repo-url>` — register with ArgoCD
+3. Access the app at `http://<app-name>.localhost`
+
+The Kubernetes Secret containing service credentials is created automatically by `dev-template-configure` (via UIS) and referenced from `manifests/deployment.yaml` via `secretKeyRef`. You don't need to create it manually.
+
+## Try this with
+
+- [Companion or related templates](../<category>/<other-template>) — describe how they compose
 ```
 
 ## Notes
 
 - The **Quick Start** section is the most important — users see it first after installation
-- **Project Structure** should show the deployed layout (what the user sees after `dev-template` runs), not the template source layout
+- **Project Structure** should show the layout the user sees after `dev-template <id>` runs, not the template source layout
 - Keep descriptions concise — the README is a quick reference, not a tutorial
-- Don't include tool installation instructions — `dev-template.sh` handles this via `TEMPLATE_TOOLS`
+- Don't include tool installation instructions — `dev-template <id>` and `dev-template-configure` handle this via `tools:` in `template-info.yaml`
+- For templates with `requires:`, **embed the file contents** for `template-info.yaml` and init files in the README. Users need to see what they're editing.
+- **Don't document manual `docker build` or `kubectl apply` workflows.** They bypass GitHub Actions + ArgoCD and aren't the standard platform workflow.

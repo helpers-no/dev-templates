@@ -81,6 +81,7 @@ for i in $(seq 0 $((template_count - 1))); do
     description=$(jq -r ".templates[$i].description" "$REGISTRY")
     category=$(jq -r ".templates[$i].category" "$REGISTRY")
     install_type=$(jq -r ".templates[$i].install_type" "$REGISTRY")
+    context=$(jq -r ".templates[$i].context" "$REGISTRY")
     abstract=$(jq -r ".templates[$i].abstract" "$REGISTRY")
     tools=$(jq -r ".templates[$i].tools" "$REGISTRY")
     readme=$(jq -r ".templates[$i].readme" "$REGISTRY")
@@ -106,8 +107,14 @@ for i in $(seq 0 $((template_count - 1))); do
         continue
     fi
 
-    # Install command — always dev-template now (unified command)
-    local_install_cmd="dev-template $tid"
+    # Install command — route by template context (Phase 1 task 1.1)
+    # context: dct → dev-template (DCT devcontainer command)
+    # context: uis → uis template install (UIS provision-host command, available in DCT via the uis shim from DCT v1.7.34+)
+    if [[ "$context" == "uis" ]]; then
+        local_install_cmd="uis template install $tid"
+    else
+        local_install_cmd="dev-template $tid"
+    fi
 
     # Build tags array for MDX component
     local_tags_mdx=$(jq -r ".templates[$i].tags | @json" "$REGISTRY")
@@ -119,7 +126,8 @@ for i in $(seq 0 $((template_count - 1))); do
 "
     done < <(jq -r ".templates[$i].tags[]" "$REGISTRY")
 
-    # Write MDX file
+    # Write MDX file (Phase 1 task 1.2: no separate ## Summary section —
+    # the TemplateHeader description + README intro carry the content)
     cat > "$page_file" <<MDXEOF
 ---
 title: $name
@@ -141,12 +149,6 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   tags={$local_tags_mdx}
   tools="$tools"
 />
-
-## Summary
-
-$summary
-
----
 
 MDXEOF
 
