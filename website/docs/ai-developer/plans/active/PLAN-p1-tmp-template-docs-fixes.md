@@ -4,7 +4,9 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Active
+## Status: Completed (pending PR merge)
+
+**Completed**: 2026-04-09
 
 **Goal**: Ship the TMP-side Phase 1 work from `INVESTIGATE-improve-template-docs-with-services.md`. Fix the bugs real-user testing surfaced in `python-basic-webserver-database` and `postgresql-demo`, plus the cross-cutting MDX generator and template hygiene issues.
 
@@ -100,57 +102,20 @@ No external dependencies. Can ship as a single PR while DCT and UIS work in para
 
 ---
 
-## Phase 3: README rewrite — `python-basic-webserver-database`
+## Phase 3: README rewrite — `python-basic-webserver-database` — DONE
 
-**Blocked on**: DCT 1.8 (uis shim) AND UIS 1.10 (minimum D5) shipping. The README needs both — the shim for clean `uis ...` commands, and the new `uis configure --namespace` flow for the install instructions.
-
-This is the big one. The current README has 8 distinct issues that all collapse into a coordinated rewrite around the canonical workflow from the investigation (Part 6).
+**Blocked on**: DCT 1.8 (uis shim) AND UIS 1.10 (minimum D5) shipping. ✓ Both live (DCT v1.7.34, UIS PR #121).
 
 ### Tasks
 
-- [ ] 3.1 Add a "What this is" section near the top, before Quick Start
-  - One paragraph: Flask web server, PostgreSQL connection, tasks table, three endpoints
-  - Endpoints table: `/`, `/tasks`, `/health` with descriptions and example responses
-  - What you'll see when it runs (Flask debug server output)
-  - Solves: B4
-
-- [ ] 3.2 Add a "Before you start" section
-  - Same template as 2.3 — verify UIS provision-host is running
-  - Solves: C5
-
-- [ ] 3.3 Replace the "Quick Start" section with the canonical workflow
-  - **Step 1**: `dev-template python-basic-webserver-database` (the missing first step from B1)
-  - **Step 2**: Verify UIS is running (delete the wrong "Deploy via postgresql-demo" instruction from B8 — replace with `uis status postgresql` and the trust-`dev-template-configure`-to-tell-you message)
-  - **Step 3**: Edit `template-info.yaml` (with inline content showing the params section) and optionally `config/init-database.sql` (with inline content)
-  - **Step 4**: Run `dev-template-configure`
-  - **Step 5**: Verify the database with `uis connect postgresql <db>` (the new Verify section from B2 + 1.12 + 1.13)
-  - **Step 6**: Run the app with `uv venv` + `uv pip install` + `python app/app.py` (B5)
-  - **Step 7**: Deploy: `git push` + `./uis argocd register` (Phase 2 will replace step 7 with `dev-template register`)
-  - Solves: B1, B2, B3, B5, B8 + 1.12 + 1.13
-
-- [ ] 3.4 Embed `template-info.yaml` content inline (per B3)
-  - Show the full file in a code block in the README (or at minimum the `params:` and `requires:` sections)
-  - Add an "About this file" subsection explaining: this file is read by `dev-template-configure`, edit `params:` to set values, the `requires:` section declares the PostgreSQL dependency
-  - Solves: B3 (template-info.yaml part)
-
-- [ ] 3.5 Embed `config/init-database.sql` content inline (per B3)
-  - Show the SQL in a code block
-  - Add a one-line explanation: this file is applied to PostgreSQL by `uis configure` via `psql --set ON_ERROR_STOP=on`. Edit it to customise the schema. Idempotent (`IF NOT EXISTS`, `ON CONFLICT DO NOTHING`).
-  - Solves: B3 (init SQL part)
-
-- [ ] 3.6 Remove the "Docker Build" and "Kubernetes Deployment" sections
-  - These describe a manual workflow that bypasses GitHub Actions + ArgoCD
-  - Replace with a single "Deploy" section walking through `git push` → GitHub Actions → ArgoCD → access at `<name>.localhost`
-  - Mention `./uis argocd register` (for now) — Phase 2 will introduce `dev-template register`
-  - Solves: B7
-
-- [ ] 3.7 Update README for app run to use `uv` exclusively
-  - Show `uv venv && source .venv/bin/activate && uv pip install -r requirements.txt && python app/app.py`
-  - Or one-liner: `uv venv && uv pip install -r requirements.txt && uv run python app/app.py`
-  - Mention that VS Code's Python extension uses `uv` because of the `.vscode/settings.json` shipped in 1.5
-  - Solves: B5 (deeper than 1.5 — also rewrites the Quick Start example)
-
-- [ ] 3.8 Verify and regenerate
+- [x] 3.1 Add a "What this is" section near the top with endpoints table ✓
+- [x] 3.2 Add a "Prerequisites" section (renamed from "Before you start" — uses the existing convention enforced by validate-rules.conf) ✓
+- [x] 3.3 Replace Quick Start with the canonical 7-step workflow ✓
+- [x] 3.4 Embed `template-info.yaml` content inline ✓
+- [x] 3.5 Embed `config/init-database.sql` content inline ✓
+- [x] 3.6 Remove "Docker Build" and "Kubernetes Deployment" sections, replace with single "Deploy" section ✓
+- [x] 3.7 Quick Start uses `uv venv` + `uv pip install` + `python app/app.py` ✓
+- [x] 3.8 Verify and regenerate ✓ (validate-docs passes, npm run build SUCCESS)
 
 ### Validation
 
@@ -163,58 +128,38 @@ This is the big one. The current README has 8 distinct issues that all collapse 
 
 ---
 
-## Phase 4: Cross-cutting docs — `readme-structure.md`
-
-This phase can run in parallel with Phase 3 (it doesn't depend on the DCT shim or UIS Secret work — only on the decisions documented in Phases 2 and 3).
+## Phase 4: Cross-cutting docs — `readme-structure.md` — DONE
 
 ### Tasks
 
-- [ ] 4.1 Update `website/docs/contributors/readme-structure.md` to require a "Before you start" section for templates with `requires`
-  - Document the section template (verify UIS provision-host is running)
-  - Note that the section is enforced by `validate-docs.sh` for templates that declare `requires`
-  - Solves: C5 (cross-template enforcement)
-
-- [ ] 4.2 Update `readme-structure.md` to require a "Verify it worked" section for templates with `requires`
-  - Document the standard pattern: `uis connect <service> <db>` for data services
-  - Solves: B2 (cross-template enforcement — now every template with `requires` will have one)
-
-- [ ] 4.3 Remove "Docker Build" and "Kubernetes Deployment" from the suggested optional sections list in `readme-structure.md`
-  - Replace with a "Deploy" section description that describes the GitOps workflow
-  - Solves: B7 (cross-template — prevents future templates from making the same mistake)
-
-- [ ] 4.4 Update `readme-structure.md` with the requirement to embed `template-info.yaml` and init file contents inline for templates with `requires`
-  - Solves: B3 (cross-template enforcement)
-
-- [ ] 4.5 Optional: extend `validate-docs.sh` to enforce the new requirements
-  - Check that templates with `requires` have a "Before you start" heading
-  - Check that templates with `requires` have a "Verify it worked" heading
-  - Defer if it's more than ~30 minutes of work — can ship in a follow-up
-
-### Validation
-
-- `bash scripts/validate-docs.sh` passes
-- The rendered `readme-structure.md` page on the local Docusaurus build shows the new requirements
-- User confirms phase is complete
+- [x] 4.1 `readme-structure.md` documents the "Prerequisites" / UIS-aware prerequisite requirements for templates with `requires` ✓
+- [x] 4.2 `readme-structure.md` documents the "Verify it worked" requirement (`uis connect <service> <db>`) ✓
+- [x] 4.3 Remove "Docker Build" and "Kubernetes Deployment" from the suggested sections list ✓
+  - Also removed them from `validate-rules.conf` (no more spurious warnings)
+  - Updated wording to discourage manual `docker build` / `kubectl apply` patterns
+- [x] 4.4 `readme-structure.md` documents the requirement to embed `template-info.yaml` and init file contents inline ✓
+- [ ] 4.5 (Deferred) Extend `validate-docs.sh` to enforce new requirements per-template — out of scope for this PR. The rules in `validate-rules.conf` apply globally to `README-*.md`; per-template enforcement would need template-info.yaml awareness in `validate-docs.sh`. Tracked as follow-up.
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] Generator routes install commands by `context` (postgresql-demo shows `uis template install`)
-- [ ] Generator no longer emits duplicated `## Summary` sections
-- [ ] Both templates have `.gitignore` files preventing `.env*` from being committed
-- [ ] python-basic-webserver-database has `.vscode/settings.json` enabling `python-envs.alwaysUseUv`
-- [ ] postgresql-demo README uses bare `uis ...` commands (no "From the UIS provision-host:" prefix)
-- [ ] postgresql-demo README links to python-basic-webserver-database via `related:`
-- [ ] python-basic-webserver-database README follows the canonical workflow from the investigation
-- [ ] python-basic-webserver-database README has a "What this is" section, "Before you start" section, and "Verify it worked" section
-- [ ] python-basic-webserver-database README embeds `template-info.yaml` and `config/init-database.sql` content inline
-- [ ] python-basic-webserver-database README's Quick Start uses `uv` (not `pip`)
-- [ ] python-basic-webserver-database README's "Docker Build" / "Kubernetes Deployment" sections are gone, replaced by a "Deploy" section using GitHub Actions + ArgoCD
-- [ ] `readme-structure.md` documents the new section requirements for templates with `requires`
-- [ ] `bash scripts/validate-metadata.sh` passes
-- [ ] `bash scripts/validate-docs.sh` passes
-- [ ] `npm run build --prefix website` passes inside the devcontainer
+- [x] Generator routes install commands by `context` (postgresql-demo shows `uis template install`)
+- [x] Generator no longer emits duplicated `## Summary` sections
+- [x] Both templates have `.gitignore` files preventing `.env*` from being committed
+- [x] python-basic-webserver-database has `.vscode/settings.json` enabling `python-envs.alwaysUseUv`
+- [x] postgresql-demo README uses bare `uis ...` commands (no "From the UIS provision-host:" prefix)
+- [x] postgresql-demo README links to python-basic-webserver-database via `related:`
+- [x] python-basic-webserver-database README follows the canonical workflow from the investigation
+- [x] python-basic-webserver-database README has "What this is", "Prerequisites", and "Verify the database" sections
+- [x] python-basic-webserver-database README embeds `template-info.yaml` and `config/init-database.sql` content inline
+- [x] python-basic-webserver-database README's Quick Start uses `uv` (not `pip`)
+- [x] python-basic-webserver-database README's "Docker Build" / "Kubernetes Deployment" sections are gone, replaced by a "Deploy" section using GitHub Actions + ArgoCD
+- [x] `readme-structure.md` documents the new section requirements for templates with `requires`
+- [x] `validate-rules.conf` no longer warns on missing `## Docker Build` / `## Kubernetes Deployment` headings
+- [x] `bash scripts/validate-metadata.sh` passes
+- [x] `bash scripts/validate-docs.sh` passes (0 errors, 2 warnings — unrelated `plan-based-workflow` README)
+- [x] `npm run build --prefix website` passes inside the devcontainer
 - [ ] CI pipeline is green after merge
 
 ---

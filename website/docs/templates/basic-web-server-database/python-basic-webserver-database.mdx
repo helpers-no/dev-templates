@@ -27,102 +27,233 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
 />
 
 
-A minimal Flask web server that connects to PostgreSQL and reads from a `tasks` table. This template demonstrates the full producer/consumer flow:
+A minimal Flask web server that connects to PostgreSQL and reads from a `tasks` table. The full producer/consumer flow:
 
-- **Producer (UIS):** `uis template install postgresql-demo` deploys PostgreSQL to the cluster
-- **Consumer (this template):** `dev-template configure` creates a per-app database, runs the init SQL, and writes `DATABASE_URL` to `.env`
-- **App:** reads `DATABASE_URL` from the environment and queries the `tasks` table
+- **PostgreSQL** runs in your UIS-managed Kubernetes cluster (deployed once during cluster setup, or via `uis deploy postgresql`).
+- **`dev-template-configure`** creates a per-app database and user, applies the init SQL, and writes `DATABASE_URL` to `.env` for local dev.
+- **The Flask app** reads `DATABASE_URL` from `.env`, connects to PostgreSQL via `host.docker.internal:35432` (the local port forward UIS exposes), and serves the seeded data.
 
-## Quick Start
+## What this is
 
-### 1. Deploy PostgreSQL (once per environment)
+A small but complete Flask application:
 
-If PostgreSQL isn't running in your UIS cluster yet, deploy it via the `postgresql-demo` UIS stack template:
+| Endpoint | Method | Returns |
+|---|---|---|
+| `/` | GET | Plain-text greeting with the template name and current time |
+| `/tasks` | GET | JSON list of rows from the `tasks` table (the seeded data, plus anything you've added) |
+| `/health` | GET | `{"status": "ok", "database": "connected"}` if the DB is reachable, or a 503 if not |
 
-```bash
-uis template install postgresql-demo
-```
-
-### 2. Configure this app's database
-
-This creates a new database + user in PostgreSQL, applies the init SQL (tasks table + seed data), and writes `DATABASE_URL` to `.env`:
-
-```bash
-dev-template configure
-```
-
-You'll be prompted to fill in `params.app_name` and `params.database_name` in `template-info.yaml` first (or pass them via `--param`).
-
-### 3. Install Python dependencies and run
-
-```bash
-pip install -r requirements.txt
-python app/app.py
-```
-
-Then open:
-- http://localhost:3000 — home page
-- http://localhost:3000/tasks — list tasks from the database
-- http://localhost:3000/health — verify DB connectivity
-
-The app **requires** `DATABASE_URL` and will exit immediately if it isn't set.
+The app **requires** `DATABASE_URL` and exits immediately with a clear error if it's missing — there's no fallback. This is intentional: the template demonstrates the producer/consumer pattern where credentials always come from `dev-template-configure`.
 
 ## Prerequisites
 
-Development tools are installed automatically by the devcontainer. If you need to reinstall, run `dev-setup`.
+This template uses UIS to configure PostgreSQL. Verify the UIS provision-host container is running:
 
-UIS must be running with PostgreSQL deployed (see step 1 above).
+```bash
+docker ps --filter name=uis-provision-host --format '{{.Status}}'
+```
 
-## Project Structure
+You should see `Up X minutes`. If not, start UIS from the `urbalurba-infrastructure` repo. Inside DCT (devcontainer-toolbox v1.7.34 or later) you also have the `uis` shim, which routes `uis ...` commands to the provision-host automatically.
 
-```plaintext
+If PostgreSQL isn't deployed in your cluster, **don't worry** — `dev-template-configure` will detect it in step 4 and tell you exactly what to run (`uis deploy postgresql`).
+
+## Quick Start
+
+### 1. Install the template
+
+```bash
+dev-template python-basic-webserver-database
+```
+
+DCT downloads the template from the registry and copies all files to your current project directory, including `app/`, `manifests/`, `Dockerfile`, `requirements.txt`, `.gitignore`, `template-info.yaml`, and `config/init-database.sql`.
+
+### 2. Edit `template-info.yaml`
+
+Open `template-info.yaml` and find the `params:` section near the bottom. Set values for your app:
+
+```yaml
+params:
+  app_name: "my-cool-app"
+  database_name: "my_cool_app_db"
+```
+
+The defaults (`my-app`, `my_app_db`) work, but pick names that match your project — these become the PostgreSQL user and database names.
+
+The full `template-info.yaml` declares the PostgreSQL dependency in the `requires:` section:
+
+```yaml
+params:
+  app_name: "my-app"
+  database_name: "my_app_db"
+
+requires:
+  - service: postgresql
+    config:
+      database: "{{ params.database_name }}"
+      init: "config/init-database.sql"
+```
+
+DCT reads this file when you run `dev-template-configure` in the next step. The `{{ params.database_name }}` reference is substituted with the value you set above.
+
+### 3. (Optional) Customise `config/init-database.sql`
+
+This file is the schema and seed data UIS applies to your database. The default creates a `tasks` table with 3 rows:
+
+```sql
+CREATE TABLE IF NOT EXISTS tasks (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    status VARCHAR(20) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
+
+INSERT INTO tasks (title, status) VALUES
+    ('Set up the database connection', 'done'),
+    ('Build something with Flask + PostgreSQL', 'pending'),
+    ('Deploy to Kubernetes via ArgoCD', 'pending')
+ON CONFLICT DO NOTHING;
+```
+
+All statements are idempotent (`IF NOT EXISTS`, `ON CONFLICT DO NOTHING`) so re-running configure is safe. UIS applies the file with `psql --set ON_ERROR_STOP=on`, so any syntax error fails fast with a clear message.
+
+For your real schema, edit this file to add your own tables, indexes, and seed data.
+
+### 4. Run `dev-template-configure`
+
+```bash
+dev-template-configure
+```
+
+What happens:
+
+1. DCT reads `template-info.yaml` and validates that the `params:` are filled in
+2. DCT calls `uis configure postgresql --app <app_name> --database <database_name> --init-file -` via the bridge, piping in the substituted SQL
+3. UIS creates the database and user, applies the init SQL, and writes connection details
+4. UIS also creates a Kubernetes Secret in your app's namespace so the deployed pod can read `DATABASE_URL` later (when you `git push` and ArgoCD deploys)
+5. DCT writes `.env` to your project root (gitignored) with the local connection string
+
+If PostgreSQL isn't deployed in your cluster, this step fails with a clear error from UIS telling you to run `uis deploy postgresql`.
+
+You should see something like:
+
+```
+📦 Configuring postgresql...
+✅ postgresql — configured
+   → .env: DATABASE_URL=postgresql://my_cool_app:Xa7mP9...@host.docker.internal:35432/my_cool_app_db (local)
+   → K8s Secret: <repo-name>-db in namespace <repo-name> (cluster)
+```
+
+### 5. Verify the database
+
+Inspect the seeded data without starting the app:
+
+```bash
+uis connect postgresql my_cool_app_db
+```
+
+Inside psql:
+
+```sql
+SELECT * FROM tasks;
+\q
+```
+
+You should see 3 rows. If they're there, the database is set up correctly and `DATABASE_URL` is in your `.env`.
+
+### 6. Run the app
+
+DCT ships with [`uv`](https://github.com/astral-sh/uv) for fast Python package management. Create a virtualenv, install dependencies, and run the app:
+
+```bash
+uv venv
+source .venv/bin/activate
+uv pip install -r requirements.txt
+python app/app.py
+```
+
+Or one-liner (no manual activation):
+
+```bash
+uv venv
+uv pip install -r requirements.txt
+uv run python app/app.py
+```
+
+The Flask debug server starts on port 3000.
+
+The shipped `.vscode/settings.json` enables `python-envs.alwaysUseUv` so VS Code's Python extension uses `uv` for package operations and works seamlessly with the venv.
+
+### 7. Open in your browser
+
+VS Code's "Ports" tab in the bottom panel auto-forwards port 3000. Click the globe icon next to it to open these URLs:
+
+- `http://localhost:3000/` — Home page
+- `http://localhost:3000/tasks` — JSON list of seeded rows
+- `http://localhost:3000/health` — DB connectivity check
+
+If `/tasks` shows the 3 seeded rows, your producer/consumer chain is working end-to-end: Flask → DATABASE_URL → host.docker.internal → UIS port-forward → PostgreSQL pod in K8s.
+
+## Project structure
+
+After installation, your project contains:
+
+```
 ├── app/
 │   └── app.py                                      # Flask app reading from PostgreSQL
 ├── config/
-│   └── init-database.sql                           # Tasks table + seed data (applied by uis configure)
+│   └── init-database.sql                           # Schema + seed data (applied by uis configure)
 ├── manifests/
 │   ├── deployment.yaml                             # K8s Deployment + Service (uses Secret for DATABASE_URL)
 │   └── kustomization.yaml                          # ArgoCD configuration
 ├── .github/
 │   └── workflows/
 │       └── urbalurba-build-and-push.yaml           # CI/CD pipeline
+├── .vscode/
+│   └── settings.json                               # python-envs.alwaysUseUv: true
+├── .gitignore                                      # Excludes .env*, .venv/, etc.
 ├── Dockerfile                                      # Container build
-├── requirements.txt                                # Python dependencies
-├── template-info.yaml                              # Template metadata
+├── requirements.txt                                # Flask, psycopg2-binary, python-dotenv
+├── template-info.yaml                              # Template metadata (read by dev-template-configure)
 └── README-python-basic-webserver-database.md       # This file
 ```
 
 ## Development
 
-- Edit `app/app.py` — the Flask application
-- Edit `config/init-database.sql` to change the schema (re-run `dev-template configure` to apply)
-- Changes auto-reload in debug mode
+- Edit `app/app.py` — the main Flask application. Changes auto-reload in debug mode.
+- Edit `config/init-database.sql` to change the schema. Re-run `dev-template-configure` to apply the changes.
+- Edit `template-info.yaml` to change `params`. Re-run `dev-template-configure` afterward (it's idempotent — safe to run repeatedly).
 
-## Docker Build
+## Deploy to your local cluster
 
-```bash
-docker build -t python-basic-webserver-database .
-docker run -p 3000:3000 --env-file .env python-basic-webserver-database
-```
+The standard workflow uses GitHub Actions + ArgoCD — no manual `docker build` or `kubectl apply`:
 
-## Kubernetes Deployment
+1. **Push your code to GitHub**:
+   ```bash
+   git push
+   ```
+   GitHub Actions builds and pushes the container image to GitHub Container Registry. The image is **credential-free** — `DATABASE_URL` is injected at runtime from a Kubernetes Secret.
 
-Before deploying, create the `DATABASE_URL` secret using the **cluster** connection string from `uis configure` output:
+2. **Register the app with ArgoCD** (one-time per project, from your host machine):
+   ```bash
+   ./uis argocd register <app-name> <github-repo-url>
+   ```
+   This creates an ArgoCD Application that watches your repo and auto-deploys updates on every push.
 
-```bash
-kubectl create secret generic <repo-name>-db \
-  --from-literal=DATABASE_URL='postgresql://user:pass@postgresql.default.svc.cluster.local:5432/<db>'
-```
+3. **Access the app** at `http://<app-name>.localhost`. ArgoCD applies the deployment manifest, K8s injects `DATABASE_URL` from the Secret UIS created in step 4 above, and the pod connects to PostgreSQL via the cluster service DNS (`postgresql.default.svc.cluster.local`).
 
-Then apply the manifests:
+You don't need to create the Kubernetes Secret manually — `dev-template-configure` already created it in the right namespace. The deployment manifest references it via `secretKeyRef`.
 
-```bash
-kubectl apply -k manifests/
-```
+## Try this with
+
+This is the consumer side of the producer/consumer pattern. The producer side is:
+
+- [PostgreSQL Demo](../demo/postgresql-demo) — a UIS stack template that deploys PostgreSQL standalone, useful for verifying your UIS setup. You don't need to install it for `python-basic-webserver-database` to work — `dev-template-configure` handles everything.
 
 ## CI/CD
 
-The GitHub Actions workflow automatically builds and pushes the Docker image to GitHub Container Registry when changes are pushed to the main branch.
+The GitHub Actions workflow (`.github/workflows/urbalurba-build-and-push.yaml`) automatically builds and pushes the Docker image to GitHub Container Registry when changes are pushed to the main branch. ArgoCD picks up the new image and deploys it.
 
 ---
 
