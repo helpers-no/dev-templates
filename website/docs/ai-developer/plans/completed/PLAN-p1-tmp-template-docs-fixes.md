@@ -4,9 +4,9 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Completed (pending PR merge)
+## Status: Completed
 
-**Completed**: 2026-04-09
+**Completed**: 2026-04-09 (PR helpers-no/dev-templates#25 merged, CI green, deployed)
 
 **Goal**: Ship the TMP-side Phase 1 work from `INVESTIGATE-improve-template-docs-with-services.md`. Fix the bugs real-user testing surfaced in `python-basic-webserver-database` and `postgresql-demo`, plus the cross-cutting MDX generator and template hygiene issues.
 
@@ -162,7 +162,7 @@ No external dependencies. Can ship as a single PR while DCT and UIS work in para
 - [x] `bash scripts/validate-metadata.sh` passes
 - [x] `bash scripts/validate-docs.sh` passes (0 errors, 2 warnings — unrelated `plan-based-workflow` README)
 - [x] `npm run build --prefix website` passes inside the devcontainer
-- [ ] CI pipeline is green after merge
+- [x] CI pipeline is green after merge ✓
 
 ---
 
