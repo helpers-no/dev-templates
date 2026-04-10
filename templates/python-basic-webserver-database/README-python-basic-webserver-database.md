@@ -3,7 +3,7 @@
 A minimal Flask web server that connects to PostgreSQL and reads from a `tasks` table. The full producer/consumer flow:
 
 - **PostgreSQL** runs in your UIS-managed Kubernetes cluster (deployed once during cluster setup, or via `uis deploy postgresql`).
-- **`dev-template-configure`** creates a per-app database and user, applies the init SQL, and writes `DATABASE_URL` to `.env` for local dev.
+- **`dev-template configure`** creates a per-app database and user, applies the init SQL, and writes `DATABASE_URL` to `.env` for local dev.
 - **The Flask app** reads `DATABASE_URL` from `.env`, connects to PostgreSQL via `host.docker.internal:35432` (the local port forward UIS exposes), and serves the seeded data.
 
 ## What this is
@@ -16,7 +16,7 @@ A small but complete Flask application:
 | `/tasks` | GET | JSON list of rows from the `tasks` table (the seeded data, plus anything you've added) |
 | `/health` | GET | `{"status": "ok", "database": "connected"}` if the DB is reachable, or a 503 if not |
 
-The app **requires** `DATABASE_URL` and exits immediately with a clear error if it's missing — there's no fallback. This is intentional: the template demonstrates the producer/consumer pattern where credentials always come from `dev-template-configure`.
+The app **requires** `DATABASE_URL` and exits immediately with a clear error if it's missing — there's no fallback. This is intentional: the template demonstrates the producer/consumer pattern where credentials always come from `dev-template configure`.
 
 ## Prerequisites
 
@@ -28,7 +28,7 @@ docker ps --filter name=uis-provision-host --format '{{.Status}}'
 
 You should see `Up X minutes`. If not, start UIS from the `urbalurba-infrastructure` repo. Inside DCT (devcontainer-toolbox v1.7.34 or later) you also have the `uis` shim, which routes `uis ...` commands to the provision-host automatically.
 
-If PostgreSQL isn't deployed in your cluster, **don't worry** — `dev-template-configure` will detect it in step 4 and tell you exactly what to run (`uis deploy postgresql`).
+If PostgreSQL isn't deployed in your cluster, **don't worry** — `dev-template configure` will detect it in step 4 and tell you exactly what to run (`uis deploy postgresql`).
 
 ## Quick Start
 
@@ -66,7 +66,7 @@ requires:
       init: "config/init-database.sql"
 ```
 
-DCT reads this file when you run `dev-template-configure` in the next step. The `{{ params.database_name }}` reference is substituted with the value you set above.
+DCT reads this file when you run `dev-template configure` in the next step. The `{{ params.database_name }}` reference is substituted with the value you set above.
 
 ### 3. (Optional) Customise `config/init-database.sql`
 
@@ -93,30 +93,123 @@ All statements are idempotent (`IF NOT EXISTS`, `ON CONFLICT DO NOTHING`) so re-
 
 For your real schema, edit this file to add your own tables, indexes, and seed data.
 
-### 4. Run `dev-template-configure`
+### 4. Run `dev-template configure`
 
 ```bash
-dev-template-configure
+dev-template configure
 ```
 
-What happens:
+This is the load-bearing step. DCT (v1.7.36 or later) prints every action it takes — UIS bridge check, git identity detection, template-info.yaml read, parameter validation, init file load, the literal UIS command being called, the response, the port-forward path, the .env write, and the K8s secret created. If anything fails, you'll see exactly which step bit you.
 
-1. DCT reads `template-info.yaml` and validates that the `params:` are filled in
-2. DCT calls `uis configure postgresql --app <app_name> --database <database_name> --init-file -` via the bridge, piping in the substituted SQL
-3. UIS creates the database and user, applies the init SQL, and writes connection details
-4. UIS also creates a Kubernetes Secret in your app's namespace so the deployed pod can read `DATABASE_URL` later (when you `git push` and ArgoCD deploys)
-5. DCT writes `.env` to your project root (gitignored) with the local connection string
+If PostgreSQL isn't deployed in your cluster, the step fails with a clear error from UIS telling you to run `uis deploy postgresql`.
 
-If PostgreSQL isn't deployed in your cluster, this step fails with a clear error from UIS telling you to run `uis deploy postgresql`.
-
-You should see something like:
+#### Expected output
 
 ```
-📦 Configuring postgresql...
-✅ postgresql — configured
-   → .env: DATABASE_URL=postgresql://my_cool_app:Xa7mP9...@host.docker.internal:35432/my_cool_app_db (local)
-   → K8s Secret: <repo-name>-db in namespace <repo-name> (cluster)
+🔧 Template Configure
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔌 Checking UIS bridge...
+   ✓ uis-provision-host container is running
+
+🔍 Detecting git identity...
+   ✓ Repo:   yourorg/my-cool-app
+   ✓ Branch: main
+
+📄 Reading template-info.yaml...
+   ✓ File: /workspace/template-info.yaml
+   ✓ ID:   python-basic-webserver-database
+   ✓ Type: app
+
+📝 Parameters:
+   app_name      = my-cool-app
+   database_name = my_cool_app_db
+
+🔧 Configuring 1 service requirement...
+
+   ─── postgresql ──────────────────────────────────────────────────
+   Database:           my_cool_app_db
+   K8s namespace:      my-cool-app
+   K8s secret prefix:  my-cool-app
+   Env var:            DATABASE_URL
+
+   📄 Reading init file...
+   ✓ Path: config/init-database.sql
+   ✓ Size: 702 bytes (19 lines)
+
+   📡 Calling UIS (you can copy-paste this to debug):
+      docker exec -i uis-provision-host uis configure postgresql my-cool-app \
+        --database my_cool_app_db \
+        --namespace my-cool-app \
+        --secret-name-prefix my-cool-app \
+        --init-file - \
+        --json \
+        < config/init-database.sql
+
+   Waiting for UIS response...
+   ✓ Status: ok (took 2s)
+
+   📦 UIS created:
+      Database: my_cool_app_db
+      Username: my_cool_app
+      Password: *** (hidden)
+
+   🔌 Port forward (created by UIS, lives inside uis-provision-host):
+
+      ┌─────────────────────────────────────────────────┐
+      │  DCT  →  host.docker.internal:35432             │  ← your app connects here
+      └─────────────────────────────────────────────────┘
+                       ↕
+      ┌─────────────────────────────────────────────────┐
+      │  Mac/Linux host  →  port 35432                  │  ← Docker port-publish
+      └─────────────────────────────────────────────────┘
+                       ↕
+      ┌─────────────────────────────────────────────────┐
+      │  uis-provision-host container  →  port 35432    │  ← kubectl port-forward
+      └─────────────────────────────────────────────────┘    lives inside this container
+                       ↕
+      ┌─────────────────────────────────────────────────┐
+      │  K8s: postgresql.default.svc.cluster.local:5432 │  ← actual postgresql pod
+      └─────────────────────────────────────────────────┘
+
+      Survives DCT rebuilds. Dies if you restart uis-provision-host.
+      Manage:  uis expose --status                (list all forwards)
+               uis expose postgresql --stop       (tear down this one)
+
+   💾 Writing local URL to .env...
+   ✓ File:  /workspace/.env
+   ✓ Key:   DATABASE_URL
+   ✓ Value: postgresql://my_cool_app:***@host.docker.internal:35432/my_cool_app_db
+
+   🔐 K8s Secret (created by UIS for ArgoCD/in-cluster pods):
+      Name:      my-cool-app-db
+      Namespace: my-cool-app
+      Key:       DATABASE_URL
+      Verify:    kubectl get secret my-cool-app-db -n my-cool-app
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Configuration complete (1 configured, 0 skipped, 0 failed)
+   Total time: 2s
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 Next steps:
+   • Verify the database:    uis connect postgresql my_cool_app_db
+   • Check the K8s secret:   kubectl get secret my-cool-app-db -n my-cool-app
+   • Check port forwards:    uis expose --status
+   • Run the app:            see README for run instructions
 ```
+
+The K8s secret name is derived from the repo name (e.g. `my-cool-app-db`), which matches the `secretKeyRef` in `manifests/deployment.yaml`. Re-running `dev-template configure` is idempotent — you'll see `Status: already_configured` and `(0 configured, 1 skipped, 0 failed)`.
+
+What just happened:
+
+1. DCT read `template-info.yaml` and validated the `params:`
+2. DCT detected the git repo (used as the K8s namespace + secret prefix)
+3. DCT loaded `config/init-database.sql` and substituted any `{{ params.* }}` references
+4. DCT called UIS via the in-container bridge: `uis configure postgresql ...`
+5. UIS created the database, user, applied the init SQL, set up the port-forward (35432), and created a K8s Secret in the namespace
+6. DCT wrote `DATABASE_URL` to `.env` (local URL via `host.docker.internal:35432`)
+7. The K8s Secret holds the cluster-internal URL (`postgresql.default.svc.cluster.local:5432`) for the deployed pod to read via `secretKeyRef`
 
 ### 5. Verify the database
 
@@ -194,15 +287,15 @@ After installation, your project contains:
 ├── .gitignore                                      # Excludes .env*, .venv/, etc.
 ├── Dockerfile                                      # Container build
 ├── requirements.txt                                # Flask, psycopg2-binary, python-dotenv
-├── template-info.yaml                              # Template metadata (read by dev-template-configure)
+├── template-info.yaml                              # Template metadata (read by dev-template configure)
 └── README-python-basic-webserver-database.md       # This file
 ```
 
 ## Development
 
 - Edit `app/app.py` — the main Flask application. Changes auto-reload in debug mode.
-- Edit `config/init-database.sql` to change the schema. Re-run `dev-template-configure` to apply the changes.
-- Edit `template-info.yaml` to change `params`. Re-run `dev-template-configure` afterward (it's idempotent — safe to run repeatedly).
+- Edit `config/init-database.sql` to change the schema. Re-run `dev-template configure` to apply the changes.
+- Edit `template-info.yaml` to change `params`. Re-run `dev-template configure` afterward (it's idempotent — safe to run repeatedly).
 
 ## Deploy to your local cluster
 
@@ -222,13 +315,13 @@ The standard workflow uses GitHub Actions + ArgoCD — no manual `docker build` 
 
 3. **Access the app** at `http://<app-name>.localhost`. ArgoCD applies the deployment manifest, K8s injects `DATABASE_URL` from the Secret UIS created in step 4 above, and the pod connects to PostgreSQL via the cluster service DNS (`postgresql.default.svc.cluster.local`).
 
-You don't need to create the Kubernetes Secret manually — `dev-template-configure` already created it in the right namespace. The deployment manifest references it via `secretKeyRef`.
+You don't need to create the Kubernetes Secret manually — `dev-template configure` already created it in the right namespace. The deployment manifest references it via `secretKeyRef`.
 
 ## Try this with
 
 This is the consumer side of the producer/consumer pattern. The producer side is:
 
-- [PostgreSQL Demo](../demo/postgresql-demo) — a UIS stack template that deploys PostgreSQL standalone, useful for verifying your UIS setup. You don't need to install it for `python-basic-webserver-database` to work — `dev-template-configure` handles everything.
+- [PostgreSQL Demo](../demo/postgresql-demo) — a UIS stack template that deploys PostgreSQL standalone, useful for verifying your UIS setup. You don't need to install it for `python-basic-webserver-database` to work — `dev-template configure` handles everything.
 
 ## CI/CD
 
