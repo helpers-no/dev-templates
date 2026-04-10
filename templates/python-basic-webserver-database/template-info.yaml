@@ -32,6 +32,16 @@ related:
   - python-basic-webserver
   - postgresql-demo
 
+quickstart:
+  title: "Run the Flask app"
+  commands:
+    - uv venv
+    - uv pip install -r requirements.txt
+    - uv run python app/app.py
+  note: |
+    Flask debug server starts on port 3000.
+    VS Code auto-forwards the port — click the globe icon in the Ports tab.
+
 params:
   app_name: "my-app"
   database_name: "my_app_db"

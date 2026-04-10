@@ -57,6 +57,11 @@ interface TemplateInfoYaml {
   params?: Record<string, string>;
   requires?: Array<Record<string, unknown>>;
   provides?: unknown;
+  quickstart?: {
+    title: string;
+    commands: string[];
+    note?: string;
+  };
 }
 
 // --- Scanning ---
@@ -225,6 +230,7 @@ for (const catFile of categoryFiles) {
     if (raw.params) entry.params = raw.params;
     if (raw.requires) entry.requires = raw.requires;
     if (raw.provides) entry.provides = raw.provides;
+    if (raw.quickstart) entry.quickstart = raw.quickstart;
 
     allTemplates.push(entry);
   }

@@ -24,6 +24,14 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   tools="dev-java"
 />
 
+import TemplateGetStarted from '@site/src/components/TemplateGetStarted';
+
+<TemplateGetStarted
+  requires={null}
+  params={null}
+  quickstart={{"title":"Run the Spring Boot app","commands":["mvn spring-boot:run"],"note":"Spring Boot runs on port 3000. VS Code auto-forwards the port.\n"}}
+/>
+
 
 A minimal Spring Boot web server. Displays "Hello World" with current time and date, and provides health check endpoints via Spring Boot Actuator.
 

@@ -24,6 +24,14 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   tools="dev-python"
 />
 
+import TemplateGetStarted from '@site/src/components/TemplateGetStarted';
+
+<TemplateGetStarted
+  requires={null}
+  params={null}
+  quickstart={{"title":"Run the Flask app","commands":["uv venv","uv pip install -r requirements.txt","uv run python app/app.py"],"note":"Flask runs on port 3000. VS Code auto-forwards the port — click the globe icon in the Ports tab.\n"}}
+/>
+
 
 A minimal Flask web server. Displays "Hello World" with current time and date, and demonstrates deployment to Kubernetes via ArgoCD and GitHub Actions.
 

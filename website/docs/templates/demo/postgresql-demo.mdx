@@ -23,6 +23,14 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   tools=""
 />
 
+import TemplateGetStarted from '@site/src/components/TemplateGetStarted';
+
+<TemplateGetStarted
+  requires={null}
+  params={{"app_name":"demo-app","database_name":"demo_db"}}
+  quickstart={{"title":"Verify the database","commands":["uis connect postgresql demo_db"],"note":"Inside psql, run: SELECT * FROM tasks;\nYou should see 3 seeded rows. Type \\q to exit.\n"}}
+/>
+
 
 A minimal UIS stack template that deploys PostgreSQL and creates a sample database with seed data. Use it to verify your UIS setup, or as a starting point for your own UIS stack templates.
 

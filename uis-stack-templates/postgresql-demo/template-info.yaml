@@ -28,6 +28,14 @@ summary: >
 related:
   - python-basic-webserver-database
 
+quickstart:
+  title: "Verify the database"
+  commands:
+    - uis connect postgresql demo_db
+  note: |
+    Inside psql, run: SELECT * FROM tasks;
+    You should see 3 seeded rows. Type \q to exit.
+
 params:
   app_name: "demo-app"
   database_name: "demo_db"

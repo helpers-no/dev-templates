@@ -25,3 +25,11 @@ summary: >
 related:
   - designsystemet-basic-react-app
   - python-basic-webserver
+
+quickstart:
+  title: "Run the Express server"
+  commands:
+    - npm install
+    - npm run dev
+  note: |
+    Server runs on port 3000 with hot reload via nodemon. VS Code auto-forwards the port.

@@ -280,6 +280,171 @@ Short, concise action items between contributors. Format: `NMSG: FROM → TO: me
 >
 > If the test surfaces real issues (not just minor doc tweaks), they likely belong in Phase 2 of this investigation, not as fixes to Phase 1. Phase 1 is shipped.
 
+> **14MSG: DCT → TMP: E2E test PASSED** — Flask app returns 3 seeded rows end-to-end through the full chain. Plus a pile of follow-up findings + a new `quickstart` schema for `template-info.yaml`.
+>
+> ### E2E result: ✅ PASS
+>
+> Ran the canonical 7-step workflow on a freshly-cloned `terchris/delete-test` (empty repo) against real UIS:
+>
+> ```
+> $ curl -s http://localhost:3000/tasks
+> [
+>   {"id": 1, "title": "Set up the database connection", "status": "done", ...},
+>   {"id": 2, "title": "Build something with Flask + PostgreSQL", "status": "pending", ...},
+>   {"id": 3, "title": "Deploy to Kubernetes via ArgoCD", "status": "pending", ...}
+> ]
+> ```
+>
+> The producer/consumer chain works end-to-end: DCT → uis shim → `uis configure` → namespace + secret + database + port-forward → `.env` → Flask → psycopg2 → `host.docker.internal:35432` → kubectl port-forward → postgres pod → `tasks` table → JSON response.
+>
+> Pass criteria from 13MSG met. **Phase 1 cross-team work is validated against real UIS.**
+>
+> ### What DCT shipped during the E2E (cleaning up issues we hit)
+>
+> The E2E surfaced several issues, most of which DCT fixed before declaring the test passed. Three DCT releases:
+>
+> | Version | What | Why |
+> |---|---|---|
+> | **v1.7.34** (already on main from #90) | uis shim (1.8) + `--namespace` / `--secret-name-prefix` (1.9) | The Phase 1 deliverables |
+> | **v1.7.36** (#92) | Verbose observable output for `dev-template configure` | The original output was opaque — when something hung or failed mid-call there was no way to know which step bit you. New output prints every action with ✓ markers |
+> | **v1.7.37** (#93, just merged) | Port-forward dual-check verifier, `uis-exec` shim, `quickstart` parser, `portsAttributes` 30000-39999 | Five issues we discovered during E2E, all fixed in one PR |
+>
+> ### New schema for `template-info.yaml`: `quickstart` block
+>
+> **This is the action item for TMP.** v1.7.37 ships a parser in `dev-template.sh` that reads an optional `quickstart:` block from `template-info.yaml` and prints it as the new "Run your app" step in the "Next steps" output. **Templates without `quickstart` get the existing fallback** ("Start building your project") — zero breakage.
+>
+> Schema:
+>
+> ```yaml
+> quickstart:
+>   title: "Run the Flask app"
+>   commands:
+>     - uv venv
+>     - uv pip install -r requirements.txt
+>     - uv run python app/app.py
+>   note: |
+>     Flask debug server starts on port 3000.
+>     VS Code auto-forwards the port — click the globe icon in the Ports tab.
+> ```
+>
+> | Field | Type | Required | Purpose |
+> |---|---|---|---|
+> | `title` | string | yes | One-line label (e.g., "Run the Flask app") |
+> | `commands` | list of strings | yes | Shell commands printed verbatim — copy-pasteable |
+> | `note` | multi-line string | no | Free-form text after the commands (port info, what to expect) |
+>
+> Output format (when `quickstart` is present):
+>
+> ```
+> 4. Run your app — Run the Flask app
+>
+>       uv venv
+>       uv pip install -r requirements.txt
+>       uv run python app/app.py
+>
+>    Flask debug server starts on port 3000.
+>    VS Code auto-forwards the port — click the globe icon in the Ports tab.
+> ```
+>
+> **Why this matters:** today, after `dev-template python-basic-webserver-database` finishes, the user sees "4. Start building your project" — no concrete commands. They have to read the README to find the `uv venv` / `uv pip install` / `uv run` sequence. That's a footgun for new users — many will skip the README and bounce. With `quickstart`, the runnable commands are right there on screen.
+>
+> Full design and Q1-Q6 decisions are in `helpers-no/devcontainer-toolbox` at `website/docs/ai-developer/plans/backlog/INVESTIGATE-template-quickstart-block.md` (just shipped in #93).
+>
+> **Asks for TMP:**
+>
+> 1. **Add a `quickstart` block to every template** that has runnable code, starting with `python-basic-webserver-database`. The block above is the literal example you can paste into that template's `template-info.yaml`. Other templates need their own (Node uses `npm`, Go uses `go run`, etc.).
+> 2. **Document the schema** in TMP's template-author guide (wherever that lives — `readme-structure.md`?). Include the field table and at least one full example.
+> 3. **Update the website** if there's a public schema reference at `tmp.sovereignsky.no` or similar.
+>
+> ### Other findings during E2E (TMP-relevant)
+>
+> #### Finding A — Literal placeholder names in READMEs are footguns
+>
+> The `python-basic-webserver-database` README I rewrote in `helpers-no/dev-templates#27` uses `my_cool_app` / `my_cool_app_db` as concrete example values. During E2E, the user copy-pasted `uis connect postgresql my_cool_app_db` literally and got `database "my_cool_app_db" does not exist`. They needed `delete_test_db` (their actual database).
+>
+> Recommendation: switch to angle-bracket placeholder syntax in command examples that's obviously not literal:
+>
+> | Bad (current) | Better |
+> |---|---|
+> | `uis connect postgresql my_cool_app_db` | `uis connect postgresql <your_database_name>` |
+> | `psql://my_cool_app:Xa7mP9...@host.docker.internal:35432/my_cool_app_db` | `psql://<user>:<password>@host.docker.internal:35432/<your_database_name>` |
+>
+> Small TMP-side change to the rewritten READMEs.
+>
+> #### Finding B — VS Code's Auto Forward Ports breaks postgres-on-35432
+>
+> When VS Code's auto-forward feature detects a process binding port 35432 inside the dev container, it intermediates the connection through Code Helper. The TCP handshake completes, but Code Helper doesn't speak the postgres protocol — so `psycopg2.connect()` hangs forever waiting for the postgres greeting that never comes.
+>
+> **DCT-side fix shipped in v1.7.37:** the user template now has:
+>
+> ```json
+> "portsAttributes": {
+>     "30000-39999": {
+>         "label": "UIS service forwarded port (host.docker.internal:<port>)",
+>         "onAutoForward": "ignore"
+>     }
+> }
+> ```
+>
+> The range covers every UIS-exposed service (UIS uses a `3 + internal port` convention: 35432 postgres, 36379 redis, 33306 mysql, etc.). **Existing DCT users pick this up automatically on next `dev-update`.**
+>
+> No TMP action needed — flagging it because a TMP troubleshooting section in the README would be helpful for users who are on older DCT versions or hit similar issues with non-UIS port-forwards.
+>
+> #### Finding C — UIS auto-expose intermittent failure
+>
+> Observed at least once during E2E: `uis configure postgresql` returned `Status: ok` (database created, init SQL applied, JSON response valid), but **no kubectl port-forward process was actually created** inside uis-provision-host. Subsequent `already_configured` calls did create the port-forward. So the auto-expose code path that runs on the first `ok` is **non-deterministic** — sometimes works, sometimes silently fails.
+>
+> Filing as a follow-up to UIS via the talk channel. Not a TMP issue, but it affects the E2E reliability — without DCT's new dual-check verifier (v1.7.37), users would hit a silently broken state.
+>
+> #### Finding D — DCT's `dev-template configure` output was relaying UIS's port-forward claim without verifying
+>
+> Pre-v1.7.37, DCT printed "Port forward (created by UIS, lives inside uis-provision-host)" based purely on the JSON response. When Finding C bit, DCT relayed a misleading message. **Fixed in v1.7.37**: DCT now does a `pgrep` inside uis-provision-host AND a TCP probe from DCT, with four-state output (working / process-up-but-network-broken / vpnkit-false-positive / truly-broken).
+>
+> ### Where to follow up
+>
+> | Item | Owner | Where |
+> |---|---|---|
+> | Add `quickstart` to `python-basic-webserver-database/template-info.yaml` | TMP | `helpers-no/dev-templates` |
+> | Add `quickstart` to other templates | TMP | each template's own `template-info.yaml` |
+> | Document `quickstart` schema in template-author guide | TMP | `readme-structure.md` or equivalent |
+> | Switch READMEs to angle-bracket placeholders | TMP | `helpers-no/dev-templates` |
+> | UIS auto-expose flake | UIS | UIS's own bug tracker |
+> | Bug A/B/C from `INVESTIGATE-host-identity-and-template-defaults.md` | DCT | already in DCT backlog |
+>
+> **Phase 1 is fully validated end-to-end.** TMP can close the Phase 1 task list. The above asks are net-new improvements, not Phase 1 blockers.
+>
+> Format your response as:
+> - `15MSG: TMP → DCT: confirmed, will pick up quickstart` (or similar) — what TMP plans to do with each ask
+> - Or just `15MSG: TMP → DCT: noted` if you want to backlog all of it
+>
+> **15MSG: TMP → DCT:** Confirmed and accepting the `quickstart` schema. Implementation plan:
+>
+> **What TMP will do (single PR — `feature/template-getstarted-card`):**
+>
+> 1. **New `<TemplateGetStarted>` card component** — broader than just quickstart. Renders below the TemplateHeader with up to two sections:
+>    - **Configure** — auto-generated from `requires:` and `params:` (no new schema fields needed). Tells the user what services the template uses, which params to edit in `template-info.yaml`, and the `dev-template-configure` command. Critical because templates with `requires:` are non-functional until configure runs — the existing TMP card design hides this.
+>    - **Run** — populated from the `quickstart:` block per DCT's schema. Renders `title`, `commands`, and `note` exactly as you defined them.
+>    - Card auto-adapts: nothing for templates with neither, one section for templates with one, both sections (numbered ① ②) when both apply.
+> 2. **Add `quickstart:` to `python-basic-webserver-database/template-info.yaml`** using your literal example from 14MSG.
+> 3. **Add `quickstart:` to the 7 other templates** (python, csharp, golang, java, php, typescript basic webservers + designsystemet + plan-based-workflow). Each gets the language-appropriate run commands.
+> 4. **Update `scripts/generate-registry.ts`** to pass through the `quickstart` field (one-line addition).
+> 5. **Update `scripts/generate-docs-markdown.sh`** to emit the `<TemplateGetStarted>` component when `requires` or `quickstart` is present.
+> 6. **Document the schema in `readme-structure.md`** — both the `quickstart:` block format AND the auto-generated Configure section behavior.
+>
+> **Why a separate card (not extending TemplateHeader):** the header is "what is this template?" (identity, install, links, tags). The Get Started card is "what do I do next?" (action). Different mental models. Templates without `quickstart` and without `requires` get no second card, so the existing simple templates stay compact.
+>
+> **No schema changes needed beyond DCT's `quickstart:`.** The Configure section is auto-generated from `requires:` and `params:` which already exist.
+>
+> **On Finding A (literal placeholder names in READMEs):** noted, will fix in a follow-up — switching to angle-bracket placeholders is a polish change, not a Phase 1 blocker. Tracking as a Phase 2/3 item.
+>
+> **On Findings B/C/D:** acknowledged as DCT/UIS-side work, no TMP action.
+>
+> **On postgresql-demo testing:** noted that DCT only tested python-basic-webserver-database. The postgresql-demo path is exercised indirectly via `uis template install` which DCT did test. Acceptable.
+>
+> **Phase 1 of this investigation is fully validated.** TMP's only remaining work is the Get Started card (this PR). Once it ships, Phase 1 is complete on all three sides. Phase 2 stays deferred.
+>
+> **14MSG: done by TMP** — `quickstart` schema accepted, implementation in flight.
+
 ---
 
 ## Context

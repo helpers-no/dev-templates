@@ -27,6 +27,119 @@ These are recommended but not enforced:
 | **Try this with** | Cross-references to related/companion templates |
 | **VS Code tip** | One-line workspace setting the user can paste into their existing `.vscode/settings.json` (see "VS Code settings pattern" below) |
 
+## The `quickstart:` block in `template-info.yaml`
+
+Templates can declare a `quickstart:` block in `template-info.yaml`. It does two things:
+
+1. **DCT's `dev-template install`** prints the commands at the end of the install output as a "Run your app" step (DCT v1.7.37+)
+2. **The website** renders a "Get Started" card on the template detail page below the TemplateHeader, with the commands in a copy-pasteable monospace block
+
+The same data drives both surfaces — define it once, get it everywhere.
+
+### Schema
+
+```yaml
+quickstart:
+  title: "Run the Flask app"
+  commands:
+    - uv venv
+    - uv pip install -r requirements.txt
+    - uv run python app/app.py
+  note: |
+    Flask debug server starts on port 3000.
+    VS Code auto-forwards the port — click the globe icon in the Ports tab.
+```
+
+| Field | Type | Required | Purpose |
+|---|---|---|---|
+| `title` | string | yes | One-line label, e.g., "Run the Flask app". Becomes the heading on the card. |
+| `commands` | list of strings | yes | Shell commands printed verbatim. Each on its own line in the rendered block. Copy-pasteable. |
+| `note` | multi-line string | no | Free-form text after the commands (port info, what to expect, browser tips). |
+
+### When to add it
+
+Add `quickstart:` to any template that has runnable code where the user needs to know what to run after `dev-template install` finishes. Skip it for overlay templates that just add files (like `plan-based-workflow`) — there's nothing to run.
+
+### Examples per language
+
+```yaml
+# Python (uses uv from DCT)
+quickstart:
+  title: "Run the Flask app"
+  commands:
+    - uv venv
+    - uv pip install -r requirements.txt
+    - uv run python app/app.py
+  note: |
+    Flask runs on port 3000.
+
+# Node / TypeScript
+quickstart:
+  title: "Run the Express server"
+  commands:
+    - npm install
+    - npm run dev
+  note: |
+    Server runs on port 3000 with hot reload via nodemon.
+
+# Go
+quickstart:
+  title: "Run the Go server"
+  commands:
+    - go run main.go
+  note: |
+    Server runs on port 3000.
+
+# Java (Spring Boot)
+quickstart:
+  title: "Run the Spring Boot app"
+  commands:
+    - mvn spring-boot:run
+  note: |
+    Spring Boot runs on port 3000.
+```
+
+## The auto-generated Configure section
+
+Templates with `requires:` get a **Configure section** in the Get Started card automatically — no schema fields needed. The section reads `requires:` and `params:` from `template-info.yaml` and tells the user:
+
+- Which UIS services the template uses (from `requires[].service`)
+- Which `params` they must edit before running configure (from `params:` keys with empty default values)
+- The `dev-template-configure` command to run
+
+The card auto-adapts:
+
+| Template has | Card shows |
+|---|---|
+| Neither `requires:` nor `quickstart:` | No card |
+| Only `quickstart:` | Just the Run section |
+| Only `requires:` | Just the Configure section |
+| Both `requires:` and `quickstart:` | Both sections, numbered ① ② |
+
+### What this means for template authors
+
+If your template has `requires:` services, you don't need to write any configure documentation in the README — the Configure section is auto-generated. You just need to make sure:
+
+1. Your `params:` block has the keys the user needs to edit
+2. The default value is `""` (empty string) for params the user MUST set, or a sensible default if optional
+
+Example:
+
+```yaml
+params:
+  app_name: ""              # Required — user must set
+  database_name: ""         # Required — user must set
+  log_level: "INFO"         # Optional — has a default
+
+requires:
+  - service: postgresql
+    config:
+      database: "{{ params.database_name }}"
+      init: "config/init-database.sql"
+```
+
+The auto-generated Configure section will list `params.app_name` and `params.database_name` as the params to edit. `params.log_level` won't appear because it has a default.
+
 ## VS Code settings pattern (do not ship `.vscode/` files)
 
 **Templates must not ship `.vscode/settings.json` or `.vscode/extensions.json` files.** Per [12MSG in INVESTIGATE-improve-template-docs-with-services.md](../ai-developer/plans/backlog/INVESTIGATE-improve-template-docs-with-services.md), DCT does not implement JSON merge for template files. A template that ships `.vscode/settings.json` would risk overwriting the user's existing VS Code config (including the devcontainer extension recommendation in `extensions.json` that the project needs to start).

@@ -26,3 +26,10 @@ summary: >
 related:
   - java-basic-webserver
   - golang-basic-webserver
+
+quickstart:
+  title: "Run the ASP.NET Core app"
+  commands:
+    - dotnet watch run
+  note: |
+    ASP.NET Core runs on port 3000 with hot reload via dotnet watch. VS Code auto-forwards the port.

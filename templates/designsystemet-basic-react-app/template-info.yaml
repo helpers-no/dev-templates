@@ -26,3 +26,11 @@ summary: >
   Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.
 related:
   - typescript-basic-webserver
+
+quickstart:
+  title: "Run the Vite dev server"
+  commands:
+    - npm install
+    - npm run dev
+  note: |
+    Vite runs on port 5173. VS Code auto-forwards the port — click the globe icon in the Ports tab.

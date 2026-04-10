@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-09T11:58:58.378Z",
+  "generated": "2026-04-10T13:32:38.953Z",
   "categories": [
     {
       "id": "WORKFLOW",
@@ -105,7 +105,14 @@
         "java-basic-webserver",
         "golang-basic-webserver"
       ],
-      "context": "dct"
+      "context": "dct",
+      "quickstart": {
+        "title": "Run the ASP.NET Core app",
+        "commands": [
+          "dotnet watch run"
+        ],
+        "note": "ASP.NET Core runs on port 3000 with hot reload via dotnet watch. VS Code auto-forwards the port.\n"
+      }
     },
     {
       "id": "designsystemet-basic-react-app",
@@ -133,7 +140,15 @@
       "related": [
         "typescript-basic-webserver"
       ],
-      "context": "dct"
+      "context": "dct",
+      "quickstart": {
+        "title": "Run the Vite dev server",
+        "commands": [
+          "npm install",
+          "npm run dev"
+        ],
+        "note": "Vite runs on port 5173. VS Code auto-forwards the port — click the globe icon in the Ports tab.\n"
+      }
     },
     {
       "id": "golang-basic-webserver",
@@ -160,7 +175,14 @@
         "typescript-basic-webserver",
         "java-basic-webserver"
       ],
-      "context": "dct"
+      "context": "dct",
+      "quickstart": {
+        "title": "Run the Go server",
+        "commands": [
+          "go run main.go"
+        ],
+        "note": "Server runs on port 3000. VS Code auto-forwards the port.\n"
+      }
     },
     {
       "id": "java-basic-webserver",
@@ -188,7 +210,14 @@
         "golang-basic-webserver",
         "csharp-basic-webserver"
       ],
-      "context": "dct"
+      "context": "dct",
+      "quickstart": {
+        "title": "Run the Spring Boot app",
+        "commands": [
+          "mvn spring-boot:run"
+        ],
+        "note": "Spring Boot runs on port 3000. VS Code auto-forwards the port.\n"
+      }
     },
     {
       "id": "php-basic-webserver",
@@ -215,7 +244,14 @@
         "python-basic-webserver",
         "typescript-basic-webserver"
       ],
-      "context": "dct"
+      "context": "dct",
+      "quickstart": {
+        "title": "Run the PHP server",
+        "commands": [
+          "php -S 0.0.0.0:3000 -t public"
+        ],
+        "note": "PHP's built-in server runs on port 3000. VS Code auto-forwards the port.\n"
+      }
     },
     {
       "id": "python-basic-webserver",
@@ -243,7 +279,16 @@
         "php-basic-webserver",
         "typescript-basic-webserver"
       ],
-      "context": "dct"
+      "context": "dct",
+      "quickstart": {
+        "title": "Run the Flask app",
+        "commands": [
+          "uv venv",
+          "uv pip install -r requirements.txt",
+          "uv run python app/app.py"
+        ],
+        "note": "Flask runs on port 3000. VS Code auto-forwards the port — click the globe icon in the Ports tab.\n"
+      }
     },
     {
       "id": "python-basic-webserver-database",
@@ -285,7 +330,16 @@
             "init": "config/init-database.sql"
           }
         }
-      ]
+      ],
+      "quickstart": {
+        "title": "Run the Flask app",
+        "commands": [
+          "uv venv",
+          "uv pip install -r requirements.txt",
+          "uv run python app/app.py"
+        ],
+        "note": "Flask debug server starts on port 3000.\nVS Code auto-forwards the port — click the globe icon in the Ports tab.\n"
+      }
     },
     {
       "id": "typescript-basic-webserver",
@@ -313,7 +367,15 @@
         "designsystemet-basic-react-app",
         "python-basic-webserver"
       ],
-      "context": "dct"
+      "context": "dct",
+      "quickstart": {
+        "title": "Run the Express server",
+        "commands": [
+          "npm install",
+          "npm run dev"
+        ],
+        "note": "Server runs on port 3000 with hot reload via nodemon. VS Code auto-forwards the port.\n"
+      }
     },
     {
       "id": "postgresql-demo",
@@ -354,6 +416,13 @@
             }
           }
         ]
+      },
+      "quickstart": {
+        "title": "Verify the database",
+        "commands": [
+          "uis connect postgresql demo_db"
+        ],
+        "note": "Inside psql, run: SELECT * FROM tasks;\nYou should see 3 seeded rows. Type \\q to exit.\n"
       }
     }
   ]

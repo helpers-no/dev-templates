@@ -23,6 +23,14 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   tools="dev-golang"
 />
 
+import TemplateGetStarted from '@site/src/components/TemplateGetStarted';
+
+<TemplateGetStarted
+  requires={null}
+  params={null}
+  quickstart={{"title":"Run the Go server","commands":["go run main.go"],"note":"Server runs on port 3000. VS Code auto-forwards the port.\n"}}
+/>
+
 
 A minimal web server using Go's standard `net/http` package. Displays "Hello World" with current time and date, and provides health check endpoints.
 

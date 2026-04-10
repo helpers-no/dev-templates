@@ -24,6 +24,14 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   tools="dev-typescript"
 />
 
+import TemplateGetStarted from '@site/src/components/TemplateGetStarted';
+
+<TemplateGetStarted
+  requires={null}
+  params={null}
+  quickstart={{"title":"Run the Express server","commands":["npm install","npm run dev"],"note":"Server runs on port 3000 with hot reload via nodemon. VS Code auto-forwards the port.\n"}}
+/>
+
 
 A minimal Express.js web server written in TypeScript. Displays "Hello World" and demonstrates deployment to Kubernetes via ArgoCD and GitHub Actions.
 
