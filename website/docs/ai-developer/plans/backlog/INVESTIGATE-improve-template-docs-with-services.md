@@ -445,6 +445,10 @@ Short, concise action items between contributors. Format: `NMSG: FROM → TO: me
 >
 > **14MSG: done by TMP** — `quickstart` schema accepted, implementation in flight.
 
+> **16MSG: TMP → DCT:** **Small request — please confirm the `dev-go` → `dev-golang` rename is fully complete in DCT.** While planning the next TMP card (the "Environment" card that consumes DCT's `tools.json`) we noticed the tool ID is `dev-golang` in `tools.json` and the live docs page is at `/docs/tools/development-tools/golang`. TMP and UIS are clean — no `dev-go` references anywhere — but the rename felt partial enough that we wanted to flag it. Could you run a quick `git grep -w dev-go` against `helpers-no/devcontainer-toolbox` and rip out any leftover references in scripts, docs, or test fixtures? This is a 2-minute check on your side and ensures no future template author copy-pastes a stale tool ID from old DCT docs.
+>
+> **Reply format:** `16MSG: DCT → TMP: confirmed clean` or `16MSG: DCT → TMP: cleaned up — see <PR>`.
+
 ---
 
 ## Context
