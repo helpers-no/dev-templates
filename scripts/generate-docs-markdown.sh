@@ -126,7 +126,16 @@ for i in $(seq 0 $((template_count - 1))); do
 "
     done < <(jq -r ".templates[$i].tags[]" "$REGISTRY")
 
-    # Check if the template has requires or quickstart (drives the GetStarted card)
+    # Check whether the template has any environment-card content. The card
+    # renders if any of the following are non-empty:
+    #   - resolvedTools (from template-info.yaml `tools:`)
+    #   - resolvedServices (from `requires:` or `provides.services:`)
+    #   - resolvedInitFiles (from any service's `config.init`)
+    #   - quickstart (run commands)
+    #   - requires (legacy — drives the Configure section)
+    local_has_tools=$(jq -r ".templates[$i].resolvedTools | if length > 0 then \"y\" else empty end" "$REGISTRY")
+    local_has_services=$(jq -r ".templates[$i].resolvedServices | if length > 0 then \"y\" else empty end" "$REGISTRY")
+    local_has_init=$(jq -r ".templates[$i].resolvedInitFiles | if (. // {} | length) > 0 then \"y\" else empty end" "$REGISTRY")
     local_has_requires=$(jq -r ".templates[$i].requires // empty" "$REGISTRY")
     local_has_quickstart=$(jq -r ".templates[$i].quickstart // empty" "$REGISTRY")
 
@@ -156,19 +165,31 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
 
 MDXEOF
 
-    # Emit GetStarted card if requires or quickstart is present
-    if [[ -n "$local_has_requires" || -n "$local_has_quickstart" ]]; then
+    # Emit Environment card if any environment content is present.
+    # The component is a dumb renderer — every value is pre-resolved by
+    # generate-registry.ts and passed as JSON props. JSX accepts JSON literals
+    # because `null`/`{}`/`[]` are all valid JS expressions, so propName={$jq_compact}
+    # works directly. (See PLAN-environment-card.md task 1.0 for the pattern doc.)
+    if [[ -n "$local_has_tools" || -n "$local_has_services" || -n "$local_has_init" || -n "$local_has_requires" || -n "$local_has_quickstart" ]]; then
         local_requires_json=$(jq -c ".templates[$i].requires // null" "$REGISTRY")
         local_params_json=$(jq -c ".templates[$i].params // null" "$REGISTRY")
         local_quickstart_json=$(jq -c ".templates[$i].quickstart // null" "$REGISTRY")
+        local_tools_json=$(jq -c ".templates[$i].resolvedTools // null" "$REGISTRY")
+        local_services_json=$(jq -c ".templates[$i].resolvedServices // null" "$REGISTRY")
+        local_template_kind_json=$(jq -c ".templates[$i].templateKind // null" "$REGISTRY")
+        local_init_files_json=$(jq -c ".templates[$i].resolvedInitFiles // null" "$REGISTRY")
 
         cat >> "$page_file" <<MDXEOF
-import TemplateGetStarted from '@site/src/components/TemplateGetStarted';
+import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
-<TemplateGetStarted
+<TemplateEnvironment
   requires={$local_requires_json}
   params={$local_params_json}
   quickstart={$local_quickstart_json}
+  tools={$local_tools_json}
+  services={$local_services_json}
+  templateKind={$local_template_kind_json}
+  initFiles={$local_init_files_json}
 />
 
 MDXEOF

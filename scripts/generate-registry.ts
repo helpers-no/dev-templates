@@ -4,6 +4,23 @@
  * Scans all template-categories.yaml and template-info.yaml files,
  * validates them, and outputs website/src/data/template-registry.json.
  *
+ * For the Environment card (PLAN-environment-card.md), this script also:
+ *  - Resolves each template's `tools:` IDs against the vendored DCT tools.json
+ *    (rich descriptions + DCT doc URLs).
+ *  - Resolves each template's `requires:` (app) or `provides.services:` (stack)
+ *    against the vendored UIS services.json (rich descriptions + UIS doc URLs
+ *    + port-forward + namespace + transitive deps).
+ *  - For app templates, parses `manifests/deployment.yaml` to extract the env
+ *    var name, K8s secret name pattern, and container port. These are values
+ *    the contributor already wrote in the manifest; we read them so the
+ *    Environment card can show them above the fold.
+ *  - Reads init SQL files referenced via `requires[].config.init` /
+ *    `provides.services[].config.init` and embeds the contents on the
+ *    registry entry so the website can show them in a collapsible block.
+ *
+ * The bash script generate-docs-markdown.sh consumes the resolved fields with
+ * jq and emits MDX. The React component is a dumb renderer.
+ *
  * Usage: npx tsx scripts/generate-registry.ts
  *   (run from repo root, uses js-yaml from website/node_modules)
  */
@@ -12,12 +29,24 @@ import {readFileSync, writeFileSync, readdirSync, statSync, existsSync} from 'fs
 import {join, dirname, basename} from 'path';
 import {createRequire} from 'module';
 
+import {
+  DCT_DOCS_BASE,
+  UIS_DOCS_BASE,
+  buildDctToolDocsUrl,
+  buildUisDocsUrl,
+} from './lib/dct-doc-paths.js';
+
 // Load js-yaml from website/node_modules
 const ROOT = dirname(dirname(new URL(import.meta.url).pathname));
 const require = createRequire(join(ROOT, 'website/package.json'));
-const yaml = require('js-yaml') as {load: (str: string) => unknown};
+const yaml = require('js-yaml') as {
+  load: (str: string) => unknown;
+  loadAll: (str: string) => unknown[];
+};
 
 const OUTPUT_PATH = join(ROOT, 'website/src/data/template-registry.json');
+const DCT_TOOLS_PATH = join(ROOT, 'website/src/data/dct-tools.json');
+const UIS_SERVICES_PATH = join(ROOT, 'website/src/data/uis-services.json');
 
 // --- Types ---
 
@@ -55,13 +84,369 @@ interface TemplateInfoYaml {
   summary: string;
   related: string[];
   params?: Record<string, string>;
-  requires?: Array<Record<string, unknown>>;
-  provides?: unknown;
+  requires?: Array<{
+    service: string;
+    config?: Record<string, unknown>;
+  }>;
+  provides?: {
+    services?: Array<{
+      service: string;
+      config?: Record<string, unknown>;
+    }>;
+  };
   quickstart?: {
     title: string;
     commands: string[];
     note?: string;
   };
+}
+
+interface DctTool {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  website?: string;
+}
+
+interface DctToolsFile {
+  version: string;
+  generated: string;
+  tools: DctTool[];
+}
+
+interface UisService {
+  id: string;
+  name: string;
+  description: string;
+  exposePort?: number;
+  namespace?: string;
+  helmChart?: string;
+  docs?: string;
+  website?: string;
+  requires?: string[];
+}
+
+interface UisServicesFile {
+  services: UisService[];
+}
+
+interface ResolvedTool {
+  id: string;
+  name: string;
+  description: string;
+  website?: string;
+  docsUrl?: string;
+}
+
+interface TransitiveDep {
+  id: string;
+  name: string;
+  docsUrl?: string;
+}
+
+interface ResolvedService {
+  id: string;
+  name: string;
+  description: string;
+  docsUrl?: string;
+  website?: string;
+  exposePort?: number;
+  namespace?: string;
+  helmChart?: string;
+  database?: string;
+  generatedUser?: string;
+  envVar?: string;
+  secretName?: string;
+  containerPort?: number;
+  initFilePath?: string;
+  transitiveRequires?: TransitiveDep[];
+}
+
+type TemplateKind = 'app' | 'stack';
+
+interface DeploymentManifestExtract {
+  envVar?: string;
+  secretName?: string;
+  containerPort?: number;
+}
+
+// --- Vendored data loading ---
+
+function loadDctTools(): Map<string, DctTool> {
+  const raw = JSON.parse(readFileSync(DCT_TOOLS_PATH, 'utf8')) as DctToolsFile;
+  const map = new Map<string, DctTool>();
+  for (const t of raw.tools) map.set(t.id, t);
+  return map;
+}
+
+function loadUisServices(): Map<string, UisService> {
+  const raw = JSON.parse(readFileSync(UIS_SERVICES_PATH, 'utf8')) as UisServicesFile;
+  const map = new Map<string, UisService>();
+  for (const s of raw.services) map.set(s.id, s);
+  return map;
+}
+
+// --- Resolvers ---
+
+const warnings: string[] = [];
+
+function warn(msg: string): void {
+  warnings.push(msg);
+  console.warn(`⚠ ${msg}`);
+}
+
+/**
+ * Substitute `{{ params.X }}` references in a string with their default values
+ * from the template's params block. Unknown references are left as-is and
+ * trigger a warning.
+ */
+function substituteParams(
+  input: string,
+  params: Record<string, string> | undefined,
+  context: string,
+): string {
+  if (!params) return input;
+  return input.replace(/\{\{\s*params\.([a-zA-Z0-9_]+)\s*\}\}/g, (match, key) => {
+    if (key in params) return params[key];
+    warn(`${context}: unresolved {{ params.${key} }} in '${input}'`);
+    return match;
+  });
+}
+
+/**
+ * Substitute `{{REPO_NAME}}` with `params.app_name` for display purposes.
+ * At install time DCT replaces this with the user's actual git repo name; for
+ * the website preview we use app_name as the closest sensible default.
+ */
+function substituteRepoName(
+  input: string,
+  params: Record<string, string> | undefined,
+): string {
+  const appName = params?.app_name ?? '';
+  return input.replace(/\{\{\s*REPO_NAME\s*\}\}/g, appName);
+}
+
+function resolveTools(
+  toolsField: string,
+  dctTools: Map<string, DctTool>,
+  templateId: string,
+): ResolvedTool[] {
+  if (!toolsField || typeof toolsField !== 'string') return [];
+  // The `tools:` field is a whitespace-separated string of IDs (e.g. "dev-python")
+  const ids = toolsField.split(/\s+/).filter((s) => s.length > 0);
+  const resolved: ResolvedTool[] = [];
+  for (const id of ids) {
+    const t = dctTools.get(id);
+    if (!t) {
+      warn(`${templateId}: unknown tool '${id}' (not in dct-tools.json)`);
+      // Render as a bare entry so the user still sees something
+      resolved.push({id, name: id, description: ''});
+      continue;
+    }
+    const docsUrl = buildDctToolDocsUrl(t.id, t.category);
+    if (!docsUrl) {
+      warn(`${templateId}: tool '${id}' has unknown category '${t.category}' — no docs link`);
+    }
+    resolved.push({
+      id: t.id,
+      name: t.name,
+      description: t.description,
+      website: t.website,
+      docsUrl: docsUrl ?? undefined,
+    });
+  }
+  return resolved;
+}
+
+function resolveTransitiveDeps(
+  ids: string[] | undefined,
+  uisServices: Map<string, UisService>,
+): TransitiveDep[] {
+  if (!ids || ids.length === 0) return [];
+  return ids
+    .map((id): TransitiveDep | null => {
+      const s = uisServices.get(id);
+      if (!s) return {id, name: id};
+      return {
+        id: s.id,
+        name: s.name,
+        docsUrl: buildUisDocsUrl(s.docs) ?? undefined,
+      };
+    })
+    .filter((x): x is TransitiveDep => x !== null);
+}
+
+/**
+ * Generate the display-only "user" name for a service. UIS convention is to
+ * derive it from the app name (lowercased, hyphens -> underscores).
+ */
+function deriveGeneratedUser(appName: string | undefined): string | undefined {
+  if (!appName) return undefined;
+  return appName.toLowerCase().replace(/-/g, '_');
+}
+
+function resolveServices(
+  serviceEntries: Array<{service: string; config?: Record<string, unknown>}> | undefined,
+  uisServices: Map<string, UisService>,
+  params: Record<string, string> | undefined,
+  manifest: DeploymentManifestExtract | undefined,
+  templateKind: TemplateKind,
+  templateId: string,
+): ResolvedService[] {
+  if (!serviceEntries || serviceEntries.length === 0) return [];
+  const generatedUser = deriveGeneratedUser(params?.app_name);
+
+  return serviceEntries.map((entry, idx) => {
+    const s = uisServices.get(entry.service);
+    if (!s) {
+      warn(`${templateId}: unknown service '${entry.service}' (not in uis-services.json)`);
+      return {
+        id: entry.service,
+        name: entry.service,
+        description: '',
+      };
+    }
+
+    const config = entry.config ?? {};
+    const dbRaw = typeof config.database === 'string' ? config.database : undefined;
+    const initRaw = typeof config.init === 'string' ? config.init : undefined;
+    const database = dbRaw
+      ? substituteParams(dbRaw, params, `${templateId}/${entry.service}.database`)
+      : undefined;
+
+    const resolved: ResolvedService = {
+      id: s.id,
+      name: s.name,
+      description: s.description,
+      docsUrl: buildUisDocsUrl(s.docs) ?? undefined,
+      website: s.website,
+      exposePort: s.exposePort,
+      namespace: s.namespace,
+      helmChart: s.helmChart,
+      database,
+      generatedUser,
+      initFilePath: initRaw,
+      transitiveRequires: resolveTransitiveDeps(s.requires, uisServices),
+    };
+
+    // App templates: attach manifest-derived values to the FIRST service entry
+    // only. Multi-service templates will need per-service manifest extraction
+    // when they exist (currently every app template has exactly one requires
+    // entry, so this is fine).
+    // TODO(multi-service): per-service manifest reads when templates need them
+    if (templateKind === 'app' && idx === 0 && manifest) {
+      resolved.envVar = manifest.envVar;
+      resolved.secretName = manifest.secretName;
+      resolved.containerPort = manifest.containerPort;
+    }
+
+    return resolved;
+  });
+}
+
+/**
+ * Read manifests/deployment.yaml from a template's source directory and
+ * extract the env var name, secret name pattern, and container port.
+ *
+ * Assumptions (matching every current template):
+ *  - single container per pod -> uses containers[0]
+ *  - exactly one env entry that uses secretKeyRef -> uses env[0]
+ *
+ * Returns undefined if the manifest is missing or any field is absent. The
+ * card will simply not show the missing fields.
+ */
+function readDeploymentManifest(
+  templateDir: string,
+  params: Record<string, string> | undefined,
+  templateId: string,
+): DeploymentManifestExtract | undefined {
+  const manifestPath = join(templateDir, 'manifests', 'deployment.yaml');
+  if (!existsSync(manifestPath)) return undefined;
+
+  // K8s manifests are commonly multi-document YAML (Deployment + Service +
+  // ConfigMap, separated by ---). Use loadAll and pick the Deployment doc.
+  let docs: unknown[];
+  try {
+    docs = yaml.loadAll(readFileSync(manifestPath, 'utf8'));
+  } catch (e) {
+    warn(`${templateId}: failed to parse manifests/deployment.yaml: ${(e as Error).message}`);
+    return undefined;
+  }
+
+  const deployment = docs.find(
+    (d) => (d as {kind?: string})?.kind === 'Deployment',
+  ) as
+    | {
+        spec?: {template?: {spec?: {containers?: Array<unknown>}}};
+      }
+    | undefined;
+
+  if (!deployment) {
+    warn(`${templateId}: manifests/deployment.yaml has no kind:Deployment document`);
+    return undefined;
+  }
+
+  // Navigate the K8s Deployment shape defensively. We use containers[0] and
+  // env[0] which is true for all current templates.
+  const container = deployment.spec?.template?.spec?.containers?.[0] as
+    | {
+        env?: Array<{
+          name?: string;
+          valueFrom?: {secretKeyRef?: {name?: string}};
+        }>;
+        ports?: Array<{containerPort?: number}>;
+      }
+    | undefined;
+
+  if (!container) {
+    warn(`${templateId}: manifests/deployment.yaml has no containers[0]`);
+    return undefined;
+  }
+
+  const envEntry = container.env?.[0];
+  const portEntry = container.ports?.[0];
+
+  const envVar = typeof envEntry?.name === 'string' ? envEntry.name : undefined;
+  const secretNameRaw =
+    typeof envEntry?.valueFrom?.secretKeyRef?.name === 'string'
+      ? envEntry.valueFrom.secretKeyRef.name
+      : undefined;
+  const containerPort =
+    typeof portEntry?.containerPort === 'number' ? portEntry.containerPort : undefined;
+
+  const secretName = secretNameRaw ? substituteRepoName(secretNameRaw, params) : undefined;
+
+  return {envVar, secretName, containerPort};
+}
+
+/**
+ * Read every init file referenced by a template's services and return them as
+ * a record keyed by the relative path. Skips silently with a warning when a
+ * file is missing.
+ */
+function readInitFiles(
+  templateDir: string,
+  serviceEntries: Array<{service: string; config?: Record<string, unknown>}> | undefined,
+  templateId: string,
+): Record<string, string> {
+  if (!serviceEntries) return {};
+  const result: Record<string, string> = {};
+  for (const entry of serviceEntries) {
+    const initPath = entry.config?.init;
+    if (typeof initPath !== 'string' || initPath.length === 0) continue;
+    const fullPath = join(templateDir, initPath);
+    if (!existsSync(fullPath)) {
+      warn(`${templateId}: init file not found at ${initPath}`);
+      continue;
+    }
+    try {
+      result[initPath] = readFileSync(fullPath, 'utf8');
+    } catch (e) {
+      warn(`${templateId}: failed to read init file ${initPath}: ${(e as Error).message}`);
+    }
+  }
+  return result;
 }
 
 // --- Scanning ---
@@ -145,7 +530,12 @@ function validateTemplate(
 
 // --- Main ---
 
-console.log('Scanning for template-categories.yaml files...');
+console.log('Loading vendored platform data...');
+const dctTools = loadDctTools();
+const uisServices = loadUisServices();
+console.log(`  ${dctTools.size} DCT tools, ${uisServices.size} UIS services`);
+
+console.log('\nScanning for template-categories.yaml files...');
 const categoryFiles = findCategoryFiles();
 
 if (categoryFiles.length === 0) {
@@ -201,6 +591,7 @@ for (const catFile of categoryFiles) {
 
   for (const file of infoFiles) {
     const dirName = basename(dirname(file));
+    const templateDir = dirname(file);
     console.log(`  ${folderName}/${dirName}/template-info.yaml`);
 
     const raw = yaml.load(readFileSync(file, 'utf8')) as TemplateInfoYaml;
@@ -232,6 +623,45 @@ for (const catFile of categoryFiles) {
     if (raw.provides) entry.provides = raw.provides;
     if (raw.quickstart) entry.quickstart = raw.quickstart;
 
+    // ── Environment-card resolution (Phase 2+3 of PLAN-environment-card.md) ─
+
+    // Template kind comes from install_type which the template author already
+    // declares. Stack templates use `provides.services:`; everything else
+    // (app, overlay) consumes services via `requires:` (if any). The kind
+    // drives the header label of the cluster section in the Environment card.
+    const templateKind: TemplateKind = raw.install_type === 'stack' ? 'stack' : 'app';
+    entry.templateKind = templateKind;
+
+    // Pick the service list from whichever field applies.
+    const serviceList = templateKind === 'stack' ? raw.provides?.services : raw.requires;
+
+    // Resolve tools (DCT)
+    entry.resolvedTools = resolveTools(raw.tools, dctTools, raw.id);
+
+    // For app templates, read manifests/deployment.yaml to extract env_var,
+    // secret_name, container_port. Stack templates skip this step — they
+    // have no consumer manifest.
+    let manifestExtract: DeploymentManifestExtract | undefined;
+    if (templateKind === 'app') {
+      manifestExtract = readDeploymentManifest(templateDir, raw.params, raw.id);
+    }
+    if (manifestExtract) {
+      entry.manifest = manifestExtract;
+    }
+
+    // Resolve services (UIS) and merge in manifest-derived values
+    entry.resolvedServices = resolveServices(
+      serviceList,
+      uisServices,
+      raw.params,
+      manifestExtract,
+      templateKind,
+      raw.id,
+    );
+
+    // Read init SQL files for the collapsible block
+    entry.resolvedInitFiles = readInitFiles(templateDir, serviceList, raw.id);
+
     allTemplates.push(entry);
   }
 }
@@ -245,6 +675,8 @@ if (errors.length > 0) {
 // Write output
 const registry = {
   generated: new Date().toISOString(),
+  dctDocsBase: DCT_DOCS_BASE,
+  uisDocsBase: UIS_DOCS_BASE,
   categories: allCategories,
   templates: allTemplates,
 };
@@ -252,3 +684,6 @@ const registry = {
 writeFileSync(OUTPUT_PATH, JSON.stringify(registry, null, 2) + '\n');
 console.log(`\nGenerated ${OUTPUT_PATH}`);
 console.log(`  ${allCategories.length} categories, ${allTemplates.length} templates`);
+if (warnings.length > 0) {
+  console.log(`  ${warnings.length} warning(s) — see above`);
+}

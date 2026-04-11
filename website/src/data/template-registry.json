@@ -1,5 +1,7 @@
 {
-  "generated": "2026-04-11T06:56:23.403Z",
+  "generated": "2026-04-11T08:14:29.344Z",
+  "dctDocsBase": "https://dct.sovereignsky.no",
+  "uisDocsBase": "https://uis.sovereignsky.no",
   "categories": [
     {
       "id": "WORKFLOW",
@@ -76,7 +78,11 @@
       "docs": "https://github.com/helpers-no/dev-templates/tree/main/ai-templates/plan-based-workflow",
       "summary": "A structured AI development workflow that guides AI coding assistants through investigation, planning, and phased implementation. Includes CLAUDE.md, 6 portable docs, plan templates, and git safety rules. Designed for human-in-the-loop collaboration.",
       "related": [],
-      "context": "dct"
+      "context": "dct",
+      "templateKind": "app",
+      "resolvedTools": [],
+      "resolvedServices": [],
+      "resolvedInitFiles": {}
     },
     {
       "id": "csharp-basic-webserver",
@@ -112,7 +118,22 @@
           "dotnet watch run"
         ],
         "note": "ASP.NET Core runs on port 3000 with hot reload via dotnet watch. VS Code auto-forwards the port.\n"
-      }
+      },
+      "templateKind": "app",
+      "resolvedTools": [
+        {
+          "id": "dev-csharp",
+          "name": "C# Development Tools",
+          "description": "Installs .NET SDK, ASP.NET Core Runtime, and VS Code extensions for C# development",
+          "website": "https://dotnet.microsoft.com",
+          "docsUrl": "https://dct.sovereignsky.no/docs/tools/development-tools/csharp"
+        }
+      ],
+      "manifest": {
+        "containerPort": 80
+      },
+      "resolvedServices": [],
+      "resolvedInitFiles": {}
     },
     {
       "id": "designsystemet-basic-react-app",
@@ -148,7 +169,22 @@
           "npm run dev"
         ],
         "note": "Vite runs on port 5173. VS Code auto-forwards the port — click the globe icon in the Ports tab.\n"
-      }
+      },
+      "templateKind": "app",
+      "resolvedTools": [
+        {
+          "id": "dev-typescript",
+          "name": "TypeScript Development Tools",
+          "description": "Adds TypeScript and development tools (Node.js already in devcontainer)",
+          "website": "https://www.typescriptlang.org",
+          "docsUrl": "https://dct.sovereignsky.no/docs/tools/development-tools/typescript"
+        }
+      ],
+      "manifest": {
+        "containerPort": 3000
+      },
+      "resolvedServices": [],
+      "resolvedInitFiles": {}
     },
     {
       "id": "golang-basic-webserver",
@@ -182,7 +218,22 @@
           "go run main.go"
         ],
         "note": "Server runs on port 3000. VS Code auto-forwards the port.\n"
-      }
+      },
+      "templateKind": "app",
+      "resolvedTools": [
+        {
+          "id": "dev-golang",
+          "name": "Go Runtime & Development Tools",
+          "description": "Installs Go runtime, common tools, and VS Code extensions for Go development.",
+          "website": "https://go.dev",
+          "docsUrl": "https://dct.sovereignsky.no/docs/tools/development-tools/golang"
+        }
+      ],
+      "manifest": {
+        "containerPort": 3000
+      },
+      "resolvedServices": [],
+      "resolvedInitFiles": {}
     },
     {
       "id": "java-basic-webserver",
@@ -217,7 +268,22 @@
           "mvn spring-boot:run"
         ],
         "note": "Spring Boot runs on port 3000. VS Code auto-forwards the port.\n"
-      }
+      },
+      "templateKind": "app",
+      "resolvedTools": [
+        {
+          "id": "dev-java",
+          "name": "Java Runtime & Development Tools",
+          "description": "Installs Java JDK, Maven, Gradle, and VS Code extensions for Java development.",
+          "website": "https://dev.java",
+          "docsUrl": "https://dct.sovereignsky.no/docs/tools/development-tools/java"
+        }
+      ],
+      "manifest": {
+        "containerPort": 3000
+      },
+      "resolvedServices": [],
+      "resolvedInitFiles": {}
     },
     {
       "id": "php-basic-webserver",
@@ -251,7 +317,22 @@
           "php -S 0.0.0.0:3000 -t public"
         ],
         "note": "PHP's built-in server runs on port 3000. VS Code auto-forwards the port.\n"
-      }
+      },
+      "templateKind": "app",
+      "resolvedTools": [
+        {
+          "id": "dev-php-laravel",
+          "name": "PHP Laravel Development Tools",
+          "description": "Installs PHP 8.4, Composer, Laravel installer, and sets up Laravel development environment",
+          "website": "https://laravel.com",
+          "docsUrl": "https://dct.sovereignsky.no/docs/tools/development-tools/php-laravel"
+        }
+      ],
+      "manifest": {
+        "containerPort": 3000
+      },
+      "resolvedServices": [],
+      "resolvedInitFiles": {}
     },
     {
       "id": "python-basic-webserver",
@@ -288,7 +369,22 @@
           "uv run python app/app.py"
         ],
         "note": "Flask runs on port 3000. VS Code auto-forwards the port — click the globe icon in the Ports tab.\n"
-      }
+      },
+      "templateKind": "app",
+      "resolvedTools": [
+        {
+          "id": "dev-python",
+          "name": "Python Development Tools",
+          "description": "Adds ipython, pytest-cov, uv, and VS Code extensions for Python development",
+          "website": "https://python.org",
+          "docsUrl": "https://dct.sovereignsky.no/docs/tools/development-tools/python"
+        }
+      ],
+      "manifest": {
+        "containerPort": 3000
+      },
+      "resolvedServices": [],
+      "resolvedInitFiles": {}
     },
     {
       "id": "python-basic-webserver-database",
@@ -339,6 +435,43 @@
           "uv run python app/app.py"
         ],
         "note": "Flask debug server starts on port 3000.\nVS Code auto-forwards the port — click the globe icon in the Ports tab.\n"
+      },
+      "templateKind": "app",
+      "resolvedTools": [
+        {
+          "id": "dev-python",
+          "name": "Python Development Tools",
+          "description": "Adds ipython, pytest-cov, uv, and VS Code extensions for Python development",
+          "website": "https://python.org",
+          "docsUrl": "https://dct.sovereignsky.no/docs/tools/development-tools/python"
+        }
+      ],
+      "manifest": {
+        "envVar": "DATABASE_URL",
+        "secretName": "my-app-db",
+        "containerPort": 3000
+      },
+      "resolvedServices": [
+        {
+          "id": "postgresql",
+          "name": "PostgreSQL",
+          "description": "Open-source relational database",
+          "docsUrl": "https://uis.sovereignsky.no/docs/services/databases/postgresql",
+          "website": "https://www.postgresql.org",
+          "exposePort": 35432,
+          "namespace": "default",
+          "helmChart": "bitnami/postgresql",
+          "database": "my_app_db",
+          "generatedUser": "my_app",
+          "initFilePath": "config/init-database.sql",
+          "transitiveRequires": [],
+          "envVar": "DATABASE_URL",
+          "secretName": "my-app-db",
+          "containerPort": 3000
+        }
+      ],
+      "resolvedInitFiles": {
+        "config/init-database.sql": "-- Init file for python-basic-webserver-database\n-- Applied by: uis configure postgresql --init-file -\n-- Uses psql --set ON_ERROR_STOP=on for fail-fast on syntax errors\n-- All statements are idempotent — safe to re-run\n\nCREATE TABLE IF NOT EXISTS tasks (\n    id SERIAL PRIMARY KEY,\n    title VARCHAR(255) NOT NULL,\n    status VARCHAR(20) DEFAULT 'pending',\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);\n\nINSERT INTO tasks (title, status) VALUES\n    ('Set up the database connection', 'done'),\n    ('Build something with Flask + PostgreSQL', 'pending'),\n    ('Deploy to Kubernetes via ArgoCD', 'pending')\nON CONFLICT DO NOTHING;\n"
       }
     },
     {
@@ -375,7 +508,22 @@
           "npm run dev"
         ],
         "note": "Server runs on port 3000 with hot reload via nodemon. VS Code auto-forwards the port.\n"
-      }
+      },
+      "templateKind": "app",
+      "resolvedTools": [
+        {
+          "id": "dev-typescript",
+          "name": "TypeScript Development Tools",
+          "description": "Adds TypeScript and development tools (Node.js already in devcontainer)",
+          "website": "https://www.typescriptlang.org",
+          "docsUrl": "https://dct.sovereignsky.no/docs/tools/development-tools/typescript"
+        }
+      ],
+      "manifest": {
+        "containerPort": 3000
+      },
+      "resolvedServices": [],
+      "resolvedInitFiles": {}
     },
     {
       "id": "postgresql-demo",
@@ -423,6 +571,27 @@
           "uis connect postgresql demo_db"
         ],
         "note": "Inside psql, run: SELECT * FROM tasks;\nYou should see 3 seeded rows. Type \\q to exit.\n"
+      },
+      "templateKind": "stack",
+      "resolvedTools": [],
+      "resolvedServices": [
+        {
+          "id": "postgresql",
+          "name": "PostgreSQL",
+          "description": "Open-source relational database",
+          "docsUrl": "https://uis.sovereignsky.no/docs/services/databases/postgresql",
+          "website": "https://www.postgresql.org",
+          "exposePort": 35432,
+          "namespace": "default",
+          "helmChart": "bitnami/postgresql",
+          "database": "demo_db",
+          "generatedUser": "demo_app",
+          "initFilePath": "config/init-database.sql",
+          "transitiveRequires": []
+        }
+      ],
+      "resolvedInitFiles": {
+        "config/init-database.sql": "-- PostgreSQL Demo — sample schema with seed data\n-- Applied by: uis configure postgresql --init-file -\n-- Uses psql --set ON_ERROR_STOP=on for fail-fast on syntax errors\n-- All statements are idempotent — safe to re-run\n\nCREATE TABLE IF NOT EXISTS tasks (\n    id SERIAL PRIMARY KEY,\n    title VARCHAR(255) NOT NULL,\n    status VARCHAR(20) DEFAULT 'pending',\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);\n\nINSERT INTO tasks (title, status) VALUES\n    ('Verify uis template install works', 'done'),\n    ('Build your own UIS stack template', 'pending'),\n    ('Deploy it with uis template install', 'pending')\nON CONFLICT DO NOTHING;\n"
       }
     }
   ]

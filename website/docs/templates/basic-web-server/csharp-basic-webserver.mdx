@@ -25,12 +25,16 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   tools="dev-csharp"
 />
 
-import TemplateGetStarted from '@site/src/components/TemplateGetStarted';
+import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
-<TemplateGetStarted
+<TemplateEnvironment
   requires={null}
   params={null}
   quickstart={{"title":"Run the ASP.NET Core app","commands":["dotnet watch run"],"note":"ASP.NET Core runs on port 3000 with hot reload via dotnet watch. VS Code auto-forwards the port.\n"}}
+  tools={[{"id":"dev-csharp","name":"C# Development Tools","description":"Installs .NET SDK, ASP.NET Core Runtime, and VS Code extensions for C# development","website":"https://dotnet.microsoft.com","docsUrl":"https://dct.sovereignsky.no/docs/tools/development-tools/csharp"}]}
+  services={[]}
+  templateKind={"app"}
+  initFiles={{}}
 />
 
 

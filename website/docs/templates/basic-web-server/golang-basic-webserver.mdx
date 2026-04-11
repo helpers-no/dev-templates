@@ -23,12 +23,16 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   tools="dev-golang"
 />
 
-import TemplateGetStarted from '@site/src/components/TemplateGetStarted';
+import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
-<TemplateGetStarted
+<TemplateEnvironment
   requires={null}
   params={null}
   quickstart={{"title":"Run the Go server","commands":["go run main.go"],"note":"Server runs on port 3000. VS Code auto-forwards the port.\n"}}
+  tools={[{"id":"dev-golang","name":"Go Runtime & Development Tools","description":"Installs Go runtime, common tools, and VS Code extensions for Go development.","website":"https://go.dev","docsUrl":"https://dct.sovereignsky.no/docs/tools/development-tools/golang"}]}
+  services={[]}
+  templateKind={"app"}
+  initFiles={{}}
 />
 
 
