@@ -4,7 +4,7 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Active — Phase 1 DONE, awaiting Phase 1 validation
+## Status: Active — Phases 1, 2, 3 DONE, awaiting Phase 4 (visual + link + CI verification)
 
 **Goal**: Replace the current `<TemplateGetStarted>` card with a richer `<TemplateEnvironment>` card that surfaces *everything* a template sets up — devcontainer tools, cluster services, generated credentials, K8s secrets, port-forwards, and the database init schema (inlined and expandable). **This plan is website-only.** No changes to templates, `template-info.yaml` schema, DCT, or UIS.
 
@@ -135,21 +135,17 @@ User reviews:
 
 ---
 
-## Phase 2: Render the "What gets set up" section
+## Phase 2: Render the "What gets set up" section — DONE
 
 ### Tasks
 
-- [ ] 2.1 In `TemplateEnvironment/index.tsx`, add a new top section before Configure that renders three blocks conditionally:
+- [x] 2.1 In `TemplateEnvironment/index.tsx`, add a new top section before Configure that renders three blocks conditionally:
   - **In your devcontainer**: list each tool as `<strong><a href={docsUrl}>{name}</a></strong> — {description}`. The `docsUrl` links to the DCT site (e.g. `https://dct.sovereignsky.no/docs/tools/development-tools/python`). Optionally also show a small "↗" linking to the upstream `website`. If a template references an unknown tool ID, fall back to rendering the bare ID with a build-log warning.
   - **In your Kubernetes cluster**: for each entry in the resolved `services` prop, render: service `name` linked to `docsUrl` (the UIS site, e.g. `https://uis.sovereignsky.no/docs/services/databases/postgresql`), with logo if available, one-line `description`, then a small details list — Database name, Generated user, K8s Secret name, Port-forward (`host.docker.internal:{exposePort}`), Env var, Namespace. If the service has transitive `requires` (e.g. authentik → postgresql, redis), show them as "Also deploys: …" with each linked to its UIS doc page.
   - **Schema applied to the database**: for each `requires[].config.init` that has a corresponding entry in `initFiles`, render a `<details>` element with `<summary><code>{path}</code></summary>` and a `<pre><code>{content}</code></pre>` body. Collapsed by default.
-- [ ] 2.2 Add styles for the new section in `TemplateEnvironment/styles.module.css`:
-  - Sub-section headings (devcontainer / cluster / schema)
-  - Bullet list styling matching the existing params list
-  - `<details>` styling: bordered box, monospace summary, scrollable code body with max-height (e.g. 400px)
-  - Dark mode parity
-- [ ] 2.3 Add a one-sentence intro paragraph above "What gets set up" — confirm wording with user during implementation.
-- [ ] 2.4 Ensure the existing Configure/Run sections still render below "What gets set up". Numbering ① ② ③ applies only when more than one section is present (preserve existing logic).
+- [x] 2.2 Styles added in `TemplateEnvironment/styles.module.css` (extended during Phase 1.7 copy step). Includes sub-section headings, item cards, details list (label/value), transitive deps, init file `<details>` with 400px max-height + scrollable, dark mode variants.
+- [x] 2.3 Intro paragraph: "When you install this template, the following are configured for you:" — short and direct.
+- [x] 2.4 Numbering ① ② ③ now applies across the three top-level sections (What gets set up / Configure / Run) when more than one is present.
 
 ### Validation
 
@@ -157,14 +153,14 @@ User runs the generator and views the regenerated `python-basic-webserver-databa
 
 ---
 
-## Phase 3: Generator — resolve all data in `generate-registry.ts`, render in `generate-docs-markdown.sh`
+## Phase 3: Generator — resolve all data in `generate-registry.ts`, render in `generate-docs-markdown.sh` — DONE
 
 **Design rule**: ALL cross-reference resolution (tool ID → tool details, service ID → service details, manifest reads, params substitution, init file reads) happens in `scripts/generate-registry.ts`. The bash script `generate-docs-markdown.sh` only reads the resolved data from `template-registry.json` with `jq` and emits MDX. This keeps YAML/JSON parsing in one place (TypeScript + js-yaml + Node `fs`) and shell-side complexity to a minimum.
 
 ### Tasks
 
-- [ ] 3.1 The vendored `dct-tools.json`, `uis-services.json`, and `uis-categories.json` are already in `website/src/data/` from Phase 1. `generate-registry.ts` reads them via `readFileSync` + `JSON.parse` (or `import` if the tsconfig allows JSON imports — check the existing code style).
-- [ ] 3.2 **Tools resolution (in `generate-registry.ts`).** For each template's `tools:` (parse the `tools:` string into a list of IDs — split on whitespace if it's a single string, as it currently is), look up each ID in `dct-tools.json` and produce `{id, name, description, website, docsUrl}`. Build `docsUrl` by:
+- [x] 3.1 The vendored `dct-tools.json`, `uis-services.json` are loaded via `readFileSync` + `JSON.parse` at the top of `generate-registry.ts` and turned into `Map<string, T>` for O(1) lookup. (`uis-categories.json` is vendored but not yet consumed by the script — kept available for future enrichment.)
+- [x] 3.2 **Tools resolution (in `generate-registry.ts`).** For each template's `tools:` (parse the `tools:` string into a list of IDs — split on whitespace if it's a single string, as it currently is), look up each ID in `dct-tools.json` and produce `{id, name, description, website, docsUrl}`. Build `docsUrl` by:
   1. Read the tool's `category` (e.g. `LANGUAGE_DEV`)
   2. Look up the category slug in the `dct-doc-paths.ts` map (`LANGUAGE_DEV` → `development-tools`)
   3. Strip the `dev-` or `tool-` prefix from the ID (`dev-golang` → `golang`)
@@ -173,7 +169,7 @@ User runs the generator and views the regenerated `python-basic-webserver-databa
   Log a warning for unknown IDs or unknown categories; don't fail the build. Attach the resolved array to the registry entry as `resolvedTools`.
 
   **Note**: `dct-doc-paths.ts` is a TypeScript file under `website/src/`, so `generate-registry.ts` can `import` from it directly. (If the import path proves awkward because the script runs from the repo root, copy the data into a sibling JSON file `dct-doc-paths.json` and import that — decide during implementation.)
-- [ ] 3.3 **Services resolution (in `generate-registry.ts`).** Detect whether the template is an **app** (has `requires:`) or a **stack** (has `provides.services:`). Set `templateKind` on the registry entry accordingly. For each service entry from whichever field applies:
+- [x] 3.3 **Services resolution (in `generate-registry.ts`).** Implementation detail: `templateKind` is derived from `install_type` (`stack` → `'stack'`, everything else → `'app'`), not from "has `requires:`". This handles edge cases like overlay templates and app templates without services. For each service entry from whichever field applies:
   - Look up `service` in `uis-services.json` to get `{name, description, exposePort, namespace, docs, requires}` (the last is transitive deps — list of service IDs)
   - Resolve transitive deps: for each ID in `requires`, look up its `name` and `docs` in `uis-services.json` so the card can render "Also deploys: PostgreSQL ↗, Redis ↗" with working links
   - Merge with the template's per-service `config` (e.g. `database`, `init` path)
@@ -181,7 +177,7 @@ User runs the generator and views the regenerated `python-basic-webserver-databa
   - For app templates only: attach the manifest-derived `envVar`, `secretName`, `containerPort` from task 3.4 to the corresponding service entry. Stack templates skip these fields entirely (they have no consumer app).
 
   Attach the resolved array to the registry entry as `resolvedServices`.
-- [ ] 3.4 **Manifest reads (in `generate-registry.ts`, app templates only).** For each app template (one with `requires:`) that has a `manifests/deployment.yaml`, parse it with the existing `js-yaml` and extract:
+- [x] 3.4 **Manifest reads (in `generate-registry.ts`, app templates only).** Implementation note: deployment.yaml is a multi-document YAML (`Deployment` + `Service` separated by `---`), so the reader uses `yaml.loadAll()` and picks the doc with `kind: Deployment`. Single-document `yaml.load()` would have failed. For each app template (one with `requires:`) that has a `manifests/deployment.yaml`, parse it with the existing `js-yaml` and extract:
   - `envVar` = `spec.template.spec.containers[0].env[0].name`
   - `secretName` (raw, with `{{REPO_NAME}}` placeholder) = `spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name`
   - `containerPort` = `spec.template.spec.containers[0].ports[0].containerPort`
@@ -193,11 +189,11 @@ User runs the generator and views the regenerated `python-basic-webserver-databa
   If the manifest is missing or any path resolves to null/undefined, leave that field unset (don't fail the build) and log a warning. **`containers[0]` assumes single-container pods** — true for all current templates; add a code comment noting this as a known limitation.
 
   **Multi-service templates**: today every app template has exactly one `requires:` entry, so a single manifest read populates a single service entry. Multi-service templates will need per-service manifest extraction when they exist; flag this as future work in a code comment.
-- [ ] 3.5 **Resolve `{{ params.* }}` in service `config.database`** (in `generate-registry.ts`) against the template's `params:` defaults so the displayed value is concrete (e.g. `my_app_db` not `{{ params.database_name }}`). Use a small substitution helper — same one used for `secretName` in 3.4.
-- [ ] 3.6 **Read init files (in `generate-registry.ts`).** For each template with services that have `config.init`, read the file from the template's source directory (`templates/<id>/<init-path>` for app templates, `uis-stack-templates/<id>/<init-path>` for stack templates), and accumulate them into a `Record<string, string>` keyed by the relative path. Attach as `resolvedInitFiles` on the registry entry. Skip silently with a warning if a file is missing.
-- [ ] 3.7 **Update the registry TypeScript types** to include the new fields: `resolvedTools`, `resolvedServices`, `templateKind`, `resolvedInitFiles`. Update the `TemplateInfoYaml` type if needed to include `provides:` (currently it's `provides?: unknown`).
-- [ ] 3.8 **Update `generate-docs-markdown.sh`** to read the new fields from `template-registry.json` with `jq` and pass them to `<TemplateEnvironment>` as JSX props using the pattern documented in task 1.0. Switch the emitted component name from `TemplateGetStarted` to `TemplateEnvironment` (and update the `import` line).
-- [ ] 3.9 Run both generators end-to-end and inspect the diffs:
+- [x] 3.5 **Resolve `{{ params.* }}` in service `config.database`** — done via `substituteParams()` helper. Same helper also covers `{{REPO_NAME}}` substitution via `substituteRepoName()` for the secret name pattern.
+- [x] 3.6 **Read init files** — done via `readInitFiles()`, returns a `Record<string, string>` keyed by relative path. Missing files warn and skip; the rest of the card still renders.
+- [x] 3.7 **TypeScript types** updated. New interfaces: `DctTool`, `DctToolsFile`, `UisService`, `UisServicesFile`, `ResolvedTool`, `TransitiveDep`, `ResolvedService`, `TemplateKind`, `DeploymentManifestExtract`. `TemplateInfoYaml.provides` is now properly typed (was `unknown`).
+- [x] 3.8 **`generate-docs-markdown.sh`** updated. Switched `<TemplateGetStarted>` → `<TemplateEnvironment>` with all 7 props (`requires`, `params`, `quickstart`, `tools`, `services`, `templateKind`, `initFiles`) emitted via the same `jq -c` JSON-as-JSX pattern. Card-emit condition extended to include `resolvedTools`, `resolvedServices`, `resolvedInitFiles`.
+- [x] 3.9 Ran both generators end-to-end inside DCT. Verified:
   ```bash
   npx tsx scripts/generate-registry.ts
   bash scripts/generate-docs-markdown.sh

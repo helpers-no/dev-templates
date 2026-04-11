@@ -24,12 +24,16 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   tools="dev-typescript"
 />
 
-import TemplateGetStarted from '@site/src/components/TemplateGetStarted';
+import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
-<TemplateGetStarted
+<TemplateEnvironment
   requires={null}
   params={null}
   quickstart={{"title":"Run the Express server","commands":["npm install","npm run dev"],"note":"Server runs on port 3000 with hot reload via nodemon. VS Code auto-forwards the port.\n"}}
+  tools={[{"id":"dev-typescript","name":"TypeScript Development Tools","description":"Adds TypeScript and development tools (Node.js already in devcontainer)","website":"https://www.typescriptlang.org","docsUrl":"https://dct.sovereignsky.no/docs/tools/development-tools/typescript"}]}
+  services={[]}
+  templateKind={"app"}
+  initFiles={{}}
 />
 
 

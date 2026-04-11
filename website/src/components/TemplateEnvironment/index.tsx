@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './styles.module.css';
 
-// ── Existing prop types (unchanged from TemplateGetStarted) ─────────
+// ── Legacy prop types (kept during the rename, may be removed later) ─
 
 interface RequiresEntry {
   service: string;
@@ -30,7 +30,7 @@ export interface ResolvedTool {
   description: string;
   /** Upstream project website, optional */
   website?: string;
-  /** Pre-built DCT docs URL (e.g. https://dct.sovereignsky.no/docs/tools/development-tools/python) */
+  /** Pre-built DCT docs URL */
   docsUrl?: string;
 }
 
@@ -47,7 +47,7 @@ export interface ResolvedService {
   name: string;
   /** One-line description from uis-services.json */
   description: string;
-  /** Pre-built UIS docs URL (e.g. https://uis.sovereignsky.no/docs/services/databases/postgresql) */
+  /** Pre-built UIS docs URL */
   docsUrl?: string;
   /** Upstream project website (e.g. https://www.postgresql.org), optional */
   website?: string;
@@ -81,56 +81,254 @@ export interface ResolvedService {
 export type TemplateKind = 'app' | 'stack';
 
 interface TemplateEnvironmentProps {
-  // Existing props (kept during the rename — Phase 2 will rewire to the new ones)
+  // Legacy props (still emitted by the generator for now — used as fallback)
   requires?: RequiresEntry[];
   params?: Record<string, string>;
   quickstart?: QuickstartBlock;
 
-  // New props (Phase 1: accepted but not yet rendered; Phase 2 wires them up)
+  // New props (Phase 2+3)
   tools?: ResolvedTool[];
   services?: ResolvedService[];
   templateKind?: TemplateKind;
   initFiles?: Record<string, string>;
 }
 
+// ── Sub-renderers ───────────────────────────────────────────────────
+
+function ToolsBlock({tools}: {tools: ResolvedTool[]}) {
+  return (
+    <div className={styles.subsection}>
+      <div className={styles.subsectionTitle}>In your devcontainer</div>
+      <ul className={styles.itemList}>
+        {tools.map((t) => (
+          <li key={t.id} className={styles.item}>
+            <div className={styles.itemHeader}>
+              {t.docsUrl ? (
+                <a href={t.docsUrl} target="_blank" rel="noopener noreferrer">
+                  {t.name}
+                </a>
+              ) : (
+                t.name
+              )}
+              {t.website && (
+                <a
+                  href={t.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.external}
+                  aria-label={`${t.name} upstream website`}
+                >
+                  ↗
+                </a>
+              )}
+            </div>
+            <div className={styles.itemDesc}>{t.description}</div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function ServicesBlock({
+  services,
+  templateKind,
+}: {
+  services: ResolvedService[];
+  templateKind: TemplateKind;
+}) {
+  const heading =
+    templateKind === 'stack' ? 'Provided to your cluster' : 'In your Kubernetes cluster';
+  return (
+    <div className={styles.subsection}>
+      <div className={styles.subsectionTitle}>{heading}</div>
+      <ul className={styles.itemList}>
+        {services.map((s) => (
+          <li key={s.id} className={styles.item}>
+            <div className={styles.itemHeader}>
+              {s.docsUrl ? (
+                <a href={s.docsUrl} target="_blank" rel="noopener noreferrer">
+                  {s.name}
+                </a>
+              ) : (
+                s.name
+              )}
+              {s.website && (
+                <a
+                  href={s.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.external}
+                  aria-label={`${s.name} upstream website`}
+                >
+                  ↗
+                </a>
+              )}
+            </div>
+            <div className={styles.itemDesc}>{s.description}</div>
+            <ul className={styles.detailsList}>
+              {s.database && (
+                <li>
+                  <span className={styles.detailsLabel}>Database</span>
+                  <span className={styles.detailsValue}>{s.database}</span>
+                </li>
+              )}
+              {s.generatedUser && (
+                <li>
+                  <span className={styles.detailsLabel}>User</span>
+                  <span className={styles.detailsValue}>{s.generatedUser}</span>
+                </li>
+              )}
+              {s.secretName && (
+                <li>
+                  <span className={styles.detailsLabel}>K8s Secret</span>
+                  <span className={styles.detailsValue}>{s.secretName}</span>
+                </li>
+              )}
+              {s.exposePort && (
+                <li>
+                  <span className={styles.detailsLabel}>Port-forward</span>
+                  <span className={styles.detailsValue}>
+                    host.docker.internal:{s.exposePort}
+                  </span>
+                </li>
+              )}
+              {s.envVar && (
+                <li>
+                  <span className={styles.detailsLabel}>Env var</span>
+                  <span className={styles.detailsValue}>{s.envVar}</span>
+                </li>
+              )}
+              {s.namespace && (
+                <li>
+                  <span className={styles.detailsLabel}>Namespace</span>
+                  <span className={styles.detailsValue}>{s.namespace}</span>
+                </li>
+              )}
+              {s.helmChart && (
+                <li>
+                  <span className={styles.detailsLabel}>Helm chart</span>
+                  <span className={styles.detailsValue}>{s.helmChart}</span>
+                </li>
+              )}
+            </ul>
+            {s.transitiveRequires && s.transitiveRequires.length > 0 && (
+              <div className={styles.transitive}>
+                Also deploys:{' '}
+                {s.transitiveRequires.map((d, i) => (
+                  <React.Fragment key={d.id}>
+                    {i > 0 && ', '}
+                    {d.docsUrl ? (
+                      <a href={d.docsUrl} target="_blank" rel="noopener noreferrer">
+                        {d.name}
+                      </a>
+                    ) : (
+                      d.name
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function InitFilesBlock({initFiles}: {initFiles: Record<string, string>}) {
+  const entries = Object.entries(initFiles);
+  if (entries.length === 0) return null;
+  return (
+    <div className={styles.subsection}>
+      <div className={styles.subsectionTitle}>Schema applied to the database</div>
+      {entries.map(([path, content]) => (
+        <details key={path} className={styles.initFile}>
+          <summary>
+            <code>{path}</code>
+          </summary>
+          <pre>
+            <code>{content}</code>
+          </pre>
+        </details>
+      ))}
+    </div>
+  );
+}
+
+// ── Main component ─────────────────────────────────────────────────
+
 export default function TemplateEnvironment({
   requires,
   params,
   quickstart,
-  tools: _tools,
-  services: _services,
-  templateKind: _templateKind,
-  initFiles: _initFiles,
+  tools,
+  services,
+  templateKind = 'app',
+  initFiles,
 }: TemplateEnvironmentProps) {
-  // Phase 1 stub: render the existing two-section card unchanged.
-  // Phase 2 will add the "What gets set up" section above Configure
-  // and rewire `requires` -> `services` for the cluster block.
+  const hasTools = !!tools && tools.length > 0;
+  const hasServices = !!services && services.length > 0;
+  const hasInitFiles = !!initFiles && Object.keys(initFiles).length > 0;
+  const hasWhatGetsSetUp = hasTools || hasServices || hasInitFiles;
 
-  // Don't render anything if neither configure nor run applies
-  if (!requires?.length && !quickstart) return null;
-
+  // Configure section: shown for app templates that consume services
+  // (i.e. have requires:). Stack templates skip the configure section
+  // because they don't use dev-template-configure.
   const showConfigure = !!requires && requires.length > 0;
   const showRun = !!quickstart;
-  const showNumbers = showConfigure && showRun;
+
+  // Numbering: ① ② ③ across whichever sections are present.
+  const sectionsShown = [hasWhatGetsSetUp, showConfigure, showRun].filter(Boolean).length;
+  const showNumbers = sectionsShown > 1;
+  let n = 0;
+  const nextNumber = () => {
+    if (!showNumbers) return null;
+    n += 1;
+    const symbols = ['①', '②', '③'];
+    return <span className={styles.number}>{symbols[n - 1]}</span>;
+  };
+
+  // Don't render the card at all if there's nothing to show.
+  if (!hasWhatGetsSetUp && !showConfigure && !showRun) return null;
 
   // Param keys the user must fill in (those with empty default values)
   const paramKeys = params ? Object.keys(params).filter((k) => params[k] === '') : [];
 
-  // Service names from requires
-  const services = requires?.map((r) => r.service).join(', ') ?? '';
+  // Service-name list for the Configure paragraph. Prefer the resolved
+  // services (which give nicer names like "PostgreSQL"); fall back to the
+  // raw requires IDs.
+  const configureServiceNames = hasServices
+    ? services!.map((s) => s.name).join(', ')
+    : requires?.map((r) => r.service).join(', ') ?? '';
 
   return (
     <div className={styles.card}>
       <div className={styles.eyebrow}>ENVIRONMENT</div>
 
+      {hasWhatGetsSetUp && (
+        <div className={styles.section}>
+          <h3 className={styles.title}>
+            {nextNumber()}
+            What gets set up
+          </h3>
+          <p className={styles.intro}>
+            When you install this template, the following are configured for you:
+          </p>
+          {hasTools && <ToolsBlock tools={tools!} />}
+          {hasServices && <ServicesBlock services={services!} templateKind={templateKind} />}
+          {hasInitFiles && <InitFilesBlock initFiles={initFiles!} />}
+        </div>
+      )}
+
       {showConfigure && (
         <div className={styles.section}>
           <h3 className={styles.title}>
-            {showNumbers && <span className={styles.number}>①</span>}
+            {nextNumber()}
             Configure
           </h3>
           <p className={styles.text}>
-            This template uses <strong>{services}</strong>.
+            This template uses <strong>{configureServiceNames}</strong>.
           </p>
           {paramKeys.length > 0 && (
             <>
@@ -156,7 +354,7 @@ export default function TemplateEnvironment({
       {showRun && quickstart && (
         <div className={styles.section}>
           <h3 className={styles.title}>
-            {showNumbers && <span className={styles.number}>②</span>}
+            {nextNumber()}
             {quickstart.title}
           </h3>
           <pre className={styles.commands}>

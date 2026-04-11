@@ -25,12 +25,16 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   tools="dev-typescript"
 />
 
-import TemplateGetStarted from '@site/src/components/TemplateGetStarted';
+import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
-<TemplateGetStarted
+<TemplateEnvironment
   requires={null}
   params={null}
   quickstart={{"title":"Run the Vite dev server","commands":["npm install","npm run dev"],"note":"Vite runs on port 5173. VS Code auto-forwards the port — click the globe icon in the Ports tab.\n"}}
+  tools={[{"id":"dev-typescript","name":"TypeScript Development Tools","description":"Adds TypeScript and development tools (Node.js already in devcontainer)","website":"https://www.typescriptlang.org","docsUrl":"https://dct.sovereignsky.no/docs/tools/development-tools/typescript"}]}
+  services={[]}
+  templateKind={"app"}
+  initFiles={{}}
 />
 
 

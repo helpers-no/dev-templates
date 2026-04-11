@@ -24,12 +24,16 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   tools="dev-java"
 />
 
-import TemplateGetStarted from '@site/src/components/TemplateGetStarted';
+import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
-<TemplateGetStarted
+<TemplateEnvironment
   requires={null}
   params={null}
   quickstart={{"title":"Run the Spring Boot app","commands":["mvn spring-boot:run"],"note":"Spring Boot runs on port 3000. VS Code auto-forwards the port.\n"}}
+  tools={[{"id":"dev-java","name":"Java Runtime & Development Tools","description":"Installs Java JDK, Maven, Gradle, and VS Code extensions for Java development.","website":"https://dev.java","docsUrl":"https://dct.sovereignsky.no/docs/tools/development-tools/java"}]}
+  services={[]}
+  templateKind={"app"}
+  initFiles={{}}
 />
 
 
