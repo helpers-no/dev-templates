@@ -32,5 +32,6 @@ quickstart:
   commands:
     - npm install
     - npm run dev
+  run: "npm run dev"
   note: |
     Vite runs on port 5173. VS Code auto-forwards the port — click the globe icon in the Ports tab.

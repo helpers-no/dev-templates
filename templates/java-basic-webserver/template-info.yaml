@@ -30,5 +30,6 @@ quickstart:
   title: "Run the Spring Boot app"
   commands:
     - mvn spring-boot:run
+  run: "mvn spring-boot:run"
   note: |
     Spring Boot runs on port 3000. VS Code auto-forwards the port.

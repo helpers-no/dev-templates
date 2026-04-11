@@ -30,13 +30,43 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 <TemplateEnvironment
   requires={null}
   params={null}
-  quickstart={{"title":"Run the ASP.NET Core app","commands":["dotnet watch run"],"note":"ASP.NET Core runs on port 3000 with hot reload via dotnet watch. VS Code auto-forwards the port.\n"}}
+  quickstart={{"title":"Run the ASP.NET Core app","commands":["dotnet watch run"],"run":"dotnet watch run","note":"ASP.NET Core runs on port 3000 with hot reload via dotnet watch. VS Code auto-forwards the port.\n"}}
   tools={[{"id":"dev-csharp","name":"C# Development Tools","description":"Installs .NET SDK, ASP.NET Core Runtime, and VS Code extensions for C# development","website":"https://dotnet.microsoft.com","docsUrl":"https://dct.sovereignsky.no/docs/tools/development-tools/csharp"}]}
   services={[]}
   templateKind={"app"}
   initFiles={{}}
 />
 
+
+## Architecture
+
+### Steady-state
+
+```mermaid
+flowchart LR
+    subgraph dct["DCT devcontainer"]
+        dev(["Developer"])
+        dev_csharp["dev-csharp"]
+        app["C# Basic Webserver"]
+    end
+    subgraph k8s["Local Kubernetes Cluster (Test environment)"]
+        argo["ArgoCD"]
+        pod["C# Basic Webserver pod"]
+    end
+    subgraph gh["GitHub"]
+        repo["repo"]
+        actions["GitHub Actions"]
+        ghcr["Container Registry"]
+    end
+
+    dev_csharp --> app
+    dev -->|git push| repo
+    repo -->|trigger| actions
+    actions -->|push image| ghcr
+    argo -->|monitors| repo
+    ghcr -->|image pull| argo
+    argo -->|deploys| pod
+```
 
 A minimal ASP.NET Core web server. Displays "Hello World" with current time and date, with hot reload support via `dotnet watch`.
 

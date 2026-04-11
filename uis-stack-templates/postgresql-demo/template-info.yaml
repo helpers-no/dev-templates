@@ -32,6 +32,7 @@ quickstart:
   title: "Verify the database"
   commands:
     - uis connect postgresql demo_db
+  run: "uis connect postgresql demo_db"
   note: |
     Inside psql, run: SELECT * FROM tasks;
     You should see 3 seeded rows. Type \q to exit.

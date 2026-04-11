@@ -38,6 +38,7 @@ quickstart:
     - uv venv
     - uv pip install -r requirements.txt
     - uv run python app/app.py
+  run: "uv run python app/app.py"
   note: |
     Flask debug server starts on port 3000.
     VS Code auto-forwards the port — click the globe icon in the Ports tab.

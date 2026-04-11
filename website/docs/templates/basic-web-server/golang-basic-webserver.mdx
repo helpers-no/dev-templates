@@ -28,13 +28,43 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 <TemplateEnvironment
   requires={null}
   params={null}
-  quickstart={{"title":"Run the Go server","commands":["go run main.go"],"note":"Server runs on port 3000. VS Code auto-forwards the port.\n"}}
+  quickstart={{"title":"Run the Go server","commands":["go run main.go"],"run":"go run main.go","note":"Server runs on port 3000. VS Code auto-forwards the port.\n"}}
   tools={[{"id":"dev-golang","name":"Go Runtime & Development Tools","description":"Installs Go runtime, common tools, and VS Code extensions for Go development.","website":"https://go.dev","docsUrl":"https://dct.sovereignsky.no/docs/tools/development-tools/golang"}]}
   services={[]}
   templateKind={"app"}
   initFiles={{}}
 />
 
+
+## Architecture
+
+### Steady-state
+
+```mermaid
+flowchart LR
+    subgraph dct["DCT devcontainer"]
+        dev(["Developer"])
+        dev_golang["dev-golang"]
+        app["Go Basic Webserver"]
+    end
+    subgraph k8s["Local Kubernetes Cluster (Test environment)"]
+        argo["ArgoCD"]
+        pod["Go Basic Webserver pod"]
+    end
+    subgraph gh["GitHub"]
+        repo["repo"]
+        actions["GitHub Actions"]
+        ghcr["Container Registry"]
+    end
+
+    dev_golang --> app
+    dev -->|git push| repo
+    repo -->|trigger| actions
+    actions -->|push image| ghcr
+    argo -->|monitors| repo
+    ghcr -->|image pull| argo
+    argo -->|deploys| pod
+```
 
 A minimal web server using Go's standard `net/http` package. Displays "Hello World" with current time and date, and provides health check endpoints.
 

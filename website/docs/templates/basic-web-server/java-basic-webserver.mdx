@@ -29,13 +29,43 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 <TemplateEnvironment
   requires={null}
   params={null}
-  quickstart={{"title":"Run the Spring Boot app","commands":["mvn spring-boot:run"],"note":"Spring Boot runs on port 3000. VS Code auto-forwards the port.\n"}}
+  quickstart={{"title":"Run the Spring Boot app","commands":["mvn spring-boot:run"],"run":"mvn spring-boot:run","note":"Spring Boot runs on port 3000. VS Code auto-forwards the port.\n"}}
   tools={[{"id":"dev-java","name":"Java Runtime & Development Tools","description":"Installs Java JDK, Maven, Gradle, and VS Code extensions for Java development.","website":"https://dev.java","docsUrl":"https://dct.sovereignsky.no/docs/tools/development-tools/java"}]}
   services={[]}
   templateKind={"app"}
   initFiles={{}}
 />
 
+
+## Architecture
+
+### Steady-state
+
+```mermaid
+flowchart LR
+    subgraph dct["DCT devcontainer"]
+        dev(["Developer"])
+        dev_java["dev-java"]
+        app["Java Basic Webserver"]
+    end
+    subgraph k8s["Local Kubernetes Cluster (Test environment)"]
+        argo["ArgoCD"]
+        pod["Java Basic Webserver pod"]
+    end
+    subgraph gh["GitHub"]
+        repo["repo"]
+        actions["GitHub Actions"]
+        ghcr["Container Registry"]
+    end
+
+    dev_java --> app
+    dev -->|git push| repo
+    repo -->|trigger| actions
+    actions -->|push image| ghcr
+    argo -->|monitors| repo
+    ghcr -->|image pull| argo
+    argo -->|deploys| pod
+```
 
 A minimal Spring Boot web server. Displays "Hello World" with current time and date, and provides health check endpoints via Spring Boot Actuator.
 
