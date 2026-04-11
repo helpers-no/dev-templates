@@ -29,13 +29,43 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 <TemplateEnvironment
   requires={null}
   params={null}
-  quickstart={{"title":"Run the Flask app","commands":["uv venv","uv pip install -r requirements.txt","uv run python app/app.py"],"note":"Flask runs on port 3000. VS Code auto-forwards the port — click the globe icon in the Ports tab.\n"}}
+  quickstart={{"title":"Run the Flask app","commands":["uv venv","uv pip install -r requirements.txt","uv run python app/app.py"],"run":"uv run python app/app.py","note":"Flask runs on port 3000. VS Code auto-forwards the port — click the globe icon in the Ports tab.\n"}}
   tools={[{"id":"dev-python","name":"Python Development Tools","description":"Adds ipython, pytest-cov, uv, and VS Code extensions for Python development","website":"https://python.org","docsUrl":"https://dct.sovereignsky.no/docs/tools/development-tools/python"}]}
   services={[]}
   templateKind={"app"}
   initFiles={{}}
 />
 
+
+## Architecture
+
+### Steady-state
+
+```mermaid
+flowchart LR
+    subgraph dct["DCT devcontainer"]
+        dev(["Developer"])
+        dev_python["dev-python"]
+        app["Python Basic Webserver"]
+    end
+    subgraph k8s["Local Kubernetes Cluster (Test environment)"]
+        argo["ArgoCD"]
+        pod["Python Basic Webserver pod"]
+    end
+    subgraph gh["GitHub"]
+        repo["repo"]
+        actions["GitHub Actions"]
+        ghcr["Container Registry"]
+    end
+
+    dev_python --> app
+    dev -->|git push| repo
+    repo -->|trigger| actions
+    actions -->|push image| ghcr
+    argo -->|monitors| repo
+    ghcr -->|image pull| argo
+    argo -->|deploys| pod
+```
 
 A minimal Flask web server. Displays "Hello World" with current time and date, and demonstrates deployment to Kubernetes via ArgoCD and GitHub Actions.
 

@@ -35,6 +35,7 @@ import {
   buildDctToolDocsUrl,
   buildUisDocsUrl,
 } from './lib/dct-doc-paths.js';
+import {buildArchitectureMdx, type TemplateEntry as ArchitectureTemplateEntry} from './lib/build-architecture-mermaid.js';
 
 // Load js-yaml from website/node_modules
 const ROOT = dirname(dirname(new URL(import.meta.url).pathname));
@@ -97,6 +98,7 @@ interface TemplateInfoYaml {
   quickstart?: {
     title: string;
     commands: string[];
+    run?: string;
     note?: string;
   };
 }
@@ -661,6 +663,14 @@ for (const catFile of categoryFiles) {
 
     // Read init SQL files for the collapsible block
     entry.resolvedInitFiles = readInitFiles(templateDir, serviceList, raw.id);
+
+    // Auto-generated ## Architecture section (PLAN-template-architecture-diagram.md).
+    // The full MDX block (headings + fenced mermaid code blocks) is pre-composed
+    // here so generate-docs-markdown.sh can paste it verbatim with a one-line
+    // jq read — all conditional logic lives in TypeScript. Overlay templates get
+    // null and the bash emitter suppresses the section entirely.
+    const {mdx: architectureMdx} = buildArchitectureMdx(entry as ArchitectureTemplateEntry);
+    entry.architectureMdx = architectureMdx;
 
     allTemplates.push(entry);
   }

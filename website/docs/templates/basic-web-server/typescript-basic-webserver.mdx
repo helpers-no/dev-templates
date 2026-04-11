@@ -29,13 +29,43 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 <TemplateEnvironment
   requires={null}
   params={null}
-  quickstart={{"title":"Run the Express server","commands":["npm install","npm run dev"],"note":"Server runs on port 3000 with hot reload via nodemon. VS Code auto-forwards the port.\n"}}
+  quickstart={{"title":"Run the Express server","commands":["npm install","npm run dev"],"run":"npm run dev","note":"Server runs on port 3000 with hot reload via nodemon. VS Code auto-forwards the port.\n"}}
   tools={[{"id":"dev-typescript","name":"TypeScript Development Tools","description":"Adds TypeScript and development tools (Node.js already in devcontainer)","website":"https://www.typescriptlang.org","docsUrl":"https://dct.sovereignsky.no/docs/tools/development-tools/typescript"}]}
   services={[]}
   templateKind={"app"}
   initFiles={{}}
 />
 
+
+## Architecture
+
+### Steady-state
+
+```mermaid
+flowchart LR
+    subgraph dct["DCT devcontainer"]
+        dev(["Developer"])
+        dev_typescript["dev-typescript"]
+        app["TypeScript Basic Webserver"]
+    end
+    subgraph k8s["Local Kubernetes Cluster (Test environment)"]
+        argo["ArgoCD"]
+        pod["TypeScript Basic Webserver pod"]
+    end
+    subgraph gh["GitHub"]
+        repo["repo"]
+        actions["GitHub Actions"]
+        ghcr["Container Registry"]
+    end
+
+    dev_typescript --> app
+    dev -->|git push| repo
+    repo -->|trigger| actions
+    actions -->|push image| ghcr
+    argo -->|monitors| repo
+    ghcr -->|image pull| argo
+    argo -->|deploys| pod
+```
 
 A minimal Express.js web server written in TypeScript. Displays "Hello World" and demonstrates deployment to Kubernetes via ArgoCD and GitHub Actions.
 

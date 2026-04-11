@@ -31,5 +31,6 @@ quickstart:
   commands:
     - npm install
     - npm run dev
+  run: "npm run dev"
   note: |
     Server runs on port 3000 with hot reload via nodemon. VS Code auto-forwards the port.

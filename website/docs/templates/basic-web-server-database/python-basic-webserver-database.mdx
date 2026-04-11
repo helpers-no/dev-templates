@@ -30,13 +30,75 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 <TemplateEnvironment
   requires={[{"service":"postgresql","config":{"database":"{{ params.database_name }}","init":"config/init-database.sql"}}]}
   params={{"app_name":"my-app","database_name":"my_app_db"}}
-  quickstart={{"title":"Run the Flask app","commands":["uv venv","uv pip install -r requirements.txt","uv run python app/app.py"],"note":"Flask debug server starts on port 3000.\nVS Code auto-forwards the port — click the globe icon in the Ports tab.\n"}}
+  quickstart={{"title":"Run the Flask app","commands":["uv venv","uv pip install -r requirements.txt","uv run python app/app.py"],"run":"uv run python app/app.py","note":"Flask debug server starts on port 3000.\nVS Code auto-forwards the port — click the globe icon in the Ports tab.\n"}}
   tools={[{"id":"dev-python","name":"Python Development Tools","description":"Adds ipython, pytest-cov, uv, and VS Code extensions for Python development","website":"https://python.org","docsUrl":"https://dct.sovereignsky.no/docs/tools/development-tools/python"}]}
   services={[{"id":"postgresql","name":"PostgreSQL","description":"Open-source relational database","docsUrl":"https://uis.sovereignsky.no/docs/services/databases/postgresql","website":"https://www.postgresql.org","exposePort":35432,"namespace":"default","helmChart":"bitnami/postgresql","database":"my_app_db","generatedUser":"my_app","initFilePath":"config/init-database.sql","transitiveRequires":[],"envVar":"DATABASE_URL","secretName":"my-app-db","containerPort":3000}]}
   templateKind={"app"}
   initFiles={{"config/init-database.sql":"-- Init file for python-basic-webserver-database\n-- Applied by: uis configure postgresql --init-file -\n-- Uses psql --set ON_ERROR_STOP=on for fail-fast on syntax errors\n-- All statements are idempotent — safe to re-run\n\nCREATE TABLE IF NOT EXISTS tasks (\n    id SERIAL PRIMARY KEY,\n    title VARCHAR(255) NOT NULL,\n    status VARCHAR(20) DEFAULT 'pending',\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);\n\nINSERT INTO tasks (title, status) VALUES\n    ('Set up the database connection', 'done'),\n    ('Build something with Flask + PostgreSQL', 'pending'),\n    ('Deploy to Kubernetes via ArgoCD', 'pending')\nON CONFLICT DO NOTHING;\n"}}
 />
 
+
+## Architecture
+
+### Steady-state
+
+```mermaid
+flowchart LR
+    subgraph dct["DCT devcontainer"]
+        dev(["Developer"])
+        dev_python["dev-python"]
+        app["my-app"]
+        env[".env"]
+    end
+    subgraph k8s["Local Kubernetes Cluster (Test environment)"]
+        svc[("PostgreSQL<br/>my_app_db")]
+        sec["K8s Secret<br/>my-app-db"]
+        argo["ArgoCD"]
+        pod["my-app pod"]
+    end
+    subgraph uis_group["UIS"]
+        uis["provision-host"]
+    end
+    subgraph gh["GitHub"]
+        repo["repo"]
+        actions["GitHub Actions"]
+        ghcr["Container Registry"]
+    end
+
+    dev_python --> app
+    env --> app
+    dev -->|dev-template configure| uis
+    uis -->|creates + port-forward| svc
+    uis -->|creates| sec
+    uis -->|writes| env
+    app -->|host.docker.internal:35432| uis
+    dev -->|git push| repo
+    repo -->|trigger| actions
+    actions -->|push image| ghcr
+    argo -->|monitors| repo
+    ghcr -->|image pull| argo
+    argo -->|deploys| pod
+    pod -->|default.svc.cluster.local:5432| svc
+```
+
+### Configure flow
+
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant DCT as DCT devcontainer
+    participant UIS as UIS provision-host
+    participant K8s as Local Kubernetes cluster
+    Dev->>DCT: dev-template configure
+    DCT->>UIS: request provisioning
+    UIS->>K8s: create namespace
+    UIS->>K8s: create PostgreSQL (my_app_db)
+    UIS->>K8s: create K8s Secret (my-app-db)
+    UIS->>UIS: kubectl port-forward 35432
+    UIS-->>DCT: write .env (host.docker.internal:35432)
+    Dev->>DCT: uv run python app/app.py
+    DCT->>K8s: connect via host.docker.internal:35432
+```
 
 A minimal Flask web server that connects to PostgreSQL and reads from a `tasks` table. The full producer/consumer flow:
 

@@ -195,6 +195,16 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 MDXEOF
     fi
 
+    # Emit auto-generated ## Architecture section (PLAN-template-architecture-diagram.md).
+    # The full MDX block (headings + fenced mermaid code blocks) is pre-composed
+    # by scripts/lib/build-architecture-mermaid.ts during registry generation
+    # and stored as a single string on each template entry. Overlay templates
+    # get null, so `jq -r … // empty` returns empty and the conditional skips.
+    local_arch_mdx=$(jq -r ".templates[$i].architectureMdx // empty" "$REGISTRY")
+    if [[ -n "$local_arch_mdx" ]]; then
+        printf '\n%s\n' "$local_arch_mdx" >> "$page_file"
+    fi
+
     # Embed README content
     local_readme_file=""
     local_readme_file=$(_find_readme "$folder" "$readme") || true

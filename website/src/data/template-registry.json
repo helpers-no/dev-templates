@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-11T08:21:45.183Z",
+  "generated": "2026-04-11T17:20:57.205Z",
   "dctDocsBase": "https://dct.sovereignsky.no",
   "uisDocsBase": "https://uis.sovereignsky.no",
   "categories": [
@@ -82,7 +82,8 @@
       "templateKind": "app",
       "resolvedTools": [],
       "resolvedServices": [],
-      "resolvedInitFiles": {}
+      "resolvedInitFiles": {},
+      "architectureMdx": null
     },
     {
       "id": "csharp-basic-webserver",
@@ -117,6 +118,7 @@
         "commands": [
           "dotnet watch run"
         ],
+        "run": "dotnet watch run",
         "note": "ASP.NET Core runs on port 3000 with hot reload via dotnet watch. VS Code auto-forwards the port.\n"
       },
       "templateKind": "app",
@@ -133,7 +135,8 @@
         "containerPort": 80
       },
       "resolvedServices": [],
-      "resolvedInitFiles": {}
+      "resolvedInitFiles": {},
+      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_csharp[\"dev-csharp\"]\n        app[\"C# Basic Webserver\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"C# Basic Webserver pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_csharp --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
     },
     {
       "id": "designsystemet-basic-react-app",
@@ -168,6 +171,7 @@
           "npm install",
           "npm run dev"
         ],
+        "run": "npm run dev",
         "note": "Vite runs on port 5173. VS Code auto-forwards the port — click the globe icon in the Ports tab.\n"
       },
       "templateKind": "app",
@@ -184,7 +188,8 @@
         "containerPort": 3000
       },
       "resolvedServices": [],
-      "resolvedInitFiles": {}
+      "resolvedInitFiles": {},
+      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_typescript[\"dev-typescript\"]\n        app[\"Designsystemet Basic React App\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"Designsystemet Basic React App pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_typescript --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
     },
     {
       "id": "golang-basic-webserver",
@@ -217,6 +222,7 @@
         "commands": [
           "go run main.go"
         ],
+        "run": "go run main.go",
         "note": "Server runs on port 3000. VS Code auto-forwards the port.\n"
       },
       "templateKind": "app",
@@ -233,7 +239,8 @@
         "containerPort": 3000
       },
       "resolvedServices": [],
-      "resolvedInitFiles": {}
+      "resolvedInitFiles": {},
+      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_golang[\"dev-golang\"]\n        app[\"Go Basic Webserver\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"Go Basic Webserver pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_golang --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
     },
     {
       "id": "java-basic-webserver",
@@ -267,6 +274,7 @@
         "commands": [
           "mvn spring-boot:run"
         ],
+        "run": "mvn spring-boot:run",
         "note": "Spring Boot runs on port 3000. VS Code auto-forwards the port.\n"
       },
       "templateKind": "app",
@@ -283,7 +291,8 @@
         "containerPort": 3000
       },
       "resolvedServices": [],
-      "resolvedInitFiles": {}
+      "resolvedInitFiles": {},
+      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_java[\"dev-java\"]\n        app[\"Java Basic Webserver\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"Java Basic Webserver pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_java --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
     },
     {
       "id": "php-basic-webserver",
@@ -316,6 +325,7 @@
         "commands": [
           "php -S 0.0.0.0:3000 -t public"
         ],
+        "run": "php -S 0.0.0.0:3000 -t public",
         "note": "PHP's built-in server runs on port 3000. VS Code auto-forwards the port.\n"
       },
       "templateKind": "app",
@@ -332,7 +342,8 @@
         "containerPort": 3000
       },
       "resolvedServices": [],
-      "resolvedInitFiles": {}
+      "resolvedInitFiles": {},
+      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_php_laravel[\"dev-php-laravel\"]\n        app[\"PHP Basic Webserver\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"PHP Basic Webserver pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_php_laravel --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
     },
     {
       "id": "python-basic-webserver",
@@ -368,6 +379,7 @@
           "uv pip install -r requirements.txt",
           "uv run python app/app.py"
         ],
+        "run": "uv run python app/app.py",
         "note": "Flask runs on port 3000. VS Code auto-forwards the port — click the globe icon in the Ports tab.\n"
       },
       "templateKind": "app",
@@ -384,7 +396,8 @@
         "containerPort": 3000
       },
       "resolvedServices": [],
-      "resolvedInitFiles": {}
+      "resolvedInitFiles": {},
+      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_python[\"dev-python\"]\n        app[\"Python Basic Webserver\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"Python Basic Webserver pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_python --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
     },
     {
       "id": "python-basic-webserver-database",
@@ -434,6 +447,7 @@
           "uv pip install -r requirements.txt",
           "uv run python app/app.py"
         ],
+        "run": "uv run python app/app.py",
         "note": "Flask debug server starts on port 3000.\nVS Code auto-forwards the port — click the globe icon in the Ports tab.\n"
       },
       "templateKind": "app",
@@ -472,7 +486,8 @@
       ],
       "resolvedInitFiles": {
         "config/init-database.sql": "-- Init file for python-basic-webserver-database\n-- Applied by: uis configure postgresql --init-file -\n-- Uses psql --set ON_ERROR_STOP=on for fail-fast on syntax errors\n-- All statements are idempotent — safe to re-run\n\nCREATE TABLE IF NOT EXISTS tasks (\n    id SERIAL PRIMARY KEY,\n    title VARCHAR(255) NOT NULL,\n    status VARCHAR(20) DEFAULT 'pending',\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);\n\nINSERT INTO tasks (title, status) VALUES\n    ('Set up the database connection', 'done'),\n    ('Build something with Flask + PostgreSQL', 'pending'),\n    ('Deploy to Kubernetes via ArgoCD', 'pending')\nON CONFLICT DO NOTHING;\n"
-      }
+      },
+      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_python[\"dev-python\"]\n        app[\"my-app\"]\n        env[\".env\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        svc[(\"PostgreSQL<br/>my_app_db\")]\n        sec[\"K8s Secret<br/>my-app-db\"]\n        argo[\"ArgoCD\"]\n        pod[\"my-app pod\"]\n    end\n    subgraph uis_group[\"UIS\"]\n        uis[\"provision-host\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_python --> app\n    env --> app\n    dev -->|dev-template configure| uis\n    uis -->|creates + port-forward| svc\n    uis -->|creates| sec\n    uis -->|writes| env\n    app -->|host.docker.internal:35432| uis\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n    pod -->|default.svc.cluster.local:5432| svc\n```\n\n### Configure flow\n\n```mermaid\nsequenceDiagram\n    participant Dev as Developer\n    participant DCT as DCT devcontainer\n    participant UIS as UIS provision-host\n    participant K8s as Local Kubernetes cluster\n    Dev->>DCT: dev-template configure\n    DCT->>UIS: request provisioning\n    UIS->>K8s: create namespace\n    UIS->>K8s: create PostgreSQL (my_app_db)\n    UIS->>K8s: create K8s Secret (my-app-db)\n    UIS->>UIS: kubectl port-forward 35432\n    UIS-->>DCT: write .env (host.docker.internal:35432)\n    Dev->>DCT: uv run python app/app.py\n    DCT->>K8s: connect via host.docker.internal:35432\n```\n"
     },
     {
       "id": "typescript-basic-webserver",
@@ -507,6 +522,7 @@
           "npm install",
           "npm run dev"
         ],
+        "run": "npm run dev",
         "note": "Server runs on port 3000 with hot reload via nodemon. VS Code auto-forwards the port.\n"
       },
       "templateKind": "app",
@@ -523,7 +539,8 @@
         "containerPort": 3000
       },
       "resolvedServices": [],
-      "resolvedInitFiles": {}
+      "resolvedInitFiles": {},
+      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_typescript[\"dev-typescript\"]\n        app[\"TypeScript Basic Webserver\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"TypeScript Basic Webserver pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_typescript --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
     },
     {
       "id": "postgresql-demo",
@@ -570,6 +587,7 @@
         "commands": [
           "uis connect postgresql demo_db"
         ],
+        "run": "uis connect postgresql demo_db",
         "note": "Inside psql, run: SELECT * FROM tasks;\nYou should see 3 seeded rows. Type \\q to exit.\n"
       },
       "templateKind": "stack",
@@ -592,7 +610,8 @@
       ],
       "resolvedInitFiles": {
         "config/init-database.sql": "-- PostgreSQL Demo — sample schema with seed data\n-- Applied by: uis configure postgresql --init-file -\n-- Uses psql --set ON_ERROR_STOP=on for fail-fast on syntax errors\n-- All statements are idempotent — safe to re-run\n\nCREATE TABLE IF NOT EXISTS tasks (\n    id SERIAL PRIMARY KEY,\n    title VARCHAR(255) NOT NULL,\n    status VARCHAR(20) DEFAULT 'pending',\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);\n\nINSERT INTO tasks (title, status) VALUES\n    ('Verify uis template install works', 'done'),\n    ('Build your own UIS stack template', 'pending'),\n    ('Deploy it with uis template install', 'pending')\nON CONFLICT DO NOTHING;\n"
-      }
+      },
+      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        svc[(\"PostgreSQL<br/>demo_db\")]\n    end\n    subgraph uis_group[\"UIS\"]\n        uis[\"provision-host\"]\n    end\n    consumers[\"Consumer templates\"]\n\n    dev -->|uis template install postgresql-demo| uis\n    uis -->|deploys + seeds| svc\n    consumers -.->|use this| svc\n```\n\n### Configure flow\n\n```mermaid\nsequenceDiagram\n    participant Dev as Developer\n    participant DCT as DCT devcontainer\n    participant UIS as UIS provision-host\n    participant K8s as Local Kubernetes cluster\n    Dev->>DCT: uis template install postgresql-demo\n    DCT->>UIS: install stack\n    UIS->>K8s: create PostgreSQL (demo_db)\n    UIS->>K8s: run init-*.sql seed files\n    UIS->>UIS: kubectl port-forward 35432\n    UIS-->>DCT: return connection JSON\n```\n"
     }
   ]
 }

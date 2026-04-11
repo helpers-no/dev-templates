@@ -63,6 +63,38 @@ Templates are installed into new projects via the `dev-template` command inside 
 
 ---
 
+## Auto-generated documentation sections
+
+Each template's documentation page under `website/docs/templates/**` is generated at build time from `template-info.yaml`, vendored DCT/UIS registries, and the template's README. Two sections in particular are fully auto-generated and should **not** be hand-edited:
+
+### Environment card (`<TemplateEnvironment />`)
+
+Rendered by the React component at `website/src/components/TemplateEnvironment/index.tsx`. Shows the resolved tools, services, configure steps, run commands, and init files. Data is pre-resolved by `scripts/generate-registry.ts` and passed as JSON props.
+
+### Architecture section (`## Architecture`)
+
+Added by `scripts/lib/build-architecture-mermaid.ts`. Composes the complete `## Architecture` MDX block — one steady-state flowchart plus (where applicable) a configure-time sequence diagram — during registry generation. The output is stored as a single `architectureMdx` string on each registry entry, and `scripts/generate-docs-markdown.sh` pastes it verbatim into the MDX page with a one-line `jq` read.
+
+**Four archetypes are handled:**
+
+- **App + services + manifest** (e.g. `python-basic-webserver-database`) — full flowchart (DCT + K8s + UIS + GitHub + ArgoCD) and configure-flow sequence diagram
+- **App + manifest, no services** (e.g. `python-basic-webserver`) — flowchart only; ArgoCD + pod chain rendered because a manifest exists, but no UIS or service nodes
+- **Stack template** (e.g. `postgresql-demo`) — minimal stack-shaped flowchart with a generic `consumers` node and a `uis template install <id>` sequence
+- **Overlay template** (e.g. `plan-based-workflow`) — entire section suppressed; `architectureMdx` is `null`
+
+**To change the diagrams**, edit `scripts/lib/build-architecture-mermaid.ts` and its unit tests at `scripts/test/build-architecture-mermaid.test.ts`, then re-run:
+
+```bash
+npx tsx scripts/generate-registry.ts
+bash scripts/generate-docs-markdown.sh --force
+```
+
+Visual style matches the canonical diagrams in `website/docs/architecture.md` — plain text labels, no emojis, default Mermaid theming. The subgraph label `"Local Kubernetes Cluster (Test environment)"` is deliberately identical to the canonical diagram for consistency.
+
+**v1 limitations**: multi-service templates throw at build time (only single-service templates are supported for now); the stack "consumer" node is a hardcoded generic label rather than being derived from cross-template data.
+
+---
+
 ## Available Templates
 
 | Template | Language/Framework | Status |
