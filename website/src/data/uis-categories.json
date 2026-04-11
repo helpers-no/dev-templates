@@ -1,0 +1,91 @@
+{"categories": [
+    {
+      "id": "OBSERVABILITY",
+      "name": "Observability",
+      "order": 0,
+      "description": "Metrics, logs, and tracing",
+      "icon": "chart-line",
+      "logo": "monitoring-logo.svg"
+    }
+,
+    {
+      "id": "AI",
+      "name": "AI & ML",
+      "order": 1,
+      "description": "AI and machine learning services",
+      "icon": "brain",
+      "logo": "ai-logo.svg"
+    }
+,
+    {
+      "id": "ANALYTICS",
+      "name": "Analytics",
+      "order": 2,
+      "description": "Data science and analytics platforms",
+      "icon": "flask",
+      "logo": "datascience-logo.svg"
+    }
+,
+    {
+      "id": "IDENTITY",
+      "name": "Identity",
+      "order": 3,
+      "description": "Identity and access management",
+      "icon": "shield",
+      "logo": "authentication-logo.svg"
+    }
+,
+    {
+      "id": "DATABASES",
+      "name": "Databases",
+      "order": 4,
+      "description": "Data storage and caching services",
+      "icon": "database",
+      "logo": "databases-logo.svg"
+    }
+,
+    {
+      "id": "MANAGEMENT",
+      "name": "Management",
+      "order": 5,
+      "description": "Admin tools, GitOps, and test services",
+      "icon": "cog",
+      "logo": "management-logo.svg"
+    }
+,
+    {
+      "id": "APPLICATIONS",
+      "name": "Applications",
+      "order": 6,
+      "description": "End-user applications and collaboration platforms",
+      "icon": "briefcase",
+      "logo": "development-logo.svg"
+    }
+,
+    {
+      "id": "NETWORKING",
+      "name": "Networking",
+      "order": 7,
+      "description": "VPN tunnels and network access",
+      "icon": "globe",
+      "logo": "core-logo.svg"
+    }
+,
+    {
+      "id": "STORAGE",
+      "name": "Storage",
+      "order": 8,
+      "description": "Platform storage infrastructure",
+      "icon": "hard-drive",
+      "logo": "core-logo.svg"
+    }
+,
+    {
+      "id": "INTEGRATION",
+      "name": "Integration",
+      "order": 9,
+      "description": "Messaging, API gateways, and event streams",
+      "icon": "inbox",
+      "logo": "queues-logo.svg"
+    }
+]}

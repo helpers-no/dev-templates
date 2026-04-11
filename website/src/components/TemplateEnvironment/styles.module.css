@@ -1,0 +1,269 @@
+.card {
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  background: var(--ifm-color-emphasis-100);
+}
+
+[data-theme='dark'] .card {
+  background: var(--ifm-color-emphasis-100);
+  border-color: var(--ifm-color-emphasis-300);
+}
+
+.eyebrow {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--ifm-color-emphasis-600);
+  margin-bottom: 1rem;
+}
+
+.section {
+  margin-bottom: 1.25rem;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.title {
+  margin: 0 0 0.6rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ifm-heading-color);
+}
+
+.number {
+  display: inline-block;
+  margin-right: 0.5rem;
+  color: var(--ifm-color-primary);
+}
+
+.text {
+  margin: 0.4rem 0;
+  font-size: 0.9rem;
+  color: var(--ifm-color-emphasis-800);
+}
+
+.text code {
+  font-family: var(--ifm-font-family-monospace);
+  background: var(--ifm-color-emphasis-200);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.params {
+  margin: 0.4rem 0 0.6rem 1rem;
+  padding: 0;
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.params li {
+  margin: 0.2rem 0;
+  list-style: none;
+}
+
+.params code {
+  font-family: var(--ifm-font-family-monospace);
+  background: var(--ifm-color-emphasis-200);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.commands {
+  margin: 0.4rem 0 0;
+  padding: 0.8rem 1rem;
+  background: var(--ifm-color-emphasis-200);
+  border-radius: 6px;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-800);
+  white-space: pre;
+  overflow-x: auto;
+}
+
+[data-theme='dark'] .commands {
+  background: var(--ifm-color-emphasis-200);
+  color: var(--ifm-color-emphasis-800);
+}
+
+.commands code {
+  background: transparent;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+.note {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-700);
+  white-space: pre-wrap;
+}
+
+/* ── New styles for "What gets set up" section ─────────────────────── */
+
+.intro {
+  margin: 0.4rem 0 0.8rem;
+  font-size: 0.9rem;
+  color: var(--ifm-color-emphasis-800);
+}
+
+.subsection {
+  margin-top: 0.9rem;
+  margin-bottom: 0.9rem;
+}
+
+.subsection:first-child {
+  margin-top: 0.4rem;
+}
+
+.subsectionTitle {
+  margin: 0 0 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.itemList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  margin: 0.4rem 0;
+  padding: 0.5rem 0.7rem;
+  border-left: 3px solid var(--ifm-color-emphasis-300);
+  background: var(--ifm-color-emphasis-100);
+  border-radius: 4px;
+}
+
+[data-theme='dark'] .item {
+  background: var(--ifm-color-emphasis-200);
+  border-left-color: var(--ifm-color-emphasis-400);
+}
+
+.itemHeader {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ifm-heading-color);
+}
+
+.itemHeader a {
+  color: var(--ifm-link-color);
+  text-decoration: none;
+}
+
+.itemHeader a:hover {
+  text-decoration: underline;
+}
+
+.itemHeader .external {
+  display: inline-block;
+  margin-left: 0.2rem;
+  font-size: 0.75rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.itemDesc {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-800);
+}
+
+.detailsList {
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.82rem;
+  color: var(--ifm-color-emphasis-800);
+}
+
+.detailsList li {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.1rem 0;
+}
+
+.detailsLabel {
+  flex: 0 0 9rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.detailsValue {
+  flex: 1 1 auto;
+  font-family: var(--ifm-font-family-monospace);
+  word-break: break-all;
+}
+
+.transitive {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.transitive a {
+  color: var(--ifm-link-color);
+  text-decoration: none;
+}
+
+.transitive a:hover {
+  text-decoration: underline;
+}
+
+.initFile {
+  margin: 0.5rem 0;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 6px;
+  background: var(--ifm-color-emphasis-100);
+  overflow: hidden;
+}
+
+[data-theme='dark'] .initFile {
+  background: var(--ifm-color-emphasis-200);
+  border-color: var(--ifm-color-emphasis-400);
+}
+
+.initFile summary {
+  padding: 0.5rem 0.8rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.85rem;
+  cursor: pointer;
+  user-select: none;
+  color: var(--ifm-color-emphasis-800);
+}
+
+.initFile summary:hover {
+  background: var(--ifm-color-emphasis-200);
+}
+
+[data-theme='dark'] .initFile summary:hover {
+  background: var(--ifm-color-emphasis-300);
+}
+
+.initFile pre {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  max-height: 400px;
+  overflow: auto;
+  background: var(--ifm-color-emphasis-200);
+  border-top: 1px solid var(--ifm-color-emphasis-300);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--ifm-color-emphasis-900);
+}
+
+[data-theme='dark'] .initFile pre {
+  background: var(--ifm-color-emphasis-300);
+  border-top-color: var(--ifm-color-emphasis-400);
+  color: var(--ifm-color-emphasis-900);
+}
