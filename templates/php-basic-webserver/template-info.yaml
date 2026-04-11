@@ -24,3 +24,10 @@ summary: >
 related:
   - python-basic-webserver
   - typescript-basic-webserver
+
+quickstart:
+  title: "Run the PHP server"
+  commands:
+    - php -S 0.0.0.0:3000 -t public
+  note: |
+    PHP's built-in server runs on port 3000. VS Code auto-forwards the port.

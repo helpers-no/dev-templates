@@ -24,3 +24,10 @@ summary: >
 related:
   - typescript-basic-webserver
   - java-basic-webserver
+
+quickstart:
+  title: "Run the Go server"
+  commands:
+    - go run main.go
+  note: |
+    Server runs on port 3000. VS Code auto-forwards the port.

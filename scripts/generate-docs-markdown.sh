@@ -126,6 +126,10 @@ for i in $(seq 0 $((template_count - 1))); do
 "
     done < <(jq -r ".templates[$i].tags[]" "$REGISTRY")
 
+    # Check if the template has requires or quickstart (drives the GetStarted card)
+    local_has_requires=$(jq -r ".templates[$i].requires // empty" "$REGISTRY")
+    local_has_quickstart=$(jq -r ".templates[$i].quickstart // empty" "$REGISTRY")
+
     # Write MDX file (Phase 1 task 1.2: no separate ## Summary section —
     # the TemplateHeader description + README intro carry the content)
     cat > "$page_file" <<MDXEOF
@@ -151,6 +155,24 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
 />
 
 MDXEOF
+
+    # Emit GetStarted card if requires or quickstart is present
+    if [[ -n "$local_has_requires" || -n "$local_has_quickstart" ]]; then
+        local_requires_json=$(jq -c ".templates[$i].requires // null" "$REGISTRY")
+        local_params_json=$(jq -c ".templates[$i].params // null" "$REGISTRY")
+        local_quickstart_json=$(jq -c ".templates[$i].quickstart // null" "$REGISTRY")
+
+        cat >> "$page_file" <<MDXEOF
+import TemplateGetStarted from '@site/src/components/TemplateGetStarted';
+
+<TemplateGetStarted
+  requires={$local_requires_json}
+  params={$local_params_json}
+  quickstart={$local_quickstart_json}
+/>
+
+MDXEOF
+    fi
 
     # Embed README content
     local_readme_file=""
