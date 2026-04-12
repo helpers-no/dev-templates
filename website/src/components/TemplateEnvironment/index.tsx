@@ -10,7 +10,8 @@ interface RequiresEntry {
 
 interface QuickstartBlock {
   title: string;
-  commands: string[];
+  setup: string[];
+  run: string;
   note?: string;
 }
 
@@ -357,8 +358,13 @@ export default function TemplateEnvironment({
             {nextNumber()}
             {quickstart.title}
           </h3>
+          {quickstart.setup.length > 0 && (
+            <pre className={styles.commands}>
+              <code>{quickstart.setup.join('\n')}</code>
+            </pre>
+          )}
           <pre className={styles.commands}>
-            <code>{quickstart.commands.join('\n')}</code>
+            <code>{quickstart.run}</code>
           </pre>
           {quickstart.note && <p className={styles.note}>{quickstart.note}</p>}
         </div>

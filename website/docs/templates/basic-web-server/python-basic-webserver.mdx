@@ -28,8 +28,8 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
 <TemplateEnvironment
   requires={null}
-  params={null}
-  quickstart={{"title":"Run the Flask app","commands":["uv venv","uv pip install -r requirements.txt","uv run python app/app.py"],"run":"uv run python app/app.py","note":"Flask runs on port 3000. VS Code auto-forwards the port — click the globe icon in the Ports tab.\n"}}
+  params={{"app_name":"my-app"}}
+  quickstart={{"title":"Run the Flask app","setup":["uv venv","uv pip install -r requirements.txt"],"run":"uv run python app/app.py","note":"Flask runs on port 3000. VS Code auto-forwards the port — click the globe icon in the Ports tab.\n"}}
   tools={[{"id":"dev-python","name":"Python Development Tools","description":"Adds ipython, pytest-cov, uv, and VS Code extensions for Python development","website":"https://python.org","docsUrl":"https://dct.sovereignsky.no/docs/tools/development-tools/python"}]}
   services={[]}
   templateKind={"app"}
@@ -46,11 +46,11 @@ flowchart LR
     subgraph dct["DCT devcontainer"]
         dev(["Developer"])
         dev_python["dev-python"]
-        app["Python Basic Webserver"]
+        app["my-app"]
     end
     subgraph k8s["Local Kubernetes Cluster (Test environment)"]
         argo["ArgoCD"]
-        pod["Python Basic Webserver pod"]
+        pod["my-app pod"]
     end
     subgraph gh["GitHub"]
         repo["repo"]

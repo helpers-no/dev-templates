@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-11T20:47:08.959Z",
+  "generated": "2026-04-12T16:33:40.048Z",
   "dctDocsBase": "https://dct.sovereignsky.no",
   "uisDocsBase": "https://uis.sovereignsky.no",
   "categories": [
@@ -63,7 +63,7 @@
       "description": "Structured AI development with plans, phases, and validation",
       "category": "WORKFLOW",
       "install_type": "overlay",
-      "abstract": "Provides a complete AI-assisted development workflow with investigation plans, phased implementation, and human-in-the-loop validation. Includes CLAUDE.md, plan templates, and git safety rules.",
+      "abstract": "A structured AI development workflow that guides AI coding assistants through investigation, planning, and phased implementation. Includes CLAUDE.md, 6 portable docs, plan templates, and git safety rules. Designed for human-in-the-loop collaboration.",
       "tools": "",
       "readme": "README-plan-based-workflow.md",
       "tags": [
@@ -76,7 +76,6 @@
       "logo": "plan-based-workflow-logo.svg",
       "website": "",
       "docs": "https://github.com/helpers-no/dev-templates/tree/main/ai-templates/plan-based-workflow",
-      "summary": "A structured AI development workflow that guides AI coding assistants through investigation, planning, and phased implementation. Includes CLAUDE.md, 6 portable docs, plan templates, and git safety rules. Designed for human-in-the-loop collaboration.",
       "related": [],
       "context": "dct",
       "templateKind": "app",
@@ -93,7 +92,7 @@
       "description": "ASP.NET Core server with health endpoint and Docker support",
       "category": "BASIC_WEB_SERVER",
       "install_type": "app",
-      "abstract": "Provides a minimal starting point for developers who want to build a C# web server using ASP.NET Core.",
+      "abstract": "A minimal ASP.NET Core web server with hot reload via dotnet watch. Includes Docker multi-stage build, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
       "tools": "dev-csharp",
       "readme": "README-csharp-basic-webserver.md",
       "tags": [
@@ -107,17 +106,17 @@
       "logo": "csharp-basic-webserver-logo.svg",
       "website": "",
       "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/csharp-basic-webserver",
-      "summary": "A minimal ASP.NET Core web server with hot reload via dotnet watch, Docker multi-stage build, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
       "related": [
         "java-basic-webserver",
         "golang-basic-webserver"
       ],
       "context": "dct",
+      "params": {
+        "app_name": "my-app"
+      },
       "quickstart": {
         "title": "Run the ASP.NET Core app",
-        "commands": [
-          "dotnet watch run"
-        ],
+        "setup": [],
         "run": "dotnet watch run",
         "note": "ASP.NET Core runs on port 3000 with hot reload via dotnet watch. VS Code auto-forwards the port.\n"
       },
@@ -136,7 +135,7 @@
       },
       "resolvedServices": [],
       "resolvedInitFiles": {},
-      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_csharp[\"dev-csharp\"]\n        app[\"C# Basic Webserver\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"C# Basic Webserver pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_csharp --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
+      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_csharp[\"dev-csharp\"]\n        app[\"my-app\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"my-app pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_csharp --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
     },
     {
       "id": "designsystemet-basic-react-app",
@@ -146,7 +145,7 @@
       "description": "React app with Designsystemet components, Vite, and TypeScript",
       "category": "WEB_APP",
       "install_type": "app",
-      "abstract": "Provides a minimal starting point for developers who want to build a blog page using Designsystemet's components and styling with React/Vite.",
+      "abstract": "A React application using Designsystemet from Digdir with blog cards, Vite for development, and TypeScript support. Includes Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
       "tools": "dev-typescript",
       "readme": "README-designsystemet-basic-react-app.md",
       "tags": [
@@ -160,16 +159,17 @@
       "logo": "designsystemet-basic-react-app-logo.svg",
       "website": "",
       "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/designsystemet-basic-react-app",
-      "summary": "A React application using Designsystemet from Digdir with blog cards, Vite for development, TypeScript support, Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
       "related": [
         "typescript-basic-webserver"
       ],
       "context": "dct",
+      "params": {
+        "app_name": "my-app"
+      },
       "quickstart": {
         "title": "Run the Vite dev server",
-        "commands": [
-          "npm install",
-          "npm run dev"
+        "setup": [
+          "npm install"
         ],
         "run": "npm run dev",
         "note": "Vite runs on port 5173. VS Code auto-forwards the port — click the globe icon in the Ports tab.\n"
@@ -189,7 +189,7 @@
       },
       "resolvedServices": [],
       "resolvedInitFiles": {},
-      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_typescript[\"dev-typescript\"]\n        app[\"Designsystemet Basic React App\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"Designsystemet Basic React App pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_typescript --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
+      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_typescript[\"dev-typescript\"]\n        app[\"my-app\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"my-app pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_typescript --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
     },
     {
       "id": "golang-basic-webserver",
@@ -199,7 +199,7 @@
       "description": "Go web server using net/http with health endpoint and Docker support",
       "category": "BASIC_WEB_SERVER",
       "install_type": "app",
-      "abstract": "Provides a minimal starting point for developers who want to build a web server using Go's standard library.",
+      "abstract": "A minimal web server using Go's standard net/http package with a health check endpoint. Includes Docker multi-stage build, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
       "tools": "dev-golang",
       "readme": "README-golang-basic-webserver.md",
       "tags": [
@@ -211,17 +211,17 @@
       "logo": "golang-basic-webserver-logo.svg",
       "website": "",
       "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/golang-basic-webserver",
-      "summary": "A minimal web server using Go's standard net/http package with a health check endpoint, Docker multi-stage build, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
       "related": [
         "typescript-basic-webserver",
         "java-basic-webserver"
       ],
       "context": "dct",
+      "params": {
+        "app_name": "my-app"
+      },
       "quickstart": {
         "title": "Run the Go server",
-        "commands": [
-          "go run main.go"
-        ],
+        "setup": [],
         "run": "go run main.go",
         "note": "Server runs on port 3000. VS Code auto-forwards the port.\n"
       },
@@ -240,7 +240,7 @@
       },
       "resolvedServices": [],
       "resolvedInitFiles": {},
-      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_golang[\"dev-golang\"]\n        app[\"Go Basic Webserver\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"Go Basic Webserver pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_golang --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
+      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_golang[\"dev-golang\"]\n        app[\"my-app\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"my-app pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_golang --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
     },
     {
       "id": "java-basic-webserver",
@@ -250,7 +250,7 @@
       "description": "Spring Boot server with health endpoint and Docker support",
       "category": "BASIC_WEB_SERVER",
       "install_type": "app",
-      "abstract": "Provides a minimal starting point for developers who want to build a Java web server using Spring Boot.",
+      "abstract": "A minimal Spring Boot web server with health check endpoints via Actuator. Includes Docker multi-stage build, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
       "tools": "dev-java",
       "readme": "README-java-basic-webserver.md",
       "tags": [
@@ -263,17 +263,17 @@
       "logo": "java-basic-webserver-logo.svg",
       "website": "",
       "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/java-basic-webserver",
-      "summary": "A minimal Spring Boot web server with health check endpoints via Actuator, Docker multi-stage build, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
       "related": [
         "golang-basic-webserver",
         "csharp-basic-webserver"
       ],
       "context": "dct",
+      "params": {
+        "app_name": "my-app"
+      },
       "quickstart": {
         "title": "Run the Spring Boot app",
-        "commands": [
-          "mvn spring-boot:run"
-        ],
+        "setup": [],
         "run": "mvn spring-boot:run",
         "note": "Spring Boot runs on port 3000. VS Code auto-forwards the port.\n"
       },
@@ -292,7 +292,7 @@
       },
       "resolvedServices": [],
       "resolvedInitFiles": {},
-      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_java[\"dev-java\"]\n        app[\"Java Basic Webserver\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"Java Basic Webserver pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_java --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
+      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_java[\"dev-java\"]\n        app[\"my-app\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"my-app pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_java --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
     },
     {
       "id": "php-basic-webserver",
@@ -302,7 +302,7 @@
       "description": "PHP web server using built-in server with health endpoint and Docker support",
       "category": "BASIC_WEB_SERVER",
       "install_type": "app",
-      "abstract": "Provides a minimal starting point for developers who want to build a PHP web server using PHP's built-in server.",
+      "abstract": "A minimal PHP web server using PHP's built-in server with a health check endpoint. Includes Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
       "tools": "dev-php-laravel",
       "readme": "README-php-basic-webserver.md",
       "tags": [
@@ -314,17 +314,17 @@
       "logo": "php-basic-webserver-logo.svg",
       "website": "",
       "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/php-basic-webserver",
-      "summary": "A minimal PHP web server using PHP's built-in server with a health check endpoint, Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
       "related": [
         "python-basic-webserver",
         "typescript-basic-webserver"
       ],
       "context": "dct",
+      "params": {
+        "app_name": "my-app"
+      },
       "quickstart": {
         "title": "Run the PHP server",
-        "commands": [
-          "php -S 0.0.0.0:3000 -t public"
-        ],
+        "setup": [],
         "run": "php -S 0.0.0.0:3000 -t public",
         "note": "PHP's built-in server runs on port 3000. VS Code auto-forwards the port.\n"
       },
@@ -343,7 +343,7 @@
       },
       "resolvedServices": [],
       "resolvedInitFiles": {},
-      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_php_laravel[\"dev-php-laravel\"]\n        app[\"PHP Basic Webserver\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"PHP Basic Webserver pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_php_laravel --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
+      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_php_laravel[\"dev-php-laravel\"]\n        app[\"my-app\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"my-app pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_php_laravel --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
     },
     {
       "id": "python-basic-webserver",
@@ -353,7 +353,7 @@
       "description": "Minimal Flask server with health endpoint and Docker support",
       "category": "BASIC_WEB_SERVER",
       "install_type": "app",
-      "abstract": "Provides a minimal starting point for developers who want to build a Python web server using Flask.",
+      "abstract": "A minimal Python web server using Flask with a health check endpoint. Includes Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow. Ideal for microservices and API backends.",
       "tools": "dev-python",
       "readme": "README-python-basic-webserver.md",
       "tags": [
@@ -366,18 +366,19 @@
       "logo": "python-basic-webserver-logo.svg",
       "website": "",
       "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver",
-      "summary": "A minimal Python web server using Flask with a health check endpoint, Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow. Ideal for microservices and API backends.",
       "related": [
         "php-basic-webserver",
         "typescript-basic-webserver"
       ],
       "context": "dct",
+      "params": {
+        "app_name": "my-app"
+      },
       "quickstart": {
         "title": "Run the Flask app",
-        "commands": [
+        "setup": [
           "uv venv",
-          "uv pip install -r requirements.txt",
-          "uv run python app/app.py"
+          "uv pip install -r requirements.txt"
         ],
         "run": "uv run python app/app.py",
         "note": "Flask runs on port 3000. VS Code auto-forwards the port — click the globe icon in the Ports tab.\n"
@@ -397,7 +398,7 @@
       },
       "resolvedServices": [],
       "resolvedInitFiles": {},
-      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_python[\"dev-python\"]\n        app[\"Python Basic Webserver\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"Python Basic Webserver pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_python --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
+      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_python[\"dev-python\"]\n        app[\"my-app\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"my-app pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_python --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
     },
     {
       "id": "python-basic-webserver-database",
@@ -407,7 +408,7 @@
       "description": "Flask server that connects to PostgreSQL and reads from a tasks table",
       "category": "BASIC_WEB_SERVER_DATABASE",
       "install_type": "app",
-      "abstract": "A minimal Flask web server that connects to a PostgreSQL database and reads from a tasks table. Demonstrates the full producer/consumer flow — UIS deploys PostgreSQL, dev-template configure creates the database and wires the connection into .env, and the app reads from it.",
+      "abstract": "A minimal Flask web server that connects to a PostgreSQL database and reads from a tasks table. Demonstrates the full producer/consumer flow — UIS deploys PostgreSQL, dev-template configure creates the database and wires the connection into .env, and the app reads from it. Includes Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow. Consumer-side companion to the postgresql-demo UIS stack template.",
       "tools": "dev-python",
       "readme": "README-python-basic-webserver-database.md",
       "tags": [
@@ -421,7 +422,6 @@
       "logo": "python-basic-webserver-database-logo.svg",
       "website": "",
       "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver-database",
-      "summary": "A Flask web server that reads from a PostgreSQL database via DATABASE_URL. Includes a sample tasks table, Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow. This is the consumer-side companion to the postgresql-demo UIS stack template — run that first to deploy PostgreSQL, then dev-template configure on this template to create the database and wire up the connection.",
       "related": [
         "python-basic-webserver",
         "postgresql-demo"
@@ -442,10 +442,9 @@
       ],
       "quickstart": {
         "title": "Run the Flask app",
-        "commands": [
+        "setup": [
           "uv venv",
-          "uv pip install -r requirements.txt",
-          "uv run python app/app.py"
+          "uv pip install -r requirements.txt"
         ],
         "run": "uv run python app/app.py",
         "note": "Flask debug server starts on port 3000.\nVS Code auto-forwards the port — click the globe icon in the Ports tab.\n"
@@ -497,7 +496,7 @@
       "description": "Express.js server with TypeScript, health endpoint, and Docker support",
       "category": "BASIC_WEB_SERVER",
       "install_type": "app",
-      "abstract": "Provides a minimal starting point for developers who want to build a Node.js web server using Express and TypeScript.",
+      "abstract": "A minimal Express.js web server written in TypeScript with hot reload via nodemon. Includes Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
       "tools": "dev-typescript",
       "readme": "README-typescript-basic-webserver.md",
       "tags": [
@@ -510,17 +509,18 @@
       "logo": "typescript-basic-webserver-logo.svg",
       "website": "",
       "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/typescript-basic-webserver",
-      "summary": "A minimal Express.js web server written in TypeScript with hot reload via nodemon, Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
       "related": [
         "designsystemet-basic-react-app",
         "python-basic-webserver"
       ],
       "context": "dct",
+      "params": {
+        "app_name": "my-app"
+      },
       "quickstart": {
         "title": "Run the Express server",
-        "commands": [
-          "npm install",
-          "npm run dev"
+        "setup": [
+          "npm install"
         ],
         "run": "npm run dev",
         "note": "Server runs on port 3000 with hot reload via nodemon. VS Code auto-forwards the port.\n"
@@ -540,7 +540,7 @@
       },
       "resolvedServices": [],
       "resolvedInitFiles": {},
-      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_typescript[\"dev-typescript\"]\n        app[\"TypeScript Basic Webserver\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"TypeScript Basic Webserver pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_typescript --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
+      "architectureMdx": "## Architecture\n\n### Steady-state\n\n```mermaid\nflowchart LR\n    subgraph dct[\"DCT devcontainer\"]\n        dev([\"Developer\"])\n        dev_typescript[\"dev-typescript\"]\n        app[\"my-app\"]\n    end\n    subgraph k8s[\"Local Kubernetes Cluster (Test environment)\"]\n        argo[\"ArgoCD\"]\n        pod[\"my-app pod\"]\n    end\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    dev_typescript --> app\n    dev -->|git push| repo\n    repo -->|trigger| actions\n    actions -->|push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n```\n"
     },
     {
       "id": "postgresql-demo",
@@ -550,7 +550,7 @@
       "description": "Deploys PostgreSQL and creates a sample database with seed data",
       "category": "DEMO",
       "install_type": "stack",
-      "abstract": "A minimal UIS template that deploys PostgreSQL and creates a sample tasks table with seed data. Use this to verify UIS template deployment end-to-end, or as a starting point for your own stack templates.",
+      "abstract": "A minimal UIS template that deploys PostgreSQL and creates a sample tasks table with seed data. Shows the full uis template flow from registry to deployed, configured service. Use this to verify your UIS setup or as a starting point for your own stack templates.",
       "tools": "",
       "readme": "README-postgresql-demo.md",
       "tags": [
@@ -562,7 +562,6 @@
       "logo": "postgresql-demo-logo.svg",
       "website": "",
       "docs": "https://github.com/helpers-no/dev-templates/tree/main/uis-stack-templates/postgresql-demo",
-      "summary": "A minimal demonstration template that deploys PostgreSQL to the UIS cluster and creates a sample database with a tasks table and seed data. Shows the uis template flow from registry to deployed, configured service. Use it to verify your UIS setup or as a starting point for your own stack templates.",
       "related": [
         "python-basic-webserver-database"
       ],
@@ -584,9 +583,7 @@
       },
       "quickstart": {
         "title": "Verify the database",
-        "commands": [
-          "uis connect postgresql demo_db"
-        ],
+        "setup": [],
         "run": "uis connect postgresql demo_db",
         "note": "Inside psql, run: SELECT * FROM tasks;\nYou should see 3 seeded rows. Type \\q to exit.\n"
       },

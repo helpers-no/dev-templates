@@ -30,7 +30,7 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 <TemplateEnvironment
   requires={[{"service":"postgresql","config":{"database":"{{ params.database_name }}","init":"config/init-database.sql"}}]}
   params={{"app_name":"my-app","database_name":"my_app_db"}}
-  quickstart={{"title":"Run the Flask app","commands":["uv venv","uv pip install -r requirements.txt","uv run python app/app.py"],"run":"uv run python app/app.py","note":"Flask debug server starts on port 3000.\nVS Code auto-forwards the port — click the globe icon in the Ports tab.\n"}}
+  quickstart={{"title":"Run the Flask app","setup":["uv venv","uv pip install -r requirements.txt"],"run":"uv run python app/app.py","note":"Flask debug server starts on port 3000.\nVS Code auto-forwards the port — click the globe icon in the Ports tab.\n"}}
   tools={[{"id":"dev-python","name":"Python Development Tools","description":"Adds ipython, pytest-cov, uv, and VS Code extensions for Python development","website":"https://python.org","docsUrl":"https://dct.sovereignsky.no/docs/tools/development-tools/python"}]}
   services={[{"id":"postgresql","name":"PostgreSQL","description":"Open-source relational database","docsUrl":"https://uis.sovereignsky.no/docs/services/databases/postgresql","website":"https://www.postgresql.org","exposePort":35432,"namespace":"default","helmChart":"bitnami/postgresql","database":"my_app_db","generatedUser":"my_app","initFilePath":"config/init-database.sql","transitiveRequires":[],"envVar":"DATABASE_URL","secretName":"my-app-db","containerPort":3000}]}
   templateKind={"app"}

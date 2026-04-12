@@ -82,7 +82,6 @@ interface TemplateInfoYaml {
   logo: string;
   website: string;
   docs: string;
-  summary: string;
   related: string[];
   params?: Record<string, string>;
   requires?: Array<{
@@ -97,8 +96,8 @@ interface TemplateInfoYaml {
   };
   quickstart?: {
     title: string;
-    commands: string[];
-    run?: string;
+    setup: string[];
+    run: string;
     note?: string;
   };
 }
@@ -527,7 +526,6 @@ function validateTemplate(
   if (!Array.isArray(tmpl.tags)) fail(`${file}: tags must be a list`);
   if (!tmpl.logo) fail(`${file}: missing logo`);
   if (!tmpl.docs) fail(`${file}: missing docs`);
-  if (!tmpl.summary) fail(`${file}: missing summary`);
 }
 
 // --- Main ---
@@ -614,7 +612,6 @@ for (const catFile of categoryFiles) {
       logo: raw.logo,
       website: raw.website || '',
       docs: raw.docs,
-      summary: raw.summary?.trim(),
       related: Array.isArray(raw.related) ? raw.related : [],
       context,
     };

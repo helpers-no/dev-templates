@@ -6,9 +6,12 @@ category: BASIC_WEB_SERVER_DATABASE
 install_type: app
 abstract: >
   A minimal Flask web server that connects to a PostgreSQL database and
-  reads from a tasks table. Demonstrates the full producer/consumer flow —
-  UIS deploys PostgreSQL, dev-template configure creates the database
-  and wires the connection into .env, and the app reads from it.
+  reads from a tasks table. Demonstrates the full producer/consumer
+  flow — UIS deploys PostgreSQL, dev-template configure creates the
+  database and wires the connection into .env, and the app reads from
+  it. Includes Docker containerization, Kubernetes deployment manifests,
+  and GitHub Actions CI/CD workflow. Consumer-side companion to the
+  postgresql-demo UIS stack template.
 tools: dev-python
 readme: README-python-basic-webserver-database.md
 tags:
@@ -21,23 +24,15 @@ tags:
 logo: python-basic-webserver-database-logo.svg
 website: ""
 docs: https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver-database
-summary: >
-  A Flask web server that reads from a PostgreSQL database via DATABASE_URL.
-  Includes a sample tasks table, Docker containerization, Kubernetes deployment
-  manifests, and GitHub Actions CI/CD workflow. This is the consumer-side
-  companion to the postgresql-demo UIS stack template — run that first to
-  deploy PostgreSQL, then dev-template configure on this template to create
-  the database and wire up the connection.
 related:
   - python-basic-webserver
   - postgresql-demo
 
 quickstart:
   title: "Run the Flask app"
-  commands:
+  setup:
     - uv venv
     - uv pip install -r requirements.txt
-    - uv run python app/app.py
   run: "uv run python app/app.py"
   note: |
     Flask debug server starts on port 3000.
@@ -46,6 +41,14 @@ quickstart:
 params:
   app_name: "my-app"
   database_name: "my_app_db"
+
+prerequisites:
+  - text: "DCT devcontainer running"
+    url: "https://dct.sovereignsky.no"
+  - text: "UIS provision-host container running"
+    url: "https://uis.sovereignsky.no"
+  - text: "Local Kubernetes cluster running (Rancher Desktop)"
+    url: "https://www.rancher.com/products/rancher-desktop"
 
 requires:
   - service: postgresql

@@ -88,7 +88,6 @@ for i in $(seq 0 $((template_count - 1))); do
     logo=$(jq -r ".templates[$i].logo" "$REGISTRY")
     website=$(jq -r ".templates[$i].website" "$REGISTRY")
     docs=$(jq -r ".templates[$i].docs" "$REGISTRY")
-    summary=$(jq -r ".templates[$i].summary" "$REGISTRY")
 
     [[ -z "$tid" || "$tid" == "null" ]] && continue
 
