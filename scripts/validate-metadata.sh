@@ -110,7 +110,7 @@ echo ""
 #------------------------------------------------------------------------------
 print_subsection "Validating template-info.yaml files"
 
-MANDATORY_FIELDS="id version name description category install_type abstract readme logo docs"
+MANDATORY_FIELDS="id version name description category install_type abstract readme logo maintainers links"
 
 validate_template_yaml() {
     local info_file="$1"

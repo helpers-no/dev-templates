@@ -86,8 +86,8 @@ for i in $(seq 0 $((template_count - 1))); do
     tools=$(jq -r ".templates[$i].tools" "$REGISTRY")
     readme=$(jq -r ".templates[$i].readme" "$REGISTRY")
     logo=$(jq -r ".templates[$i].logo" "$REGISTRY")
-    website=$(jq -r ".templates[$i].website" "$REGISTRY")
-    docs=$(jq -r ".templates[$i].docs" "$REGISTRY")
+    local_links_json=$(jq -c ".templates[$i].links // []" "$REGISTRY")
+    local_maintainers_json=$(jq -c ".templates[$i].maintainers // []" "$REGISTRY")
 
     [[ -z "$tid" || "$tid" == "null" ]] && continue
 
@@ -156,13 +156,20 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   version="$version"
   description="$description"
   install="$local_install_cmd"
-  website="$website"
-  docs="$docs"
+  links={$local_links_json}
+  maintainers={$local_maintainers_json}
   tags={$local_tags_mdx}
   tools="$tools"
 />
 
 MDXEOF
+
+    # Emit abstract as a paragraph between header and environment card (S2).
+    # Double trailing newline ensures a blank line before the next `import`
+    # statement — MDX requires imports to be separated from prose content.
+    if [[ -n "$abstract" && "$abstract" != "null" ]]; then
+        printf '\n%s\n\n' "$abstract" >> "$page_file"
+    fi
 
     # Emit Environment card if any environment content is present.
     # The component is a dumb renderer — every value is pre-resolved by
@@ -194,6 +201,15 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 MDXEOF
     fi
 
+    # Emit prerequisites checklist (S4) — between environment card and architecture.
+    local_prereqs_json=$(jq -c ".templates[$i].prerequisites // []" "$REGISTRY")
+    local_prereqs_len=$(echo "$local_prereqs_json" | jq 'length')
+    if [[ "$local_prereqs_len" -gt 0 ]]; then
+        printf '\n## Prerequisites\n\n' >> "$page_file"
+        echo "$local_prereqs_json" | jq -r '.[] | if .url then "- [ ] [" + .text + "](" + .url + ")" else "- [ ] " + .text end' >> "$page_file"
+        echo "" >> "$page_file"
+    fi
+
     # Emit auto-generated ## Architecture section (PLAN-template-architecture-diagram.md).
     # The full MDX block (headings + fenced mermaid code blocks) is pre-composed
     # by scripts/lib/build-architecture-mermaid.ts during registry generation
@@ -212,7 +228,7 @@ MDXEOF
         _get_readme_content "$local_readme_file" >> "$page_file"
         echo "" >> "$page_file"
     else
-        log_warn "$tid: README file not found ($readme)"
+        log_info "$tid: no README file — page is fully yaml-driven"
     fi
 
     # Add related templates

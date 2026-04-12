@@ -18,11 +18,14 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   version="1.0.0"
   description="Spring Boot server with health endpoint and Docker support"
   install="dev-template java-basic-webserver"
-  website=""
-  docs="https://github.com/helpers-no/dev-templates/tree/main/templates/java-basic-webserver"
+  links={[{"url":"https://github.com/helpers-no/dev-templates/tree/main/templates/java-basic-webserver","title":"Source code","icon":"github"}]}
+  maintainers={["terchris"]}
   tags={["java","spring-boot","webserver","api","rest"]}
   tools="dev-java"
 />
+
+
+A minimal Spring Boot web server with health check endpoints via Actuator. Includes Docker multi-stage build, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.
 
 import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
@@ -35,6 +38,11 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
   templateKind={"app"}
   initFiles={{}}
 />
+
+
+## Prerequisites
+
+- [ ] [DCT devcontainer running](https://dct.sovereignsky.no)
 
 
 ## Architecture

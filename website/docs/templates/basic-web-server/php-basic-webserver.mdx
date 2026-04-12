@@ -17,11 +17,14 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   version="1.0.0"
   description="PHP web server using built-in server with health endpoint and Docker support"
   install="dev-template php-basic-webserver"
-  website=""
-  docs="https://github.com/helpers-no/dev-templates/tree/main/templates/php-basic-webserver"
+  links={[{"url":"https://github.com/helpers-no/dev-templates/tree/main/templates/php-basic-webserver","title":"Source code","icon":"github"}]}
+  maintainers={["terchris"]}
   tags={["php","webserver","api","rest"]}
   tools="dev-php-laravel"
 />
+
+
+A minimal PHP web server using PHP's built-in server with a health check endpoint. Includes Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.
 
 import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
@@ -34,6 +37,11 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
   templateKind={"app"}
   initFiles={{}}
 />
+
+
+## Prerequisites
+
+- [ ] [DCT devcontainer running](https://dct.sovereignsky.no)
 
 
 ## Architecture

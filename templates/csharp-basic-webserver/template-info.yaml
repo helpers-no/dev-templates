@@ -18,8 +18,12 @@ tags:
   - api
   - rest
 logo: csharp-basic-webserver-logo.svg
-website: ""
-docs: https://github.com/helpers-no/dev-templates/tree/main/templates/csharp-basic-webserver
+maintainers:
+  - terchris
+links:
+  - url: https://github.com/helpers-no/dev-templates/tree/main/templates/csharp-basic-webserver
+    title: Source code
+    icon: github
 related:
   - java-basic-webserver
   - golang-basic-webserver

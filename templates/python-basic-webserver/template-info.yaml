@@ -18,8 +18,12 @@ tags:
   - api
   - rest
 logo: python-basic-webserver-logo.svg
-website: ""
-docs: https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver
+maintainers:
+  - terchris
+links:
+  - url: https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver
+    title: Source code
+    icon: github
 related:
   - php-basic-webserver
   - typescript-basic-webserver

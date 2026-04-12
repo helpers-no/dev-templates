@@ -352,17 +352,24 @@ export default function TemplateEnvironment({
         </div>
       )}
 
+      {showRun && quickstart && quickstart.setup.length > 0 && (
+        <div className={styles.section}>
+          <h3 className={styles.title}>
+            {nextNumber()}
+            Setup
+          </h3>
+          <pre className={styles.commands}>
+            <code>{quickstart.setup.join('\n')}</code>
+          </pre>
+        </div>
+      )}
+
       {showRun && quickstart && (
         <div className={styles.section}>
           <h3 className={styles.title}>
             {nextNumber()}
             {quickstart.title}
           </h3>
-          {quickstart.setup.length > 0 && (
-            <pre className={styles.commands}>
-              <code>{quickstart.setup.join('\n')}</code>
-            </pre>
-          )}
           <pre className={styles.commands}>
             <code>{quickstart.run}</code>
           </pre>

@@ -2,14 +2,21 @@ import React from 'react';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import styles from './styles.module.css';
 
+interface LinkEntry {
+  url: string;
+  title?: string;
+  icon?: string;
+  type?: string;
+}
+
 interface TemplateHeaderProps {
   logo: string;
   name: string;
   version: string;
   description: string;
   install: string;
-  website: string;
-  docs: string;
+  links?: LinkEntry[];
+  maintainers?: string[];
   tags: string[];
   tools?: string;
 }
@@ -20,8 +27,8 @@ export default function TemplateHeader({
   version,
   description,
   install,
-  website,
-  docs,
+  links,
+  maintainers,
   tags,
   tools,
 }: TemplateHeaderProps) {
@@ -45,18 +52,26 @@ export default function TemplateHeader({
           <span className={styles.installLabel}>Install:</span>
           {install}
         </div>
-        <div className={styles.links}>
-          {website && (
-            <a href={website} target="_blank" rel="noopener noreferrer" className={styles.link}>
-              Website ↗
-            </a>
-          )}
-          {docs && (
-            <a href={docs} target="_blank" rel="noopener noreferrer" className={styles.link}>
-              View Source ↗
-            </a>
-          )}
-        </div>
+        {links && links.length > 0 && (
+          <div className={styles.links}>
+            {links.map((link, idx) => (
+              <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" className={styles.link}>
+                {link.title || link.url} ↗
+              </a>
+            ))}
+          </div>
+        )}
+        {maintainers && maintainers.length > 0 && (
+          <div className={styles.maintainers}>
+            <span className={styles.maintainersLabel}>Maintainers: </span>
+            {maintainers.map((user) => (
+              <a key={user} href={`https://github.com/${user}`} target="_blank" rel="noopener noreferrer" className={styles.maintainer}>
+                <img src={`https://github.com/${user}.png?size=24`} alt={user} className={styles.avatar} loading="lazy" />
+                {user}
+              </a>
+            ))}
+          </div>
+        )}
         <div className={styles.tags}>
           {tags.map((tag) => (
             <a key={tag} href={`/docs/tags/${tag}`} className={styles.tag}>{tag}</a>

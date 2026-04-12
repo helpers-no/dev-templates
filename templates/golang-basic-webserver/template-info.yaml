@@ -16,8 +16,12 @@ tags:
   - api
   - rest
 logo: golang-basic-webserver-logo.svg
-website: ""
-docs: https://github.com/helpers-no/dev-templates/tree/main/templates/golang-basic-webserver
+maintainers:
+  - terchris
+links:
+  - url: https://github.com/helpers-no/dev-templates/tree/main/templates/golang-basic-webserver
+    title: Source code
+    icon: github
 related:
   - typescript-basic-webserver
   - java-basic-webserver

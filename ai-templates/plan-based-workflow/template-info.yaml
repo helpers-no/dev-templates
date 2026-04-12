@@ -18,8 +18,12 @@ tags:
   - claude
   - devcontainer
 logo: plan-based-workflow-logo.svg
-website: ""
-docs: https://github.com/helpers-no/dev-templates/tree/main/ai-templates/plan-based-workflow
+maintainers:
+  - terchris
+links:
+  - url: https://github.com/helpers-no/dev-templates/tree/main/ai-templates/plan-based-workflow
+    title: Source code
+    icon: github
 related: []
 
 prerequisites:

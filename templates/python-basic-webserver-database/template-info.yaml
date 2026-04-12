@@ -22,8 +22,12 @@ tags:
   - webserver
   - requires
 logo: python-basic-webserver-database-logo.svg
-website: ""
-docs: https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver-database
+maintainers:
+  - terchris
+links:
+  - url: https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver-database
+    title: Source code
+    icon: github
 related:
   - python-basic-webserver
   - postgresql-demo

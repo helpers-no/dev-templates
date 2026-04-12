@@ -17,8 +17,12 @@ tags:
   - api
   - rest
 logo: java-basic-webserver-logo.svg
-website: ""
-docs: https://github.com/helpers-no/dev-templates/tree/main/templates/java-basic-webserver
+maintainers:
+  - terchris
+links:
+  - url: https://github.com/helpers-no/dev-templates/tree/main/templates/java-basic-webserver
+    title: Source code
+    icon: github
 related:
   - golang-basic-webserver
   - csharp-basic-webserver

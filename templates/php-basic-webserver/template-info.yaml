@@ -16,8 +16,12 @@ tags:
   - api
   - rest
 logo: php-basic-webserver-logo.svg
-website: ""
-docs: https://github.com/helpers-no/dev-templates/tree/main/templates/php-basic-webserver
+maintainers:
+  - terchris
+links:
+  - url: https://github.com/helpers-no/dev-templates/tree/main/templates/php-basic-webserver
+    title: Source code
+    icon: github
 related:
   - python-basic-webserver
   - typescript-basic-webserver

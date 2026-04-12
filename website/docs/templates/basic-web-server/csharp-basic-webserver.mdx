@@ -19,11 +19,14 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   version="1.0.0"
   description="ASP.NET Core server with health endpoint and Docker support"
   install="dev-template csharp-basic-webserver"
-  website=""
-  docs="https://github.com/helpers-no/dev-templates/tree/main/templates/csharp-basic-webserver"
+  links={[{"url":"https://github.com/helpers-no/dev-templates/tree/main/templates/csharp-basic-webserver","title":"Source code","icon":"github"}]}
+  maintainers={["terchris"]}
   tags={["csharp","dotnet","aspnet","webserver","api","rest"]}
   tools="dev-csharp"
 />
+
+
+A minimal ASP.NET Core web server with hot reload via dotnet watch. Includes Docker multi-stage build, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.
 
 import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
@@ -36,6 +39,11 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
   templateKind={"app"}
   initFiles={{}}
 />
+
+
+## Prerequisites
+
+- [ ] [DCT devcontainer running](https://dct.sovereignsky.no)
 
 
 ## Architecture

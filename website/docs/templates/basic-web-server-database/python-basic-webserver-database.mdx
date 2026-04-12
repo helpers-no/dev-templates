@@ -19,11 +19,14 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   version="1.0.0"
   description="Flask server that connects to PostgreSQL and reads from a tasks table"
   install="dev-template python-basic-webserver-database"
-  website=""
-  docs="https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver-database"
+  links={[{"url":"https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver-database","title":"Source code","icon":"github"}]}
+  maintainers={["terchris"]}
   tags={["python","flask","postgresql","database","webserver","requires"]}
   tools="dev-python"
 />
+
+
+A minimal Flask web server that connects to a PostgreSQL database and reads from a tasks table. Demonstrates the full producer/consumer flow — UIS deploys PostgreSQL, dev-template configure creates the database and wires the connection into .env, and the app reads from it. Includes Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow. Consumer-side companion to the postgresql-demo UIS stack template.
 
 import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
@@ -36,6 +39,13 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
   templateKind={"app"}
   initFiles={{"config/init-database.sql":"-- Init file for python-basic-webserver-database\n-- Applied by: uis configure postgresql --init-file -\n-- Uses psql --set ON_ERROR_STOP=on for fail-fast on syntax errors\n-- All statements are idempotent — safe to re-run\n\nCREATE TABLE IF NOT EXISTS tasks (\n    id SERIAL PRIMARY KEY,\n    title VARCHAR(255) NOT NULL,\n    status VARCHAR(20) DEFAULT 'pending',\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);\n\nINSERT INTO tasks (title, status) VALUES\n    ('Set up the database connection', 'done'),\n    ('Build something with Flask + PostgreSQL', 'pending'),\n    ('Deploy to Kubernetes via ArgoCD', 'pending')\nON CONFLICT DO NOTHING;\n"}}
 />
+
+
+## Prerequisites
+
+- [ ] [DCT devcontainer running](https://dct.sovereignsky.no)
+- [ ] [UIS provision-host container running](https://uis.sovereignsky.no)
+- [ ] [Local Kubernetes cluster running (Rancher Desktop)](https://www.rancher.com/products/rancher-desktop)
 
 
 ## Architecture
