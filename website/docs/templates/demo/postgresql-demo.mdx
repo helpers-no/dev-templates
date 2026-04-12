@@ -48,18 +48,22 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
 ## Architecture
 
-### Steady-state
+### Overview
 
 ```mermaid
 flowchart LR
+    dev(["Developer"])
+
     subgraph dct["DCT devcontainer"]
-        dev(["Developer"])
+        dev_inside(["Developer shell"])
     end
-    subgraph k8s["Local Kubernetes Cluster (Test environment)"]
+
+    subgraph uis_group["UIS container"]
+        uis["uis CLI"]
+    end
+
+    subgraph k8s["Local Kubernetes Cluster"]
         svc[("PostgreSQL<br/>demo_db")]
-    end
-    subgraph uis_group["UIS"]
-        uis["provision-host"]
     end
     consumers["Consumer templates"]
 
@@ -67,8 +71,6 @@ flowchart LR
     uis -->|deploys + seeds| svc
     consumers -.->|use this| svc
 ```
-
-### Configure flow
 
 ```mermaid
 sequenceDiagram

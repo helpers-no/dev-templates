@@ -10,7 +10,7 @@
 
 **Last Updated**: 2026-04-11
 
-**Completed**: 2026-04-12 — v1 shipped in commits `c20c402` and `2b77ed2`. A v2 redesign (three-diagram split) is tracked in the separate [INVESTIGATE-architecture-diagram-v2.md](../backlog/INVESTIGATE-architecture-diagram-v2.md) investigation, still in backlog.
+**Completed**: 2026-04-12 — v1 shipped in commits `c20c402` and `2b77ed2`. Superseded the same day by the v2 redesign — see [PLAN-architecture-diagram-v2.md](./PLAN-architecture-diagram-v2.md).
 
 **Investigation**: [INVESTIGATE-template-architecture-diagram.md](../backlog/INVESTIGATE-template-architecture-diagram.md) — read for the full decision record, rationale, and archetype diagram drafts.
 
