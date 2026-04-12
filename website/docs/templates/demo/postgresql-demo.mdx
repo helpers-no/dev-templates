@@ -28,7 +28,7 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 <TemplateEnvironment
   requires={null}
   params={{"app_name":"demo-app","database_name":"demo_db"}}
-  quickstart={{"title":"Verify the database","commands":["uis connect postgresql demo_db"],"run":"uis connect postgresql demo_db","note":"Inside psql, run: SELECT * FROM tasks;\nYou should see 3 seeded rows. Type \\q to exit.\n"}}
+  quickstart={{"title":"Verify the database","setup":[],"run":"uis connect postgresql demo_db","note":"Inside psql, run: SELECT * FROM tasks;\nYou should see 3 seeded rows. Type \\q to exit.\n"}}
   tools={[]}
   services={[{"id":"postgresql","name":"PostgreSQL","description":"Open-source relational database","docsUrl":"https://uis.sovereignsky.no/docs/services/databases/postgresql","website":"https://www.postgresql.org","exposePort":35432,"namespace":"default","helmChart":"bitnami/postgresql","database":"demo_db","generatedUser":"demo_app","initFilePath":"config/init-database.sql","transitiveRequires":[]}]}
   templateKind={"stack"}

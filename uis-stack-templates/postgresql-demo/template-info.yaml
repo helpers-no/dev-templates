@@ -8,8 +8,9 @@ category: DEMO
 install_type: stack
 abstract: >
   A minimal UIS template that deploys PostgreSQL and creates a sample
-  tasks table with seed data. Use this to verify UIS template deployment
-  end-to-end, or as a starting point for your own stack templates.
+  tasks table with seed data. Shows the full uis template flow from
+  registry to deployed, configured service. Use this to verify your
+  UIS setup or as a starting point for your own stack templates.
 tools: ""
 readme: README-postgresql-demo.md
 tags:
@@ -20,18 +21,12 @@ tags:
 logo: postgresql-demo-logo.svg
 website: ""
 docs: https://github.com/helpers-no/dev-templates/tree/main/uis-stack-templates/postgresql-demo
-summary: >
-  A minimal demonstration template that deploys PostgreSQL to the UIS cluster
-  and creates a sample database with a tasks table and seed data. Shows the
-  uis template flow from registry to deployed, configured service. Use it to
-  verify your UIS setup or as a starting point for your own stack templates.
 related:
   - python-basic-webserver-database
 
 quickstart:
   title: "Verify the database"
-  commands:
-    - uis connect postgresql demo_db
+  setup: []
   run: "uis connect postgresql demo_db"
   note: |
     Inside psql, run: SELECT * FROM tasks;
@@ -40,6 +35,14 @@ quickstart:
 params:
   app_name: "demo-app"
   database_name: "demo_db"
+
+prerequisites:
+  - text: "DCT devcontainer running"
+    url: "https://dct.sovereignsky.no"
+  - text: "UIS provision-host container running"
+    url: "https://uis.sovereignsky.no"
+  - text: "Local Kubernetes cluster running (Rancher Desktop)"
+    url: "https://www.rancher.com/products/rancher-desktop"
 
 provides:
   services:

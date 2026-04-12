@@ -5,9 +5,10 @@ description: Structured AI development with plans, phases, and validation
 category: WORKFLOW
 install_type: overlay
 abstract: >
-  Provides a complete AI-assisted development workflow with investigation
-  plans, phased implementation, and human-in-the-loop validation.
-  Includes CLAUDE.md, plan templates, and git safety rules.
+  A structured AI development workflow that guides AI coding assistants
+  through investigation, planning, and phased implementation. Includes
+  CLAUDE.md, 6 portable docs, plan templates, and git safety rules.
+  Designed for human-in-the-loop collaboration.
 tools: ""
 readme: README-plan-based-workflow.md
 tags:
@@ -19,9 +20,8 @@ tags:
 logo: plan-based-workflow-logo.svg
 website: ""
 docs: https://github.com/helpers-no/dev-templates/tree/main/ai-templates/plan-based-workflow
-summary: >
-  A structured AI development workflow that guides AI coding assistants
-  through investigation, planning, and phased implementation. Includes
-  CLAUDE.md, 6 portable docs, plan templates, and git safety rules.
-  Designed for human-in-the-loop collaboration.
 related: []
+
+prerequisites:
+  - text: "DCT devcontainer running"
+    url: "https://dct.sovereignsky.no"
