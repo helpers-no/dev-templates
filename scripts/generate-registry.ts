@@ -80,8 +80,9 @@ interface TemplateInfoYaml {
   readme: string;
   tags: string[];
   logo: string;
-  website: string;
-  docs: string;
+  maintainers?: string[];
+  links?: Array<{url: string; title?: string; icon?: string; type?: string}>;
+  prerequisites?: Array<{text: string; url?: string}>;
   related: string[];
   params?: Record<string, string>;
   requires?: Array<{
@@ -525,7 +526,15 @@ function validateTemplate(
   if (!tmpl.readme) fail(`${file}: missing readme`);
   if (!Array.isArray(tmpl.tags)) fail(`${file}: tags must be a list`);
   if (!tmpl.logo) fail(`${file}: missing logo`);
-  if (!tmpl.docs) fail(`${file}: missing docs`);
+  if (!Array.isArray(tmpl.links) || tmpl.links.length === 0) {
+    fail(`${file}: links must be a non-empty array (at least a source code link)`);
+  }
+  if (!Array.isArray(tmpl.maintainers) || tmpl.maintainers.length === 0) {
+    fail(`${file}: maintainers must be a non-empty array (at least one GitHub username)`);
+  }
+  if (!Array.isArray(tmpl.prerequisites) || tmpl.prerequisites.length === 0) {
+    fail(`${file}: prerequisites must be a non-empty array (at least "DCT devcontainer running")`);
+  }
 }
 
 // --- Main ---
@@ -610,8 +619,9 @@ for (const catFile of categoryFiles) {
       readme: raw.readme,
       tags: Array.isArray(raw.tags) ? raw.tags : [],
       logo: raw.logo,
-      website: raw.website || '',
-      docs: raw.docs,
+      maintainers: Array.isArray(raw.maintainers) ? raw.maintainers : [],
+      links: Array.isArray(raw.links) ? raw.links : [],
+      prerequisites: Array.isArray(raw.prerequisites) ? raw.prerequisites : [],
       related: Array.isArray(raw.related) ? raw.related : [],
       context,
     };

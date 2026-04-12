@@ -19,8 +19,12 @@ tags:
   - demo
   - getting-started
 logo: postgresql-demo-logo.svg
-website: ""
-docs: https://github.com/helpers-no/dev-templates/tree/main/uis-stack-templates/postgresql-demo
+maintainers:
+  - terchris
+links:
+  - url: https://github.com/helpers-no/dev-templates/tree/main/uis-stack-templates/postgresql-demo
+    title: Source code
+    icon: github
 related:
   - python-basic-webserver-database
 

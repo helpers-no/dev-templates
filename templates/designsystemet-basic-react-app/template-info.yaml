@@ -19,8 +19,12 @@ tags:
   - digdir
   - webapp
 logo: designsystemet-basic-react-app-logo.svg
-website: ""
-docs: https://github.com/helpers-no/dev-templates/tree/main/templates/designsystemet-basic-react-app
+maintainers:
+  - terchris
+links:
+  - url: https://github.com/helpers-no/dev-templates/tree/main/templates/designsystemet-basic-react-app
+    title: Source code
+    icon: github
 related:
   - typescript-basic-webserver
 

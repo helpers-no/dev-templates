@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-12T16:33:40.048Z",
+  "generated": "2026-04-12T16:51:43.165Z",
   "dctDocsBase": "https://dct.sovereignsky.no",
   "uisDocsBase": "https://uis.sovereignsky.no",
   "categories": [
@@ -74,8 +74,22 @@
         "devcontainer"
       ],
       "logo": "plan-based-workflow-logo.svg",
-      "website": "",
-      "docs": "https://github.com/helpers-no/dev-templates/tree/main/ai-templates/plan-based-workflow",
+      "maintainers": [
+        "terchris"
+      ],
+      "links": [
+        {
+          "url": "https://github.com/helpers-no/dev-templates/tree/main/ai-templates/plan-based-workflow",
+          "title": "Source code",
+          "icon": "github"
+        }
+      ],
+      "prerequisites": [
+        {
+          "text": "DCT devcontainer running",
+          "url": "https://dct.sovereignsky.no"
+        }
+      ],
       "related": [],
       "context": "dct",
       "templateKind": "app",
@@ -104,8 +118,22 @@
         "rest"
       ],
       "logo": "csharp-basic-webserver-logo.svg",
-      "website": "",
-      "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/csharp-basic-webserver",
+      "maintainers": [
+        "terchris"
+      ],
+      "links": [
+        {
+          "url": "https://github.com/helpers-no/dev-templates/tree/main/templates/csharp-basic-webserver",
+          "title": "Source code",
+          "icon": "github"
+        }
+      ],
+      "prerequisites": [
+        {
+          "text": "DCT devcontainer running",
+          "url": "https://dct.sovereignsky.no"
+        }
+      ],
       "related": [
         "java-basic-webserver",
         "golang-basic-webserver"
@@ -157,8 +185,22 @@
         "webapp"
       ],
       "logo": "designsystemet-basic-react-app-logo.svg",
-      "website": "",
-      "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/designsystemet-basic-react-app",
+      "maintainers": [
+        "terchris"
+      ],
+      "links": [
+        {
+          "url": "https://github.com/helpers-no/dev-templates/tree/main/templates/designsystemet-basic-react-app",
+          "title": "Source code",
+          "icon": "github"
+        }
+      ],
+      "prerequisites": [
+        {
+          "text": "DCT devcontainer running",
+          "url": "https://dct.sovereignsky.no"
+        }
+      ],
       "related": [
         "typescript-basic-webserver"
       ],
@@ -209,8 +251,22 @@
         "rest"
       ],
       "logo": "golang-basic-webserver-logo.svg",
-      "website": "",
-      "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/golang-basic-webserver",
+      "maintainers": [
+        "terchris"
+      ],
+      "links": [
+        {
+          "url": "https://github.com/helpers-no/dev-templates/tree/main/templates/golang-basic-webserver",
+          "title": "Source code",
+          "icon": "github"
+        }
+      ],
+      "prerequisites": [
+        {
+          "text": "DCT devcontainer running",
+          "url": "https://dct.sovereignsky.no"
+        }
+      ],
       "related": [
         "typescript-basic-webserver",
         "java-basic-webserver"
@@ -261,8 +317,22 @@
         "rest"
       ],
       "logo": "java-basic-webserver-logo.svg",
-      "website": "",
-      "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/java-basic-webserver",
+      "maintainers": [
+        "terchris"
+      ],
+      "links": [
+        {
+          "url": "https://github.com/helpers-no/dev-templates/tree/main/templates/java-basic-webserver",
+          "title": "Source code",
+          "icon": "github"
+        }
+      ],
+      "prerequisites": [
+        {
+          "text": "DCT devcontainer running",
+          "url": "https://dct.sovereignsky.no"
+        }
+      ],
       "related": [
         "golang-basic-webserver",
         "csharp-basic-webserver"
@@ -312,8 +382,22 @@
         "rest"
       ],
       "logo": "php-basic-webserver-logo.svg",
-      "website": "",
-      "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/php-basic-webserver",
+      "maintainers": [
+        "terchris"
+      ],
+      "links": [
+        {
+          "url": "https://github.com/helpers-no/dev-templates/tree/main/templates/php-basic-webserver",
+          "title": "Source code",
+          "icon": "github"
+        }
+      ],
+      "prerequisites": [
+        {
+          "text": "DCT devcontainer running",
+          "url": "https://dct.sovereignsky.no"
+        }
+      ],
       "related": [
         "python-basic-webserver",
         "typescript-basic-webserver"
@@ -364,8 +448,22 @@
         "rest"
       ],
       "logo": "python-basic-webserver-logo.svg",
-      "website": "",
-      "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver",
+      "maintainers": [
+        "terchris"
+      ],
+      "links": [
+        {
+          "url": "https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver",
+          "title": "Source code",
+          "icon": "github"
+        }
+      ],
+      "prerequisites": [
+        {
+          "text": "DCT devcontainer running",
+          "url": "https://dct.sovereignsky.no"
+        }
+      ],
       "related": [
         "php-basic-webserver",
         "typescript-basic-webserver"
@@ -420,8 +518,30 @@
         "requires"
       ],
       "logo": "python-basic-webserver-database-logo.svg",
-      "website": "",
-      "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver-database",
+      "maintainers": [
+        "terchris"
+      ],
+      "links": [
+        {
+          "url": "https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver-database",
+          "title": "Source code",
+          "icon": "github"
+        }
+      ],
+      "prerequisites": [
+        {
+          "text": "DCT devcontainer running",
+          "url": "https://dct.sovereignsky.no"
+        },
+        {
+          "text": "UIS provision-host container running",
+          "url": "https://uis.sovereignsky.no"
+        },
+        {
+          "text": "Local Kubernetes cluster running (Rancher Desktop)",
+          "url": "https://www.rancher.com/products/rancher-desktop"
+        }
+      ],
       "related": [
         "python-basic-webserver",
         "postgresql-demo"
@@ -507,8 +627,22 @@
         "rest"
       ],
       "logo": "typescript-basic-webserver-logo.svg",
-      "website": "",
-      "docs": "https://github.com/helpers-no/dev-templates/tree/main/templates/typescript-basic-webserver",
+      "maintainers": [
+        "terchris"
+      ],
+      "links": [
+        {
+          "url": "https://github.com/helpers-no/dev-templates/tree/main/templates/typescript-basic-webserver",
+          "title": "Source code",
+          "icon": "github"
+        }
+      ],
+      "prerequisites": [
+        {
+          "text": "DCT devcontainer running",
+          "url": "https://dct.sovereignsky.no"
+        }
+      ],
       "related": [
         "designsystemet-basic-react-app",
         "python-basic-webserver"
@@ -560,8 +694,30 @@
         "getting-started"
       ],
       "logo": "postgresql-demo-logo.svg",
-      "website": "",
-      "docs": "https://github.com/helpers-no/dev-templates/tree/main/uis-stack-templates/postgresql-demo",
+      "maintainers": [
+        "terchris"
+      ],
+      "links": [
+        {
+          "url": "https://github.com/helpers-no/dev-templates/tree/main/uis-stack-templates/postgresql-demo",
+          "title": "Source code",
+          "icon": "github"
+        }
+      ],
+      "prerequisites": [
+        {
+          "text": "DCT devcontainer running",
+          "url": "https://dct.sovereignsky.no"
+        },
+        {
+          "text": "UIS provision-host container running",
+          "url": "https://uis.sovereignsky.no"
+        },
+        {
+          "text": "Local Kubernetes cluster running (Rancher Desktop)",
+          "url": "https://www.rancher.com/products/rancher-desktop"
+        }
+      ],
       "related": [
         "python-basic-webserver-database"
       ],

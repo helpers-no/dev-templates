@@ -89,6 +89,37 @@
   text-decoration: underline;
 }
 
+.maintainers {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.maintainersLabel {
+  font-weight: 600;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.maintainer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+
+.maintainer:hover {
+  text-decoration: underline;
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
 .tags {
   display: flex;
   flex-wrap: wrap;

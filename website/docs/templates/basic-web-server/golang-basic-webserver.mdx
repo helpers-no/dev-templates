@@ -17,11 +17,14 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   version="1.0.0"
   description="Go web server using net/http with health endpoint and Docker support"
   install="dev-template golang-basic-webserver"
-  website=""
-  docs="https://github.com/helpers-no/dev-templates/tree/main/templates/golang-basic-webserver"
+  links={[{"url":"https://github.com/helpers-no/dev-templates/tree/main/templates/golang-basic-webserver","title":"Source code","icon":"github"}]}
+  maintainers={["terchris"]}
   tags={["golang","webserver","api","rest"]}
   tools="dev-golang"
 />
+
+
+A minimal web server using Go's standard net/http package with a health check endpoint. Includes Docker multi-stage build, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.
 
 import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
@@ -34,6 +37,11 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
   templateKind={"app"}
   initFiles={{}}
 />
+
+
+## Prerequisites
+
+- [ ] [DCT devcontainer running](https://dct.sovereignsky.no)
 
 
 ## Architecture

@@ -17,8 +17,12 @@ tags:
   - api
   - rest
 logo: typescript-basic-webserver-logo.svg
-website: ""
-docs: https://github.com/helpers-no/dev-templates/tree/main/templates/typescript-basic-webserver
+maintainers:
+  - terchris
+links:
+  - url: https://github.com/helpers-no/dev-templates/tree/main/templates/typescript-basic-webserver
+    title: Source code
+    icon: github
 related:
   - designsystemet-basic-react-app
   - python-basic-webserver
