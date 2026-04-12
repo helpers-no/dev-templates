@@ -294,16 +294,22 @@ export function buildSequence(entry: TemplateEntry): string | null {
   lines.push('    participant DCT as DCT devcontainer');
   lines.push('    participant UIS as UIS provision-host');
   lines.push('    participant K8s as Local Kubernetes cluster');
+  // Service itself is a participant so CREATE database/user/init-SQL arrows
+  // land on the actual target (the database) rather than being conflated
+  // with K8s cluster operations. Label uses the service name, alias uses a
+  // short `DB` so arrows stay readable.
+  lines.push(`    participant DB as ${svc.name}`);
 
   const port = svc.exposePort ?? 35432;
-  const svcLabel = svc.database ? `${svc.name} (${svc.database})` : svc.name;
+  const dbLabel = svc.database ? `database ${svc.database} + user` : 'database + user';
 
   if (entry.install_type === 'stack') {
     lines.push(`    Dev->>DCT: uis template install ${entry.id}`);
     lines.push('    DCT->>UIS: install stack');
-    lines.push(`    UIS->>K8s: create ${svcLabel}`);
+    lines.push(`    UIS->>K8s: deploy ${svc.name}`);
+    lines.push(`    UIS->>DB: create ${dbLabel}`);
     if (svc.initFilePath) {
-      lines.push('    UIS->>K8s: run init-*.sql seed files');
+      lines.push('    UIS->>DB: run init-*.sql seed files');
     }
     lines.push(`    UIS->>UIS: kubectl port-forward ${port}`);
     lines.push('    UIS-->>DCT: return connection JSON');
@@ -322,15 +328,27 @@ export function buildSequence(entry: TemplateEntry): string | null {
   }
   lines.push('    Dev->>DCT: dev-template configure');
   lines.push('    DCT->>UIS: request provisioning');
+  // Conditional deploy: for app templates, the service is a dependency —
+  // UIS deploys it only if it is not already running in the cluster.
+  lines.push(`    alt ${svc.name} not deployed`);
+  lines.push(`        UIS->>K8s: deploy ${svc.name}`);
+  lines.push('    end');
   lines.push('    UIS->>K8s: create namespace');
-  lines.push(`    UIS->>K8s: create ${svcLabel}`);
+  lines.push(`    UIS->>DB: create ${dbLabel}`);
+  if (svc.initFilePath) {
+    lines.push('    UIS->>DB: run init-*.sql seed files');
+  }
   if (entry.manifest) {
     lines.push(`    UIS->>K8s: create K8s Secret (${entry.manifest.secretName})`);
   }
   lines.push(`    UIS->>UIS: kubectl port-forward ${port}`);
   lines.push(`    UIS-->>DCT: write .env (host.docker.internal:${port})`);
   lines.push(`    Dev->>DCT: ${runCmd}`);
-  lines.push(`    DCT->>K8s: connect via host.docker.internal:${port}`);
+  // Runtime connection: DCT opens a socket to UIS's host-facing tunnel;
+  // UIS forwards it to the database. Matches the flowchart's
+  // `app -->|host.docker.internal| uis` edge.
+  lines.push(`    DCT->>UIS: connect via host.docker.internal:${port}`);
+  lines.push('    UIS->>DB: forward connection');
 
   return lines.join('\n');
 }

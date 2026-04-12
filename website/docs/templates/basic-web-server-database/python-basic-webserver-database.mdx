@@ -89,15 +89,21 @@ sequenceDiagram
     participant DCT as DCT devcontainer
     participant UIS as UIS provision-host
     participant K8s as Local Kubernetes cluster
+    participant DB as PostgreSQL
     Dev->>DCT: dev-template configure
     DCT->>UIS: request provisioning
+    alt PostgreSQL not deployed
+        UIS->>K8s: deploy PostgreSQL
+    end
     UIS->>K8s: create namespace
-    UIS->>K8s: create PostgreSQL (my_app_db)
+    UIS->>DB: create database my_app_db + user
+    UIS->>DB: run init-*.sql seed files
     UIS->>K8s: create K8s Secret (my-app-db)
     UIS->>UIS: kubectl port-forward 35432
     UIS-->>DCT: write .env (host.docker.internal:35432)
     Dev->>DCT: uv run python app/app.py
-    DCT->>K8s: connect via host.docker.internal:35432
+    DCT->>UIS: connect via host.docker.internal:35432
+    UIS->>DB: forward connection
 ```
 
 A minimal Flask web server that connects to PostgreSQL and reads from a `tasks` table. The full producer/consumer flow:
