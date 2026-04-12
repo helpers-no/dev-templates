@@ -66,10 +66,12 @@ sequenceDiagram
     participant DCT as DCT devcontainer
     participant UIS as UIS provision-host
     participant K8s as Local Kubernetes cluster
+    participant DB as PostgreSQL
     Dev->>DCT: uis template install postgresql-demo
     DCT->>UIS: install stack
-    UIS->>K8s: create PostgreSQL (demo_db)
-    UIS->>K8s: run init-*.sql seed files
+    UIS->>K8s: deploy PostgreSQL
+    UIS->>DB: create database demo_db + user
+    UIS->>DB: run init-*.sql seed files
     UIS->>UIS: kubectl port-forward 35432
     UIS-->>DCT: return connection JSON
 ```

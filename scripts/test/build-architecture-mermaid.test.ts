@@ -162,13 +162,18 @@ test('E1: app + services + manifest emits both flowchart and sequence', () => {
   assert.match(mdx, /uis -->\|writes\| env/);
 
   // Sequence content
+  assert.match(mdx, /participant DB as PostgreSQL/);
   assert.match(mdx, /Dev->>DCT: dev-template configure/);
-  assert.match(mdx, /UIS->>K8s: create PostgreSQL \(my_app_db\)/);
+  assert.match(mdx, /alt PostgreSQL not deployed/);
+  assert.match(mdx, /UIS->>K8s: deploy PostgreSQL/);
+  assert.match(mdx, /UIS->>DB: create database my_app_db \+ user/);
+  assert.match(mdx, /UIS->>DB: run init-\*\.sql seed files/);
   assert.match(mdx, /UIS->>K8s: create K8s Secret \(my-app-db\)/);
   assert.match(mdx, /UIS->>UIS: kubectl port-forward 35432/);
   assert.match(mdx, /UIS-->>DCT: write \.env \(host\.docker\.internal:35432\)/);
   assert.match(mdx, /Dev->>DCT: uv run python app\/app\.py/);
-  assert.match(mdx, /DCT->>K8s: connect via host\.docker\.internal:35432/);
+  assert.match(mdx, /DCT->>UIS: connect via host\.docker\.internal:35432/);
+  assert.match(mdx, /UIS->>DB: forward connection/);
 
   // Must NOT contain stack-template install command
   assert.doesNotMatch(mdx, /uis template install/, 'E1 should not show uis template install');
@@ -246,10 +251,12 @@ test('E3: stack template emits flowchart with consumers + uis install sequence',
 
   // Sequence — uses entry.id in the install command, not dev-template configure
   assert.match(mdx, /```mermaid\nsequenceDiagram/);
+  assert.match(mdx, /participant DB as PostgreSQL/);
   assert.match(mdx, /Dev->>DCT: uis template install postgresql-demo/);
   assert.match(mdx, /DCT->>UIS: install stack/);
-  assert.match(mdx, /UIS->>K8s: create PostgreSQL \(demo_db\)/);
-  assert.match(mdx, /UIS->>K8s: run init-\*\.sql seed files/);
+  assert.match(mdx, /UIS->>K8s: deploy PostgreSQL/);
+  assert.match(mdx, /UIS->>DB: create database demo_db \+ user/);
+  assert.match(mdx, /UIS->>DB: run init-\*\.sql seed files/);
   assert.match(mdx, /UIS-->>DCT: return connection JSON/);
   assert.doesNotMatch(mdx, /dev-template configure/, 'stacks do not use dev-template configure');
 });
