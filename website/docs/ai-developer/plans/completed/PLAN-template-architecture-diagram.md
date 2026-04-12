@@ -4,11 +4,13 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Backlog
+## Status: Completed
 
 **Goal**: Render an auto-generated `## Architecture` section on every non-overlay template documentation page, containing a Mermaid flowchart (steady-state) and a Mermaid sequence diagram (configure-time flow), derived from existing template registry data.
 
 **Last Updated**: 2026-04-11
+
+**Completed**: 2026-04-12 — v1 shipped in commits `c20c402` and `2b77ed2`. A v2 redesign (three-diagram split) is tracked in the separate [INVESTIGATE-architecture-diagram-v2.md](./INVESTIGATE-architecture-diagram-v2.md) investigation, still in backlog.
 
 **Investigation**: [INVESTIGATE-template-architecture-diagram.md](./INVESTIGATE-template-architecture-diagram.md) — read for the full decision record, rationale, and archetype diagram drafts.
 

@@ -4,11 +4,13 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Backlog
+## Status: Completed
 
 **Goal**: Clean up `template-info.yaml` field redundancy, align with Backstage patterns, and enable yaml-driven template documentation pages. Net result: remove dead fields, add new structured fields, render more content from yaml instead of README prose.
 
 **Last Updated**: 2026-04-12
+
+**Completed**: 2026-04-12 — all 7 phases shipped in commits `b5d9c14` (phases 1-2) and `1cc0333` (phases 3-7).
 
 **Investigation**: [INVESTIGATE-template-info-schema.md](./INVESTIGATE-template-info-schema.md) — full decision record, Backstage comparison, DCT field audit, ODP positioning.
 
