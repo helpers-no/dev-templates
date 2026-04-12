@@ -73,13 +73,20 @@ Rendered by the React component at `website/src/components/TemplateEnvironment/i
 
 ### Architecture section (`## Architecture`)
 
-Added by `scripts/lib/build-architecture-mermaid.ts`. Composes the complete `## Architecture` MDX block — one steady-state flowchart plus (where applicable) a configure-time sequence diagram — during registry generation. The output is stored as a single `architectureMdx` string on each registry entry, and `scripts/generate-docs-markdown.sh` pastes it verbatim into the MDX page with a one-line `jq` read.
+Added by `scripts/lib/build-architecture-mermaid.ts`. Composes the complete `## Architecture` MDX block — **two diagrams per non-stack template**, each with a flowchart + a paired sequence diagram — during registry generation. The output is stored as a single `architectureMdx` string on each registry entry, and `scripts/generate-docs-markdown.sh` pastes it verbatim into the MDX page with a one-line `jq` read.
+
+**The two diagrams:**
+
+- **Local development** (`### Local development`) — How a developer sets up and runs the template locally. Developer runs `dev-template configure`, UIS provisions database + secret + port-forward, app connects via `host.docker.internal`, browser shows the result. Paired with a configure-flow sequence diagram.
+- **Deployment** (`### Deployment`) — What happens when the developer pushes code. GitHub Actions builds the image, ArgoCD deploys the pod, Traefik routes traffic to `<app>.localhost`. Paired with a deploy-flow sequence diagram.
+
+An **ArgoCD setup diagram** is documented in `plans/backlog/mermaid-setup-argocd.md` as a design reference but is currently SUPPRESSED until UIS ships the registration command. When UIS adds the command, add it as a third `### ArgoCD setup` sub-section.
 
 **Four archetypes are handled:**
 
-- **App + services + manifest** (e.g. `python-basic-webserver-database`) — full flowchart (DCT + K8s + UIS + GitHub + ArgoCD) and configure-flow sequence diagram
-- **App + manifest, no services** (e.g. `python-basic-webserver`) — flowchart only; ArgoCD + pod chain rendered because a manifest exists, but no UIS or service nodes
-- **Stack template** (e.g. `postgresql-demo`) — minimal stack-shaped flowchart with a generic `consumers` node and a `uis template install <id>` sequence
+- **App + services + manifest** (e.g. `python-basic-webserver-database`) — both diagrams rendered in full
+- **App + manifest, no services** (e.g. `python-basic-webserver`) — **Local development skipped** (would be a trivial dev → app → browser diagram); only `### Deployment` rendered
+- **Stack template** (e.g. `postgresql-demo`) — single `### Overview` sub-section (stacks don't have separate local-dev/deploy stories)
 - **Overlay template** (e.g. `plan-based-workflow`) — entire section suppressed; `architectureMdx` is `null`
 
 **To change the diagrams**, edit `scripts/lib/build-architecture-mermaid.ts` and its unit tests at `scripts/test/build-architecture-mermaid.test.ts`, then re-run:
@@ -89,9 +96,9 @@ npx tsx scripts/generate-registry.ts
 bash scripts/generate-docs-markdown.sh --force
 ```
 
-Visual style matches the canonical diagrams in `website/docs/architecture.md` — plain text labels, no emojis, default Mermaid theming. The subgraph label `"Local Kubernetes Cluster (Test environment)"` is deliberately identical to the canonical diagram for consistency.
+Visual style matches the canonical diagrams in `website/docs/architecture.md` — plain text labels, no emojis, default Mermaid theming. **Design rule**: every edge source is an explicit node (never a subgraph id), to avoid the Mermaid rendering bug where subgraph-id edge sources could silently drop subgraphs.
 
-**v1 limitations**: multi-service templates throw at build time (only single-service templates are supported for now); the stack "consumer" node is a hardcoded generic label rather than being derived from cross-template data.
+**Current limitations**: multi-service templates throw at build time (only single-service templates are supported for now); the stack "consumer" node is a hardcoded generic label rather than being derived from cross-template data.
 
 ---
 

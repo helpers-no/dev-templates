@@ -50,48 +50,40 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
 ## Architecture
 
-### Steady-state
+### Local development
 
 ```mermaid
 flowchart LR
+    dev(["Developer"])
+    browser["Web Browser"]
+
     subgraph dct["DCT devcontainer"]
-        dev(["Developer"])
-        dev_python["dev-python"]
         app["my-app"]
         env[".env"]
-    end
-    subgraph k8s["Local Kubernetes Cluster (Test environment)"]
-        svc[("PostgreSQL<br/>my_app_db")]
-        sec["K8s Secret<br/>my-app-db"]
-        argo["ArgoCD"]
-        pod["my-app pod"]
-    end
-    subgraph uis_group["UIS"]
-        uis["provision-host"]
-    end
-    subgraph gh["GitHub"]
-        repo["repo"]
-        actions["GitHub Actions"]
-        ghcr["Container Registry"]
+        tmpl["template-info.yaml"]
+        cfg["dev-template configure"]
     end
 
-    dev_python --> app
-    env --> app
-    dev -->|dev-template configure| uis
+    subgraph uis_group["UIS container"]
+        uis["uis CLI"]
+    end
+
+    subgraph k8s["Local Kubernetes Cluster"]
+        svc[("PostgreSQL<br/>my_app_db")]
+        sec["K8s Secret<br/>my-app-db"]
+    end
+
+    dev -->|runs| cfg
+    dev -->|uv run python app/app.py| app
+    tmpl -->|read by| cfg
+    cfg -->|sends config to| uis
     uis -->|creates + port-forward| svc
     uis -->|creates| sec
     uis -->|writes| env
+    env --> app
     app -->|host.docker.internal:35432| uis
-    dev -->|git push| repo
-    repo -->|trigger| actions
-    actions -->|push image| ghcr
-    argo -->|monitors| repo
-    ghcr -->|image pull| argo
-    argo -->|deploys| pod
-    pod -->|default.svc.cluster.local:5432| svc
+    app -.->|port 3000| browser
 ```
-
-### Configure flow
 
 ```mermaid
 sequenceDiagram
@@ -114,6 +106,69 @@ sequenceDiagram
     Dev->>DCT: uv run python app/app.py
     DCT->>UIS: connect via host.docker.internal:35432
     UIS->>DB: forward connection
+    Note over Dev,DCT: App now accessible at localhost:3000 via VS Code port forwarding
+```
+
+### Deployment
+
+```mermaid
+flowchart LR
+    dev(["Developer"])
+    browser["Web Browser"]
+
+    subgraph dct["DCT devcontainer"]
+        src["source code"]
+    end
+
+    subgraph gh["GitHub"]
+        repo["repo"]
+        actions["GitHub Actions"]
+        ghcr["Container Registry"]
+    end
+
+    subgraph k8s["Local Kubernetes Cluster"]
+        traefik["Traefik Ingress"]
+        argo["ArgoCD"]
+        pod["my-app pod"]
+        sec["K8s Secret<br/>my-app-db"]
+        svc[("PostgreSQL<br/>my_app_db")]
+    end
+
+    dev -->|git push| src
+    src -->|push| repo
+    repo -->|trigger| actions
+    actions -->|build + push image| ghcr
+    argo -->|monitors| repo
+    ghcr -->|image pull| argo
+    argo -->|deploys| pod
+    sec -->|DATABASE_URL| pod
+    pod -->|default.svc.cluster.local:5432| svc
+    traefik -->|routes to| pod
+    browser -->|my-app.localhost| traefik
+    dev --> browser
+```
+
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant DCT as DCT devcontainer
+    participant GH as GitHub
+    participant Actions as GitHub Actions
+    participant GHCR as Container Registry
+    participant Argo as ArgoCD
+    participant K8s as Local Kubernetes cluster
+    participant DB as PostgreSQL
+    Dev->>DCT: git push
+    DCT->>GH: push to repo
+    GH->>Actions: trigger workflow
+    Actions->>Actions: build container image
+    Actions->>GHCR: push image
+    Argo->>GH: detects manifest change
+    Argo->>GHCR: pull image
+    Argo->>K8s: deploy my-app pod
+    K8s->>K8s: mount K8s Secret (DATABASE_URL)
+    K8s->>DB: pod connects via default.svc.cluster.local:5432
+    Note over Dev,K8s: App now accessible at my-app.localhost via Traefik
 ```
 
 A minimal Flask web server that connects to PostgreSQL and reads from a `tasks` table. The full producer/consumer flow:

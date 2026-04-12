@@ -4,18 +4,20 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: In Progress
+## Status: Completed
+
+**Completed**: 2026-04-12 — downstream plan [PLAN-architecture-diagram-v2.md](./PLAN-architecture-diagram-v2.md) shipped.
 
 **Goal**: Redesign the per-template architecture diagrams from a single monolithic flowchart into three focused diagrams (local development, ArgoCD setup, CI/CD deployment), each paired with a sequence diagram. Determine how to auto-generate all six diagrams from existing template-info.yaml and registry data, and how to place them on the Docusaurus template page.
 
 **Last Updated**: 2026-04-12
 
-**Predecessor**: [INVESTIGATE-template-architecture-diagram.md](./INVESTIGATE-template-architecture-diagram.md) — the original investigation designed around a single diagram. Superseded by this investigation after Phase 4 visual review revealed the monolithic diagram was too noisy and conflated three distinct workflows.
+**Predecessor**: [INVESTIGATE-template-architecture-diagram.md](../backlog/INVESTIGATE-template-architecture-diagram.md) — the original investigation designed around a single diagram. Superseded by this investigation after Phase 4 visual review revealed the monolithic diagram was too noisy and conflated three distinct workflows.
 
 **Working drafts**: Hand-edited Mermaid files used during the visual review:
-- [mermaid-steady-state2.md](./mermaid-steady-state2.md) — local development flowchart + configure sequence (approved)
-- [mermaid-deploy.md](./mermaid-deploy.md) — CI/CD deployment flowchart + deploy sequence (awaiting review)
-- [mermaid-setup-argocd.md](./mermaid-setup-argocd.md) — ArgoCD registration flowchart + setup sequence (draft — refine when UIS implements the command)
+- [mermaid-steady-state2.md](../backlog/mermaid-steady-state2.md) — local development flowchart + configure sequence (approved)
+- [mermaid-deploy.md](../backlog/mermaid-deploy.md) — CI/CD deployment flowchart + deploy sequence (awaiting review)
+- [mermaid-setup-argocd.md](../backlog/mermaid-setup-argocd.md) — ArgoCD registration flowchart + setup sequence (draft — refine when UIS implements the command)
 
 ---
 
@@ -47,7 +49,7 @@ The three-diagram split emerged from iterating on these issues during the visual
 
 **Paired sequence diagram**: Configure flow (approved — shows the `alt PostgreSQL not deployed` conditional, init SQL, port-forward, .env write, and runtime connection chain)
 
-**Approved draft**: [mermaid-steady-state2.md](./mermaid-steady-state2.md)
+**Approved draft**: [mermaid-steady-state2.md](../backlog/mermaid-steady-state2.md)
 
 ### 2. ArgoCD Registration (Planned)
 
@@ -61,7 +63,7 @@ The three-diagram split emerged from iterating on these issues during the visual
 
 **Status**: Draft. The UIS command (`uis argocd register` or equivalent) does not exist yet. The diagram documents the planned flow and will be refined when implementing. Until then, this diagram should either be rendered with dashed styling / a "planned" annotation, or suppressed entirely.
 
-**Draft**: [mermaid-setup-argocd.md](./mermaid-setup-argocd.md)
+**Draft**: [mermaid-setup-argocd.md](../backlog/mermaid-setup-argocd.md)
 
 ### 3. CI/CD Deployment
 
@@ -73,7 +75,7 @@ The three-diagram split emerged from iterating on these issues during the visual
 
 **Paired sequence diagram**: Deploy flow (awaiting review)
 
-**Draft**: [mermaid-deploy.md](./mermaid-deploy.md)
+**Draft**: [mermaid-deploy.md](../backlog/mermaid-deploy.md)
 
 ---
 

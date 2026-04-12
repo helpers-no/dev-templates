@@ -46,32 +46,59 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
 ## Architecture
 
-### Steady-state
+### Deployment
 
 ```mermaid
 flowchart LR
+    dev(["Developer"])
+    browser["Web Browser"]
+
     subgraph dct["DCT devcontainer"]
-        dev(["Developer"])
-        dev_golang["dev-golang"]
-        app["my-app"]
+        src["source code"]
     end
-    subgraph k8s["Local Kubernetes Cluster (Test environment)"]
-        argo["ArgoCD"]
-        pod["my-app pod"]
-    end
+
     subgraph gh["GitHub"]
         repo["repo"]
         actions["GitHub Actions"]
         ghcr["Container Registry"]
     end
 
-    dev_golang --> app
-    dev -->|git push| repo
+    subgraph k8s["Local Kubernetes Cluster"]
+        traefik["Traefik Ingress"]
+        argo["ArgoCD"]
+        pod["my-app pod"]
+    end
+
+    dev -->|git push| src
+    src -->|push| repo
     repo -->|trigger| actions
-    actions -->|push image| ghcr
+    actions -->|build + push image| ghcr
     argo -->|monitors| repo
     ghcr -->|image pull| argo
     argo -->|deploys| pod
+    traefik -->|routes to| pod
+    browser -->|my-app.localhost| traefik
+    dev --> browser
+```
+
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant DCT as DCT devcontainer
+    participant GH as GitHub
+    participant Actions as GitHub Actions
+    participant GHCR as Container Registry
+    participant Argo as ArgoCD
+    participant K8s as Local Kubernetes cluster
+    Dev->>DCT: git push
+    DCT->>GH: push to repo
+    GH->>Actions: trigger workflow
+    Actions->>Actions: build container image
+    Actions->>GHCR: push image
+    Argo->>GH: detects manifest change
+    Argo->>GHCR: pull image
+    Argo->>K8s: deploy my-app pod
+    Note over Dev,K8s: App now accessible at my-app.localhost via Traefik
 ```
 
 A minimal web server using Go's standard `net/http` package. Displays "Hello World" with current time and date, and provides health check endpoints.
