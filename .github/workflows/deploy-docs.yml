@@ -44,9 +44,6 @@ jobs:
       - name: Validate template metadata
         run: bash scripts/validate-metadata.sh
 
-      - name: Validate documentation
-        run: bash scripts/validate-docs.sh
-
       - name: Generate template-registry.json
         run: npx tsx scripts/generate-registry.ts
 
@@ -55,6 +52,9 @@ jobs:
 
       - name: Generate plan indexes
         run: bash scripts/generate-plan-indexes.sh
+
+      - name: Validate documentation
+        run: bash scripts/validate-docs.sh
 
       - name: Build website
         working-directory: website
