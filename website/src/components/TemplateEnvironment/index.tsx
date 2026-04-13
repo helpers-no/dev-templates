@@ -279,14 +279,15 @@ export default function TemplateEnvironment({
   const showConfigure = !!requires && requires.length > 0;
   const showRun = !!quickstart;
 
-  // Numbering: ① ② ③ across whichever sections are present.
-  const sectionsShown = [hasWhatGetsSetUp, showConfigure, showRun].filter(Boolean).length;
+  // Numbering: ① ② ③ ④ across whichever sections are present.
+  const setupVisible = showRun && (quickstart?.setup?.length ?? 0) > 0;
+  const sectionsShown = [hasWhatGetsSetUp, showConfigure, setupVisible, showRun].filter(Boolean).length;
   const showNumbers = sectionsShown > 1;
   let n = 0;
   const nextNumber = () => {
     if (!showNumbers) return null;
     n += 1;
-    const symbols = ['①', '②', '③'];
+    const symbols = ['①', '②', '③', '④'];
     return <span className={styles.number}>{symbols[n - 1]}</span>;
   };
 
