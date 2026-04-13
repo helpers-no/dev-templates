@@ -10,7 +10,7 @@
 
 **Goal**: Update all contributor documentation to reflect the unified template system.
 
-**Investigation**: [INVESTIGATE-update-contributor-docs.md](../backlog/INVESTIGATE-update-contributor-docs.md)
+**Investigation**: [INVESTIGATE-update-contributor-docs.md](INVESTIGATE-update-contributor-docs.md)
 
 **Priority**: ~~High~~ — closed
 

@@ -4,13 +4,33 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Backlog
+## Status: Superseded — closed without implementation (2026-04-13)
 
 **Goal**: Address 10 open Dependabot alerts across the website and template dependencies.
 
 **Priority**: Medium
 
-**Last Updated**: 2026-03-31
+**Last Updated**: 2026-04-13
+
+---
+
+## Why closed
+
+This investigation from 2026-03-31 is fully superseded by the 2026-04-13 housekeeping arc. Every concrete item it listed has shipped:
+
+- **Website serialize-javascript vulns** → addressed by PR #40 (Docusaurus 3.9.2 → 3.10.0). The remaining transitives (lodash, lodash-es, serialize-javascript) were dismissed as out-of-scope build-time tooling, per the `feedback_docusaurus_transitive_vulns` policy.
+- **typescript-basic-webserver alerts** (path-to-regexp, minimatch, picomatch, qs, body-parser) → cleared via PRs #1, #41, #46, #47 (body-parser, qs, express 5.2.1, nodemon 3.1.14). Remaining transitives dismissed with documented reasons.
+- **python-basic-webserver flask alert** → cleared via PR #48 (Flask 3.1.3). Also PR #49 for `python-basic-webserver-database`.
+
+End state as of 2026-04-13: **0 open Dependabot alerts** on the repo.
+
+The shipped work lives in:
+- `completed/INVESTIGATE-housekeeping-docusaurus-and-prs.md` — the replacement investigation that tracked the full arc
+- `completed/PLAN-template-dependabot-triage.md` — the plan that executed the template-side triage
+
+Move this file to `completed/` to reflect the done state. No further action on the original investigation.
+
+---
 
 ---
 

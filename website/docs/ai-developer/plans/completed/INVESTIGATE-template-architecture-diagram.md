@@ -4,13 +4,27 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Decided — ready for plan (2026-04-11)
+## Status: Superseded — v1 shipped, replaced by v2 (2026-04-13)
 
 **Goal**: Determine the best way to render an auto-generated architecture diagram on each template's documentation page that visualises *what gets set up and the systems involved*, using data the website already has (template-info.yaml, manifests/deployment.yaml, vendored DCT/UIS registries).
 
-**Last Updated**: 2026-04-11
+**Last Updated**: 2026-04-13
 
-**Downstream plan**: `PLAN-template-architecture-diagram.md` — to be drafted once `PLAN-environment-card.md` Phase 4 completes.
+---
+
+## Why closed
+
+The downstream plan from this investigation (`PLAN-template-architecture-diagram.md`) shipped and is in `completed/`. It was then followed by a v2 iteration (`INVESTIGATE-architecture-diagram-v2.md` + `PLAN-architecture-diagram-v2.md`, both in `completed/`) that split the single flowchart into the current two-diagram pattern (Local development + Deployment, each with a paired sequence diagram). The v2 work landed in PR #33 and is live on per-template docs pages.
+
+Both of this investigation's hard prerequisites were either satisfied or worked around during v2:
+- **PLAN-environment-card.md Phase 4** → shipped and in `completed/`
+- **template-info.yaml schema refactor** → still deferred as `INVESTIGATE-template-info-schema.md` in backlog, but v2 worked around the missing `quickstart.run` field by reading the existing `quickstart.commands[]` for its sequence diagrams. Not blocking.
+
+Current state of architecture diagrams in the codebase is documented in `website/docs/ai-developer/project-dev-templates.md` § "Auto-generated documentation sections → Architecture section". See also `scripts/lib/build-architecture-mermaid.ts` and its unit tests for the implementation.
+
+Move this investigation to `completed/` alongside the plans it spawned. No further action.
+
+---
 
 ---
 

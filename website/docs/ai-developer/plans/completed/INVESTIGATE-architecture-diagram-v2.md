@@ -12,7 +12,7 @@
 
 **Last Updated**: 2026-04-12
 
-**Predecessor**: [INVESTIGATE-template-architecture-diagram.md](../backlog/INVESTIGATE-template-architecture-diagram.md) — the original investigation designed around a single diagram. Superseded by this investigation after Phase 4 visual review revealed the monolithic diagram was too noisy and conflated three distinct workflows.
+**Predecessor**: [INVESTIGATE-template-architecture-diagram.md](INVESTIGATE-template-architecture-diagram.md) — the original investigation designed around a single diagram. Superseded by this investigation after Phase 4 visual review revealed the monolithic diagram was too noisy and conflated three distinct workflows.
 
 **Working drafts**: Hand-edited Mermaid files used during the visual review:
 - [mermaid-steady-state2.md](../backlog/mermaid-steady-state2.md) — local development flowchart + configure sequence (approved)

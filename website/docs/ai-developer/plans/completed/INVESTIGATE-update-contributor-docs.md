@@ -4,13 +4,25 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Backlog
+## Status: Superseded — closed without additional work (2026-04-13)
 
 **Goal**: Update all contributor documentation to reflect the unified template system — YAML metadata, template-registry.json, unified `dev-template` command, and the new template types (app, overlay, stack).
 
 **Priority**: High
 
-**Last Updated**: 2026-04-06
+**Last Updated**: 2026-04-13
+
+---
+
+## Why closed
+
+`PLAN-update-contributor-docs.md` shipped and was moved to `completed/` earlier on 2026-04-13. A spot-check of the contributor docs confirms the unified-system updates landed: `website/docs/contributors/creating-a-template.md` and `website/docs/contributors/index.md` already reference `template-info.yaml` (not the old `TEMPLATE_INFO` bash format) and `generate-registry.sh` (not the removed `generate-templates-json.sh`).
+
+The investigation's file-by-file checklist (seven files) is a subset of what the plan already implemented. No delta work remains.
+
+If additional contributor-doc gaps surface later (e.g., the "Preview docs locally" section flagged during the Docusaurus upgrade — contributor docs still don't mention `npm run start`), they should be filed as fresh small PRs or a new narrowly-scoped investigation, not reopened here.
+
+---
 
 ---
 

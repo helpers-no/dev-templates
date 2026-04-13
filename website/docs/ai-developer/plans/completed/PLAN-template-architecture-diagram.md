@@ -12,7 +12,7 @@
 
 **Completed**: 2026-04-12 — v1 shipped in commits `c20c402` and `2b77ed2`. Superseded the same day by the v2 redesign — see [PLAN-architecture-diagram-v2.md](./PLAN-architecture-diagram-v2.md).
 
-**Investigation**: [INVESTIGATE-template-architecture-diagram.md](../backlog/INVESTIGATE-template-architecture-diagram.md) — read for the full decision record, rationale, and archetype diagram drafts.
+**Investigation**: [INVESTIGATE-template-architecture-diagram.md](INVESTIGATE-template-architecture-diagram.md) — read for the full decision record, rationale, and archetype diagram drafts.
 
 ---
 
@@ -21,7 +21,7 @@
 **Prerequisites** (must complete before this plan moves to `active/`):
 
 1. `PLAN-environment-card.md` Phase 4 complete and plan moved to `completed/`.
-2. `template-info.yaml` schema refactor shipped — must deliver a clean `quickstart.run: string` field (or equivalent) that the sequence builder reads verbatim. That refactor is scoped by a separate future investigation the user will create later. This plan does not block on the investigation being *written* — it blocks on its shipped outcome. See [INVESTIGATE § Dependencies](../backlog/INVESTIGATE-template-architecture-diagram.md#dependencies) for details.
+2. `template-info.yaml` schema refactor shipped — must deliver a clean `quickstart.run: string` field (or equivalent) that the sequence builder reads verbatim. That refactor is scoped by a separate future investigation the user will create later. This plan does not block on the investigation being *written* — it blocks on its shipped outcome. See [INVESTIGATE § Dependencies](INVESTIGATE-template-architecture-diagram.md#dependencies) for details.
 
 **Priority**: Medium.
 
@@ -86,7 +86,7 @@ Create a standalone TS module that can be unit-tested in isolation, mirroring th
   - `buildFlowchart(entry: TemplateEntry): string | null` — returns the raw `flowchart LR` string, or `null` for overlays
   - `buildSequence(entry: TemplateEntry): string | null` — returns the raw `sequenceDiagram` string, or `null` for overlays AND templates with `resolvedServices.length === 0`
 
-- [ ] 1.2 Implement `buildFlowchart(entry)`. Archetype rules follow [INVESTIGATE § E](../backlog/INVESTIGATE-template-architecture-diagram.md#diagram-drafts-per-archetype):
+- [ ] 1.2 Implement `buildFlowchart(entry)`. Archetype rules follow [INVESTIGATE § E](INVESTIGATE-template-architecture-diagram.md#diagram-drafts-per-archetype):
   - **Overlay** (`install_type === 'overlay'`) → return `null`
   - **DCT subgraph** (when `resolvedTools.length > 0` OR `manifest` present): emit `subgraph dct["DCT devcontainer"]` with one node per tool (use `tool.id` as node id, `tool.name` as label) plus an `app` node (label derived from `params.app_name` when present, otherwise `entry.name` or `entry.id` — no hardcoding) plus an `env` node labelled `.env` when `manifest` is present
   - **K8s subgraph** (when `resolvedServices.length > 0` OR `manifest` present): emit `subgraph k8s["Local Kubernetes Cluster (Test environment)"]` — **exact label matches `website/docs/architecture.md` canonical diagram**; include service nodes as cylinders `[("<service.name><br/><service.database>")]` plus a `sec` K8s Secret node when `manifest.secretName`, plus `argo` + `pod` nodes when `manifest` present (even for templates with no services — E2 still deploys via ArgoCD)
