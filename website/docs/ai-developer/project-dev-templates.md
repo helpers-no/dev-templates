@@ -28,6 +28,36 @@ Inside the container: `/workspace/`
 
 ---
 
+## Pre-push checklist
+
+Before pushing any commit that touches generators, `template-info.yaml`, plan files, or anything else that flows through the registry/docs pipeline, run the **full pipeline locally** in the devcontainer in the same order CI uses. This catches the broken-reference class of bug where regenerated indexes point at files you forgot to commit, or where renamed files leave stale links in other docs.
+
+```bash
+docker exec <container-name> bash -c "cd /workspace && \
+  bash scripts/validate-metadata.sh && \
+  npx tsx scripts/generate-registry.ts && \
+  bash scripts/generate-docs-markdown.sh --force && \
+  bash scripts/generate-plan-indexes.sh && \
+  bash scripts/validate-docs.sh && \
+  cd website && npm run build"
+```
+
+If this command exits non-zero, **do not push**. Fix the failure locally, re-run, and only push when the full pipeline is green.
+
+The order matches `.github/workflows/deploy-docs.yml` exactly: source validation → generation → generated-content validation → build. This means "passes locally" implies "passes CI" for everything except genuinely environment-specific issues (e.g., Node version mismatches between host and runner).
+
+### Pre-push gotchas
+
+- **Untracked files affect generated content.** `bash scripts/generate-plan-indexes.sh` walks `plans/backlog/`, `plans/active/`, `plans/completed/` and indexes whatever files exist on disk — including ones you haven't `git add`-ed yet. If your local index regen references untracked files, the committed indexes will have broken links until those files are also committed. Either commit them, or `git stash -u` them out of the way before regenerating.
+
+- **`git mv` followed by content edits**: `git mv` stages the rename, but if you edit the file afterward and don't re-`git add` it, the commit captures only the rename with zero content delta. Always run `git diff --staged` before committing a rename + edit to confirm the content changes are included.
+
+- **CI runs `validate-docs.sh` AFTER the generators** so it sees the freshly regenerated content. Your local pipeline must run them in the same order to match what CI does. The shorthand pipeline above is correct; do NOT shortcut by running validators first.
+
+> **Future improvement**: this checklist will eventually be wrapped in a single helper script (e.g., `scripts/pre-push-check.sh`) so it's one command to run. Until then, copy-paste the pipeline above.
+
+---
+
 ## Project Structure
 
 ```
