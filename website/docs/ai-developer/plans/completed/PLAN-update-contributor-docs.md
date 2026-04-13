@@ -4,15 +4,17 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Active
+## Status: Completed
+
+**Completed**: 2026-04-13 — all phases were finished by 2026-04-06 (every task `[x]`, every phase marked DONE, every acceptance criterion checked) but the file was never moved out of `active/`. This commit applies the closing ritual: status header → Completed, file moved from `active/` to `completed/`. No content changes beyond the header.
 
 **Goal**: Update all contributor documentation to reflect the unified template system.
 
 **Investigation**: [INVESTIGATE-update-contributor-docs.md](../backlog/INVESTIGATE-update-contributor-docs.md)
 
-**Priority**: High
+**Priority**: ~~High~~ — closed
 
-**Last Updated**: 2026-04-06
+**Last Updated**: 2026-04-13
 
 ---
 
