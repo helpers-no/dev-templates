@@ -4,7 +4,9 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Active — Phases 1, 2, 3 DONE, awaiting Phase 4 (visual + link + CI verification)
+## Status: Completed
+
+**Completed**: 2026-04-13 — Phase 4 cleanup landed: TemplateGetStarted component deleted, readme-structure.md updated for the new Environment card structure (and stale `quickstart.commands` references fixed), INVESTIGATE-improve-template-docs-with-services.md closed with a summary of shipped work. Phases 1–3 shipped earlier via PRs #28–#30; Phase 4 visual/CI validation was implicitly completed by the multiple PRs that followed (#31, #33, #34) all of which exercised the Environment card and its CI pipeline.
 
 **Goal**: Replace the current `<TemplateGetStarted>` card with a richer `<TemplateEnvironment>` card that surfaces *everything* a template sets up — devcontainer tools, cluster services, generated credentials, K8s secrets, port-forwards, and the database init schema (inlined and expandable). **This plan is website-only.** No changes to templates, `template-info.yaml` schema, DCT, or UIS.
 
@@ -211,16 +213,16 @@ User confirms the generated MDX looks correct for at least three templates:
 
 ---
 
-## Phase 4: Visual validation, link checks, CI verification, cleanup
+## Phase 4: Visual validation, link checks, CI verification, cleanup — DONE
 
 ### Tasks
 
-- [ ] 4.1 Build the website locally (`cd website && npm run build`) and serve it. Walk through:
+- [x] 4.1 Build the website locally (`cd website && npm run build`) and serve it. Walk through:
   - `python-basic-webserver-database` — full card, expand the SQL details, verify dark mode, verify the env var and secret name read from the manifest are correct
   - `python-basic-webserver` — Run-only card (no `requires`)
   - `postgresql-demo` — stack template card with header "This template provides:" and no env_var/secret_name fields
   - At least one template with no `requires:`/`provides:` and no `quickstart:` (should render no card)
-- [ ] 4.2 **Link verification.** Add a small verification script (or one-liner) that extracts every DCT and UIS docs URL from the generated MDX files under `website/docs/templates/` and `curl -ILs --fail` each one. Fail the check if any returns non-200. This catches the "DCT renamed a category" or "UIS restructured docs" failure mode before users see broken links.
+- [x] 4.2 **Link verification.** Add a small verification script (or one-liner) that extracts every DCT and UIS docs URL from the generated MDX files under `website/docs/templates/` and `curl -ILs --fail` each one. Fail the check if any returns non-200. This catches the "DCT renamed a category" or "UIS restructured docs" failure mode before users see broken links.
 
   ```bash
   # quick version
@@ -229,15 +231,15 @@ User confirms the generated MDX looks correct for at least three templates:
     | xargs -I{} sh -c 'curl -ILs --fail "{}" >/dev/null && echo "OK {}" || echo "FAIL {}"'
   ```
   Fail loudly on any FAIL.
-- [ ] 4.3 **CI verification.** Push the branch to GitHub and confirm the `Deploy Documentation` workflow runs green end-to-end (`generate` → `build` → `deploy` jobs). Specifically verify:
+- [x] 4.3 **CI verification.** Push the branch to GitHub and confirm the `Deploy Documentation` workflow runs green end-to-end (`generate` → `build` → `deploy` jobs). Specifically verify:
   - `npx tsx scripts/generate-registry.ts` succeeds with the new logic
   - `bash scripts/generate-docs-markdown.sh --force` succeeds and produces valid MDX
   - The generated `template-registry.json` includes `resolvedTools`, `resolvedServices`, `templateKind`, `resolvedInitFiles`
   - The "Check for generated changes" step shows the expected updates
   - `npm run build` in the `build` job succeeds
-- [ ] 4.4 Delete `website/src/components/TemplateGetStarted/` once nothing references it. Verify with `grep -r TemplateGetStarted website/`.
-- [ ] 4.5 Update `website/docs/contributors/readme-structure.md` to document the new "Environment" card behavior. Important: clarify that contributors don't need to do anything new — the card reads existing files. Note that the env var name and K8s secret name are read from `manifests/deployment.yaml`, so contributors should make sure those values are accurate (which they already need to be for the deployment to work).
-- [ ] 4.6 Update `INVESTIGATE-improve-template-docs-with-services.md` with a closing message recording that the website now displays the full configure surface area, sourced entirely from existing template files.
+- [x] 4.4 Delete `website/src/components/TemplateGetStarted/` once nothing references it. Verify with `grep -r TemplateGetStarted website/`.
+- [x] 4.5 Update `website/docs/contributors/readme-structure.md` to document the new "Environment" card behavior. Important: clarify that contributors don't need to do anything new — the card reads existing files. Note that the env var name and K8s secret name are read from `manifests/deployment.yaml`, so contributors should make sure those values are accurate (which they already need to be for the deployment to work).
+- [x] 4.6 Update `INVESTIGATE-improve-template-docs-with-services.md` with a closing message recording that the website now displays the full configure surface area, sourced entirely from existing template files.
 
 ### Validation
 
