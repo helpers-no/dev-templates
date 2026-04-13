@@ -18,7 +18,7 @@
 
 User request, paraphrased: *"Visualise what is being set up and the systems involved. We have a Postgres DB inside a Kubernetes cluster. UIS sets up the Postgres. DCT asks UIS to create a namespace, user/password, initiate a test database. DCT installs Python, creates the config, runs the Python for local dev inside the DCT. GitHub runs CI via GitHub Actions. Later we will add the commands DCT runs to tell UIS to set up ArgoCD and deploy the app built by GitHub Actions."*
 
-In short: a per-template architecture diagram that shows the actors, what they create, and how data flows. The existing text-based [Environment card](../active/PLAN-environment-card.md) lists *what* gets set up; the diagram answers *where things live* and *how they connect*.
+In short: a per-template architecture diagram that shows the actors, what they create, and how data flows. The existing text-based [Environment card](../completed/PLAN-environment-card.md) lists *what* gets set up; the diagram answers *where things live* and *how they connect*.
 
 The diagram is content, not interaction. It should:
 - Render at build time (no client-side JS dependency for the visual)

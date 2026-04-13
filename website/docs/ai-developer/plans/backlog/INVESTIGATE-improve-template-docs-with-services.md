@@ -4,13 +4,23 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Backlog
+## Status: Closed — superseded by shipped work (2026-04-13)
 
 **Goal**: Fix documentation, bugs, and rough edges for templates that depend on UIS services, in a way that actually ships. Real-user testing of `python-basic-webserver-database` surfaced concrete problems. This investigation scopes the minimum viable fix and defers speculation.
 
-**Priority**: High
+**Priority**: ~~High~~ — closed
 
-**Last Updated**: 2026-04-09
+**Last Updated**: 2026-04-13
+
+> **Closing note (2026-04-13)**: The website-side work this investigation called for has shipped via several PRs:
+>
+> - **PR #28** (`feature/template-getstarted-card`): introduced the original `<TemplateGetStarted>` card with auto-generated Configure and Run sections from `requires:` + `params:` + `quickstart:`
+> - **PR #29 / #30** (Environment card phases 1–3, 2+3): replaced `<TemplateGetStarted>` with the richer `<TemplateEnvironment>` card that surfaces tools, services, init SQL, port-forward, secret name, env var, and run commands — all sourced from existing files (no schema changes)
+> - **PR #31** (`feature/template-schema-cleanup`): refined the schema (killed `summary`, replaced `website`+`docs` with `links[]`, added `maintainers`, `prerequisites`, split `quickstart.commands` → `setup`+`run`, rendered `abstract` on the detail page)
+> - **PR #33** (architecture diagrams v2): added auto-generated Mermaid local-development and deployment diagrams per template
+> - **PR #34** (CI fix): stopped CI from committing regenerated artifacts back to main, ending the merge-conflict loop
+>
+> The Environment card now displays the full configure surface area for every template, sourced entirely from existing `template-info.yaml`, vendored DCT/UIS data, and per-template manifests. Contributors don't write any of this by hand. Further refinements (numbering bug, `configure_command` field, expected-output generator) are tracked in [INVESTIGATE-environment-card-improvements.md](./INVESTIGATE-environment-card-improvements.md). The template-side and DCT-side action items from this investigation are tracked in their own repos.
 
 ### Contributors
 
