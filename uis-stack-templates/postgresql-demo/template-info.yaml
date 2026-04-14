@@ -36,6 +36,11 @@ quickstart:
     Inside psql, run: SELECT * FROM tasks;
     You should see 3 seeded rows. Type \q to exit.
 
+# Command a developer runs to install this stack into UIS.
+# Stack templates use `uis template install <id>`; app templates use
+# `dev-template configure`; templates with no configure step omit this.
+configure_command: "uis template install postgresql-demo"
+
 params:
   app_name: "demo-app"
   database_name: "demo_db"

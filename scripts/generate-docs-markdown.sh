@@ -184,6 +184,7 @@ MDXEOF
         local_services_json=$(jq -c ".templates[$i].resolvedServices // null" "$REGISTRY")
         local_template_kind_json=$(jq -c ".templates[$i].templateKind // null" "$REGISTRY")
         local_init_files_json=$(jq -c ".templates[$i].resolvedInitFiles // null" "$REGISTRY")
+        local_configure_command_json=$(jq -c ".templates[$i].configureCommand // null" "$REGISTRY")
 
         cat >> "$page_file" <<MDXEOF
 import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
@@ -196,6 +197,7 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
   services={$local_services_json}
   templateKind={$local_template_kind_json}
   initFiles={$local_init_files_json}
+  configureCommand={$local_configure_command_json}
 />
 
 MDXEOF

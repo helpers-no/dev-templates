@@ -42,6 +42,12 @@ quickstart:
     Flask debug server starts on port 3000.
     VS Code auto-forwards the port — click the globe icon in the Ports tab.
 
+# Command a developer runs to provision the backend services this template
+# needs. Read by the Environment card and the architecture diagram builder.
+# App templates use `dev-template configure`; stack templates use
+# `uis template install <id>`; templates with no configure step omit this.
+configure_command: "dev-template configure"
+
 params:
   app_name: "my-app"
   database_name: "my_app_db"
