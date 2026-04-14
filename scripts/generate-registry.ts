@@ -604,7 +604,8 @@ for (const catFile of categoryFiles) {
     const templateDir = dirname(file);
     console.log(`  ${folderName}/${dirName}/template-info.yaml`);
 
-    const raw = yaml.load(readFileSync(file, 'utf8')) as TemplateInfoYaml;
+    const rawYamlText = readFileSync(file, 'utf8');
+    const raw = yaml.load(rawYamlText) as TemplateInfoYaml;
     validateTemplate(raw, file, dirName, categoryIdSet);
 
     const entry: Record<string, unknown> = {
@@ -633,6 +634,16 @@ for (const catFile of categoryFiles) {
     if (raw.provides) entry.provides = raw.provides;
     if (raw.quickstart) entry.quickstart = raw.quickstart;
     if (raw.configure_command) entry.configureCommand = raw.configure_command;
+
+    // Raw template-info.yaml content — rendered as a collapsible dropdown
+    // inside the Environment card's Configure sub-section so developers can
+    // see the full editable surface of the template without opening the
+    // source. Only emitted for templates that have a Configure sub-section
+    // (i.e. those with requires:); skipping others keeps the registry smaller
+    // and avoids emitting the field where the component wouldn't use it.
+    if (raw.requires && raw.requires.length > 0) {
+      entry.templateInfoYaml = rawYamlText;
+    }
 
     // ── Environment-card resolution (Phase 2+3 of PLAN-environment-card.md) ─
 

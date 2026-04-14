@@ -37,6 +37,7 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
   templateKind={"stack"}
   initFiles={{"config/init-database.sql":"-- PostgreSQL Demo — sample schema with seed data\n-- Applied by: uis configure postgresql --init-file -\n-- Uses psql --set ON_ERROR_STOP=on for fail-fast on syntax errors\n-- All statements are idempotent — safe to re-run\n\nCREATE TABLE IF NOT EXISTS tasks (\n    id SERIAL PRIMARY KEY,\n    title VARCHAR(255) NOT NULL,\n    status VARCHAR(20) DEFAULT 'pending',\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);\n\nINSERT INTO tasks (title, status) VALUES\n    ('Verify uis template install works', 'done'),\n    ('Build your own UIS stack template', 'pending'),\n    ('Deploy it with uis template install', 'pending')\nON CONFLICT DO NOTHING;\n"}}
   configureCommand={"uis template install postgresql-demo"}
+  templateInfoYaml={null}
 />
 
 

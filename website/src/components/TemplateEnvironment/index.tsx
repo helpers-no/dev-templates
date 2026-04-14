@@ -93,6 +93,7 @@ interface TemplateEnvironmentProps {
   templateKind?: TemplateKind;
   initFiles?: Record<string, string>;
   configureCommand?: string;
+  templateInfoYaml?: string;
 }
 
 // ── Sub-renderers ───────────────────────────────────────────────────
@@ -245,7 +246,7 @@ function InitFilesBlock({initFiles}: {initFiles: Record<string, string>}) {
     <div className={styles.subsection}>
       <div className={styles.subsectionTitle}>Schema applied to the database</div>
       {entries.map(([path, content]) => (
-        <details key={path} className={styles.initFile}>
+        <details key={path} className={styles.detailsBlock}>
           <summary>
             <code>{path}</code>
           </summary>
@@ -269,6 +270,7 @@ export default function TemplateEnvironment({
   templateKind = 'app',
   initFiles,
   configureCommand,
+  templateInfoYaml,
 }: TemplateEnvironmentProps) {
   const hasTools = !!tools && tools.length > 0;
   const hasServices = !!services && services.length > 0;
@@ -353,6 +355,16 @@ export default function TemplateEnvironment({
                 ))}
               </ul>
             </>
+          )}
+          {templateInfoYaml && (
+            <details className={styles.detailsBlock}>
+              <summary>
+                <code>template-info.yaml</code> — edit to change defaults
+              </summary>
+              <pre>
+                <code>{templateInfoYaml}</code>
+              </pre>
+            </details>
           )}
           <p className={styles.text}>Then run:</p>
           <pre className={styles.commands}>
