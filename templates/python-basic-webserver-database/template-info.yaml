@@ -44,8 +44,8 @@ quickstart:
 
 # Command a developer runs to provision the backend services this template
 # needs. Read by the Environment card and the architecture diagram builder.
-# App templates use `dev-template configure`; stack templates use
-# `uis template install <id>`; templates with no configure step omit this.
+# App templates use `dev-template configure`; stack templates use the
+# `uis template install` form; templates with no configure step omit this.
 configure_command: "dev-template configure"
 
 params:
