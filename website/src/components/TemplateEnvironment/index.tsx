@@ -94,6 +94,7 @@ interface TemplateEnvironmentProps {
   initFiles?: Record<string, string>;
   configureCommand?: string;
   templateInfoYaml?: string;
+  expectedOutputBlock?: string;
 }
 
 // ── Sub-renderers ───────────────────────────────────────────────────
@@ -271,6 +272,7 @@ export default function TemplateEnvironment({
   initFiles,
   configureCommand,
   templateInfoYaml,
+  expectedOutputBlock,
 }: TemplateEnvironmentProps) {
   const hasTools = !!tools && tools.length > 0;
   const hasServices = !!services && services.length > 0;
@@ -370,6 +372,16 @@ export default function TemplateEnvironment({
           <pre className={styles.commands}>
             <code>{configureCommand ?? 'dev-template configure'}</code>
           </pre>
+          {expectedOutputBlock && (
+            <details className={styles.detailsBlock}>
+              <summary>
+                Expected output from <code>{configureCommand ?? 'dev-template configure'}</code>
+              </summary>
+              <pre>
+                <code>{expectedOutputBlock}</code>
+              </pre>
+            </details>
+          )}
         </div>
       )}
 
