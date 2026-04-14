@@ -283,11 +283,17 @@ export default function TemplateEnvironment({
   // (i.e. have requires:). Stack templates skip the configure section
   // because they install via uis template install, not dev-template configure.
   const showConfigure = !!requires && requires.length > 0;
+  // Install section: shown for stack templates with an expected-output block.
+  // Stacks don't have a Configure sub-section, so this is the rendering
+  // location for their expected-output dropdown — parallel to Configure
+  // on app templates, but simpler (no params list, no template-info.yaml
+  // dropdown, just the install command + expected output).
+  const showInstall = templateKind === 'stack' && !!expectedOutputBlock;
   const showRun = !!quickstart;
 
   // Numbering: ① ② ③ ④ across whichever sections are present.
   const setupVisible = showRun && (quickstart?.setup?.length ?? 0) > 0;
-  const sectionsShown = [hasWhatGetsSetUp, showConfigure, setupVisible, showRun].filter(Boolean).length;
+  const sectionsShown = [hasWhatGetsSetUp, showConfigure, showInstall, setupVisible, showRun].filter(Boolean).length;
   const showNumbers = sectionsShown > 1;
   let n = 0;
   const nextNumber = () => {
@@ -382,6 +388,32 @@ export default function TemplateEnvironment({
               </pre>
             </details>
           )}
+        </div>
+      )}
+
+      {showInstall && (
+        <div className={styles.section}>
+          <h3 className={styles.title}>
+            {nextNumber()}
+            Install
+          </h3>
+          <p className={styles.intro}>
+            Install this stack into your local UIS environment.
+            Provisions the services defined above and seeds them with any
+            init data.
+          </p>
+          <p className={styles.text}>Then run:</p>
+          <pre className={styles.commands}>
+            <code>{configureCommand ?? 'uis template install'}</code>
+          </pre>
+          <details className={styles.detailsBlock}>
+            <summary>
+              Expected output from <code>{configureCommand ?? 'uis template install'}</code>
+            </summary>
+            <pre>
+              <code>{expectedOutputBlock}</code>
+            </pre>
+          </details>
         </div>
       )}
 
