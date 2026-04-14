@@ -331,8 +331,14 @@ export default function TemplateEnvironment({
             {nextNumber()}
             Configure
           </h3>
+          <p className={styles.intro}>
+            Set up and configure the backend services this template needs.
+            Creates a per-app database, wires credentials into a local{' '}
+            <code>.env</code> file, and stores a Kubernetes Secret in your
+            cluster for the deployed pod.
+          </p>
           <p className={styles.text}>
-            This template uses <strong>{configureServiceNames}</strong>.
+            Uses: <strong>{configureServiceNames}</strong>
           </p>
           {paramKeys.length > 0 && (
             <>
