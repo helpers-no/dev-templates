@@ -53,6 +53,8 @@
  *     clear error pointing at the missing field.
  */
 
+import { getInClusterPort } from './service-ports.ts';
+
 /**
  * The subset of a registry entry that the builder reads. Kept narrow so
  * changes to unrelated fields don't ripple here.
@@ -88,6 +90,7 @@ export interface TemplateEntry {
     note?: string;
   };
   configureCommand?: string;
+  resolvedInitFiles?: Record<string, string>;
 }
 
 export interface ArchitectureResult {
@@ -353,7 +356,7 @@ export function buildDeployFlowchart(entry: TemplateEntry): string | null {
   }
   if (hasServices && svc) {
     const ns = svc.namespace ?? 'default';
-    lines.push(`    pod -->|${ns}.svc.cluster.local:5432| svc`);
+    lines.push(`    pod -->|${ns}.svc.cluster.local:${getInClusterPort(svc.id)}| svc`);
   }
 
   // Traffic routing
@@ -406,7 +409,7 @@ export function buildDeploySequence(entry: TemplateEntry): string | null {
   }
   if (hasServices && svc) {
     const ns = svc.namespace ?? 'default';
-    lines.push(`    K8s->>DB: pod connects via ${ns}.svc.cluster.local:5432`);
+    lines.push(`    K8s->>DB: pod connects via ${ns}.svc.cluster.local:${getInClusterPort(svc.id)}`);
   }
   lines.push(`    Note over Dev,K8s: App now accessible at ${hostname}.localhost via Traefik`);
 
