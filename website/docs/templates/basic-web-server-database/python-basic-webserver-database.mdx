@@ -38,6 +38,7 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
   services={[{"id":"postgresql","name":"PostgreSQL","description":"Open-source relational database","docsUrl":"https://uis.sovereignsky.no/docs/services/databases/postgresql","website":"https://www.postgresql.org","exposePort":35432,"namespace":"default","helmChart":"bitnami/postgresql","database":"my_app_db","generatedUser":"my_app","initFilePath":"config/init-database.sql","transitiveRequires":[],"envVar":"DATABASE_URL","secretName":"my-app-db","containerPort":3000}]}
   templateKind={"app"}
   initFiles={{"config/init-database.sql":"-- Init file for python-basic-webserver-database\n-- Applied by: uis configure postgresql --init-file -\n-- Uses psql --set ON_ERROR_STOP=on for fail-fast on syntax errors\n-- All statements are idempotent — safe to re-run\n\nCREATE TABLE IF NOT EXISTS tasks (\n    id SERIAL PRIMARY KEY,\n    title VARCHAR(255) NOT NULL,\n    status VARCHAR(20) DEFAULT 'pending',\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);\n\nINSERT INTO tasks (title, status) VALUES\n    ('Set up the database connection', 'done'),\n    ('Build something with Flask + PostgreSQL', 'pending'),\n    ('Deploy to Kubernetes via ArgoCD', 'pending')\nON CONFLICT DO NOTHING;\n"}}
+  configureCommand={"dev-template configure"}
 />
 
 

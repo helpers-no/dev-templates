@@ -92,6 +92,7 @@ interface TemplateEnvironmentProps {
   services?: ResolvedService[];
   templateKind?: TemplateKind;
   initFiles?: Record<string, string>;
+  configureCommand?: string;
 }
 
 // ── Sub-renderers ───────────────────────────────────────────────────
@@ -267,6 +268,7 @@ export default function TemplateEnvironment({
   services,
   templateKind = 'app',
   initFiles,
+  configureCommand,
 }: TemplateEnvironmentProps) {
   const hasTools = !!tools && tools.length > 0;
   const hasServices = !!services && services.length > 0;
@@ -275,7 +277,7 @@ export default function TemplateEnvironment({
 
   // Configure section: shown for app templates that consume services
   // (i.e. have requires:). Stack templates skip the configure section
-  // because they don't use dev-template-configure.
+  // because they install via uis template install, not dev-template configure.
   const showConfigure = !!requires && requires.length > 0;
   const showRun = !!quickstart;
 
@@ -348,7 +350,7 @@ export default function TemplateEnvironment({
           )}
           <p className={styles.text}>Then run:</p>
           <pre className={styles.commands}>
-            <code>dev-template-configure</code>
+            <code>{configureCommand ?? 'dev-template configure'}</code>
           </pre>
         </div>
       )}

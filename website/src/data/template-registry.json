@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-13T14:10:52.395Z",
+  "generated": "2026-04-14T19:04:42.629Z",
   "dctDocsBase": "https://dct.sovereignsky.no",
   "uisDocsBase": "https://uis.sovereignsky.no",
   "categories": [
@@ -569,6 +569,7 @@
         "run": "uv run python app/app.py",
         "note": "Flask debug server starts on port 3000.\nVS Code auto-forwards the port — click the globe icon in the Ports tab.\n"
       },
+      "configureCommand": "dev-template configure",
       "templateKind": "app",
       "resolvedTools": [
         {
@@ -743,6 +744,7 @@
         "run": "uis connect postgresql demo_db",
         "note": "Inside psql, run: SELECT * FROM tasks;\nYou should see 3 seeded rows. Type \\q to exit.\n"
       },
+      "configureCommand": "uis template install postgresql-demo",
       "templateKind": "stack",
       "resolvedTools": [],
       "resolvedServices": [

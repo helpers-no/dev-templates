@@ -163,6 +163,22 @@ validate_template_yaml() {
         has_error=true
     fi
 
+    # configure_command is optional but, when present, must be a non-empty string.
+    local configure_command_type
+    configure_command_type=$(_yaml_field "$info_file" "d.configure_command === undefined ? 'absent' : typeof d.configure_command")
+    if [[ "$configure_command_type" != "absent" && "$configure_command_type" != "string" ]]; then
+        log_error "$template_name: configure_command must be a string when present, got type '$configure_command_type'"
+        has_error=true
+    fi
+    if [[ "$configure_command_type" == "string" ]]; then
+        local configure_command_value
+        configure_command_value=$(_yaml_field "$info_file" "d.configure_command")
+        if [[ -z "$configure_command_value" ]]; then
+            log_error "$template_name: configure_command must not be empty"
+            has_error=true
+        fi
+    fi
+
     local tags_type
     tags_type=$(_yaml_field "$info_file" "Array.isArray(d.tags) ? 'list' : typeof d.tags")
     if [[ "$tags_type" != "list" ]]; then

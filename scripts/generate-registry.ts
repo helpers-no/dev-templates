@@ -101,6 +101,7 @@ interface TemplateInfoYaml {
     run: string;
     note?: string;
   };
+  configure_command?: string;
 }
 
 interface DctTool {
@@ -631,6 +632,7 @@ for (const catFile of categoryFiles) {
     if (raw.requires) entry.requires = raw.requires;
     if (raw.provides) entry.provides = raw.provides;
     if (raw.quickstart) entry.quickstart = raw.quickstart;
+    if (raw.configure_command) entry.configureCommand = raw.configure_command;
 
     // ── Environment-card resolution (Phase 2+3 of PLAN-environment-card.md) ─
 

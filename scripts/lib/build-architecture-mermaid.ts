@@ -87,6 +87,7 @@ export interface TemplateEntry {
     run?: string;
     note?: string;
   };
+  configureCommand?: string;
 }
 
 export interface ArchitectureResult {
@@ -174,7 +175,7 @@ export function buildLocalDevFlowchart(entry: TemplateEntry): string | null {
     lines.push('        env[".env"]');
   }
   lines.push('        tmpl["template-info.yaml"]');
-  lines.push('        cfg["dev-template configure"]');
+  lines.push(`        cfg["${entry.configureCommand ?? 'dev-template configure'}"]`);
   lines.push('    end');
   lines.push('');
 
@@ -254,7 +255,7 @@ export function buildLocalDevSequence(entry: TemplateEntry): string | null {
   lines.push('    participant UIS as UIS provision-host');
   lines.push('    participant K8s as Local Kubernetes cluster');
   lines.push(`    participant DB as ${svc.name}`);
-  lines.push(`    Dev->>DCT: dev-template configure`);
+  lines.push(`    Dev->>DCT: ${entry.configureCommand ?? 'dev-template configure'}`);
   lines.push('    DCT->>UIS: request provisioning');
   lines.push(`    alt ${svc.name} not deployed`);
   lines.push(`        UIS->>K8s: deploy ${svc.name}`);
@@ -444,7 +445,7 @@ function buildStackFlowchart(entry: TemplateEntry): string {
   lines.push('    end');
   lines.push('    consumers["Consumer templates"]');
   lines.push('');
-  lines.push(`    dev -->|uis template install ${entry.id}| uis`);
+  lines.push(`    dev -->|${entry.configureCommand ?? `uis template install ${entry.id}`}| uis`);
   if (svc) {
     lines.push('    uis -->|deploys + seeds| svc');
     lines.push('    consumers -.->|use this| svc');
@@ -470,7 +471,7 @@ function buildStackSequence(entry: TemplateEntry): string | null {
   lines.push('    participant UIS as UIS provision-host');
   lines.push('    participant K8s as Local Kubernetes cluster');
   lines.push(`    participant DB as ${svc.name}`);
-  lines.push(`    Dev->>DCT: uis template install ${entry.id}`);
+  lines.push(`    Dev->>DCT: ${entry.configureCommand ?? `uis template install ${entry.id}`}`);
   lines.push('    DCT->>UIS: install stack');
   lines.push(`    UIS->>K8s: deploy ${svc.name}`);
   lines.push(`    UIS->>DB: create ${dbLabel}`);

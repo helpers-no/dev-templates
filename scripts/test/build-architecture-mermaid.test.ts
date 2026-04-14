@@ -62,6 +62,7 @@ const e1Fixture: TemplateEntry = {
     setup: ['uv venv', 'uv pip install -r requirements.txt'],
     run: 'uv run python app/app.py',
   },
+  configureCommand: 'dev-template configure',
 };
 
 /** E2 — app + manifest, no services (python-basic-webserver shape) */
@@ -111,6 +112,7 @@ const e3Fixture: TemplateEntry = {
     setup: [],
     run: 'uis connect postgresql demo_db',
   },
+  configureCommand: 'uis template install postgresql-demo',
 };
 
 /** E4 — overlay (plan-based-workflow shape) */
@@ -334,6 +336,48 @@ test('hostname uses params.app_name when present', () => {
   const flowchart = buildDeployFlowchart(e1Fixture);
   assert.ok(flowchart !== null);
   assert.match(flowchart!, /browser -->\|my-app\.localhost\| traefik/);
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// configureCommand wiring — the value comes from the registry entry, not
+// hardcoded strings in the builder
+// ────────────────────────────────────────────────────────────────────────────
+
+test('E1 configureCommand override changes both flowchart cfg node and sequence Dev->>DCT line', () => {
+  const custom: TemplateEntry = {
+    ...e1Fixture,
+    configureCommand: 'custom-cmd --flag',
+  };
+  const flowchart = buildLocalDevFlowchart(custom);
+  const sequence = buildLocalDevSequence(custom);
+  assert.ok(flowchart !== null);
+  assert.ok(sequence !== null);
+  assert.match(flowchart!, /cfg\["custom-cmd --flag"\]/);
+  assert.match(sequence!, /Dev->>DCT: custom-cmd --flag/);
+  assert.doesNotMatch(flowchart!, /cfg\["dev-template configure"\]/);
+});
+
+test('E1 falls back to "dev-template configure" when configureCommand is undefined', () => {
+  const noCmd: TemplateEntry = {
+    ...e1Fixture,
+    configureCommand: undefined,
+  };
+  const flowchart = buildLocalDevFlowchart(noCmd);
+  assert.ok(flowchart !== null);
+  assert.match(flowchart!, /cfg\["dev-template configure"\]/);
+});
+
+test('E3 stack configureCommand override changes both flowchart edge label and sequence', () => {
+  const custom: TemplateEntry = {
+    ...e3Fixture,
+    configureCommand: 'custom-install-cmd postgresql',
+  };
+  const result = buildArchitectureMdx(custom);
+  assert.ok(result.mdx !== null);
+  const mdx = result.mdx!;
+  assert.match(mdx, /dev -->\|custom-install-cmd postgresql\| uis/);
+  assert.match(mdx, /Dev->>DCT: custom-install-cmd postgresql/);
+  assert.doesNotMatch(mdx, /uis template install postgresql-demo/);
 });
 
 test('hostname falls back to entry.id when params.app_name is absent', () => {
