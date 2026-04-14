@@ -36,6 +36,7 @@ import {
   buildUisDocsUrl,
 } from './lib/dct-doc-paths.js';
 import {buildArchitectureMdx, type TemplateEntry as ArchitectureTemplateEntry} from './lib/build-architecture-mermaid.js';
+import {buildExpectedOutput} from './lib/build-expected-output.js';
 
 // Load js-yaml from website/node_modules
 const ROOT = dirname(dirname(new URL(import.meta.url).pathname));
@@ -691,6 +692,13 @@ for (const catFile of categoryFiles) {
     // null and the bash emitter suppresses the section entirely.
     const {mdx: architectureMdx} = buildArchitectureMdx(entry as ArchitectureTemplateEntry);
     entry.architectureMdx = architectureMdx;
+
+    // Auto-generated Expected output block (PLAN-environment-card-improvements
+    // Phase 5/6). A multi-line string that mimics what DCT/UIS prints when
+    // a developer runs the configure flow. Rendered inside a collapsible
+    // <details> block in the Environment card's Configure sub-section.
+    // Returns null for E2 (app without services) and E4 (overlay).
+    entry.expectedOutputBlock = buildExpectedOutput(entry as ArchitectureTemplateEntry);
 
     allTemplates.push(entry);
   }

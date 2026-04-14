@@ -185,13 +185,14 @@ MDXEOF
         local_template_kind_json=$(jq -c ".templates[$i].templateKind // null" "$REGISTRY")
         local_init_files_json=$(jq -c ".templates[$i].resolvedInitFiles // null" "$REGISTRY")
         local_configure_command_json=$(jq -c ".templates[$i].configureCommand // null" "$REGISTRY")
-        # templateInfoYaml: raw yaml content, embedded as a JSX attribute expression.
-        # Escape `<` and `>` to \u003c / \u003e so MDX's JSX parser doesn't
-        # mis-interpret angle-bracket patterns inside the JSON-encoded string
-        # (e.g., `<id>` or `<name>` in yaml comments) as unclosed JSX tags.
-        # React renders the unicode escapes as `<` / `>` at runtime — no
-        # visual difference.
+        # templateInfoYaml + expectedOutputBlock: raw strings embedded as JSX
+        # attribute expressions. Escape `<` and `>` to \u003c / \u003e so MDX's
+        # JSX parser doesn't mis-interpret angle-bracket patterns inside the
+        # JSON-encoded string (e.g., `<id>` or `<name>` in yaml comments) as
+        # unclosed JSX tags. React renders the unicode escapes as `<` / `>`
+        # at runtime — no visual difference.
         local_template_info_yaml_json=$(jq -c ".templates[$i].templateInfoYaml // null" "$REGISTRY" | sed -e 's/</\\u003c/g' -e 's/>/\\u003e/g')
+        local_expected_output_json=$(jq -c ".templates[$i].expectedOutputBlock // null" "$REGISTRY" | sed -e 's/</\\u003c/g' -e 's/>/\\u003e/g')
 
         cat >> "$page_file" <<MDXEOF
 import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
@@ -206,6 +207,7 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
   initFiles={$local_init_files_json}
   configureCommand={$local_configure_command_json}
   templateInfoYaml={$local_template_info_yaml_json}
+  expectedOutputBlock={$local_expected_output_json}
 />
 
 MDXEOF
