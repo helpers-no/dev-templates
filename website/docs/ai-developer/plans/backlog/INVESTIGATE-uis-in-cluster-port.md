@@ -10,7 +10,7 @@
 
 **Last Updated**: 2026-04-13
 
-**Owner of implementation**: UIS (`urbalurba-infrastructure`) — this investigation documents the TMP consumer's need so UIS can plan and ship the field. TMP's work to consume the field is tracked separately in [INVESTIGATE-environment-card-improvements.md](./INVESTIGATE-environment-card-improvements.md).
+**Owner of implementation**: UIS (`urbalurba-infrastructure`) — this investigation documents the TMP consumer's need so UIS can plan and ship the field. TMP's work to consume the field is tracked separately in [INVESTIGATE-environment-card-improvements.md](../completed/INVESTIGATE-environment-card-improvements.md).
 
 ---
 
@@ -20,7 +20,7 @@ TMP (dev-templates) generates per-template documentation pages and Mermaid diagr
 
 1. **Architecture deploy flowchart** (`scripts/lib/build-architecture-mermaid.ts`, deploy diagram): the edge `pod -->|<namespace>.svc.cluster.local:<port>| svc` shows the deployed app pod connecting to the service inside the cluster. Today this port is **hardcoded `5432`** in the builder because we only support PostgreSQL.
 
-2. **Expected-output generator** (planned in [INVESTIGATE-environment-card-improvements.md](./INVESTIGATE-environment-card-improvements.md)): the port-forward ASCII diagram and the in-cluster URL both reference the in-cluster port number.
+2. **Expected-output generator** (planned in [INVESTIGATE-environment-card-improvements.md](../completed/INVESTIGATE-environment-card-improvements.md)): the port-forward ASCII diagram and the in-cluster URL both reference the in-cluster port number.
 
 When the first non-postgres service is added (redis, mongodb, mysql, etc.), the hardcoded `5432` becomes wrong. A scalable solution is needed.
 

@@ -20,7 +20,7 @@
 > - **PR #33** (architecture diagrams v2): added auto-generated Mermaid local-development and deployment diagrams per template
 > - **PR #34** (CI fix): stopped CI from committing regenerated artifacts back to main, ending the merge-conflict loop
 >
-> The Environment card now displays the full configure surface area for every template, sourced entirely from existing `template-info.yaml`, vendored DCT/UIS data, and per-template manifests. Contributors don't write any of this by hand. Further refinements (numbering bug, `configure_command` field, expected-output generator) are tracked in [INVESTIGATE-environment-card-improvements.md](./INVESTIGATE-environment-card-improvements.md). The template-side and DCT-side action items from this investigation are tracked in their own repos.
+> The Environment card now displays the full configure surface area for every template, sourced entirely from existing `template-info.yaml`, vendored DCT/UIS data, and per-template manifests. Contributors don't write any of this by hand. Further refinements (numbering bug, `configure_command` field, expected-output generator) were shipped via [PLAN-environment-card-improvements.md](../completed/PLAN-environment-card-improvements.md) and the companion [INVESTIGATE-environment-card-improvements.md](../completed/INVESTIGATE-environment-card-improvements.md). The template-side and DCT-side action items from this investigation are tracked in their own repos.
 
 ### Contributors
 

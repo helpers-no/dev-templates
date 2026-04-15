@@ -121,7 +121,11 @@ Templates with `requires:` get a **Configure sub-section** in the Environment ca
 
 - Which UIS services the template uses (from `requires[].service`)
 - Which `params` they must edit before running configure (from `params:` keys with empty default values)
-- The `dev-template configure` command to run
+- The configure command to run (from `configure_command`)
+- A collapsible **template-info.yaml** dropdown with the full raw file so readers can see the editable surface without opening the source
+- A collapsible **Expected output** dropdown auto-generated from registry data — a sample of what DCT prints when the developer actually runs the configure step. Every value (app name, database, K8s secret, port-forward path) is derived from the template's own `template-info.yaml`, so the sample matches the template's real defaults and stays in sync when metadata changes. **Do not write a hand-authored Expected output mock in the README** — it will drift from reality and duplicate this auto-generated content.
+
+Stack templates (those with `provides.services:`) get a parallel **Install sub-section** instead of Configure — same shape, just with the stack's `uis template install` command and stack-flavoured Expected output.
 
 The card auto-adapts based on which yaml blocks are present:
 
@@ -129,8 +133,9 @@ The card auto-adapts based on which yaml blocks are present:
 |---|---|
 | No `tools`, no `requires`/`provides`, no `quickstart` | No card |
 | Only `tools` | ① What gets set up |
-| `tools` + `quickstart` | ① What gets set up, ③ Setup (if any), ④ Run |
-| `tools` + `requires` + `quickstart` | ① What gets set up, ② Configure, ③ Setup (if any), ④ Run |
+| `tools` + `quickstart` | ① What gets set up, ② Setup (if any), ③ Run |
+| `tools` + `requires` + `quickstart` (app with services) | ① What gets set up, ② Configure, ③ Setup (if any), ④ Run |
+| `tools` + `provides.services` + `quickstart` (stack) | ① What gets set up, ② Install, ③ Run |
 
 ### What this means for template authors
 
