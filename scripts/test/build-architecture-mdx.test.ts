@@ -173,27 +173,108 @@ test('emitter: ends with a trailing newline', () => {
   assert.ok(mdx.endsWith('\n'));
 });
 
-test('emitter: intro line renders when set on the model', () => {
+test('emitter: custom intro line renders when set on the model', () => {
   const model = buildArchitectureModel(e1Fixture);
-  model.intro = 'These diagrams are auto-generated.';
+  model.intro = 'Custom intro for this test only.';
   const mdx = emitArchitectureMdx(model)!;
   // Intro should appear after the `## Architecture` heading and before the first `###`
   const archIdx = mdx.indexOf('## Architecture');
-  const introIdx = mdx.indexOf('These diagrams are auto-generated.');
+  const introIdx = mdx.indexOf('Custom intro for this test only.');
   const sectionIdx = mdx.indexOf('### Local development');
   assert.ok(archIdx < introIdx);
   assert.ok(introIdx < sectionIdx);
 });
 
-test('emitter: no intro line when model.intro is undefined (Phase 2 default)', () => {
+test('emitter: default intro is used when model.intro is undefined (Phase 4)', () => {
   const mdx = emitArchitectureMdx(buildArchitectureModel(e1Fixture))!;
+  assert.match(mdx, /auto-generated from the template/);
+  assert.match(mdx, /Click any diagram to enlarge/);
+});
+
+test('emitter: empty-string intro is an explicit opt-out', () => {
+  const model = buildArchitectureModel(e1Fixture);
+  model.intro = '';
+  const mdx = emitArchitectureMdx(model)!;
   assert.doesNotMatch(mdx, /auto-generated/);
+  assert.doesNotMatch(mdx, /Click any diagram/);
 });
 
 // ────────────────────────────────────────────────────────────────────────────
-// Byte-compatibility: the refactored wrapper returns the same output as
-// the old direct-concatenation path. Regression guard against Phase 2's
-// "no visible change" promise.
+// Phase 4 — per-diagram <details> wrappers
+// ────────────────────────────────────────────────────────────────────────────
+
+test('Phase 4: each diagram is wrapped in <details className="dropdownBlock">', () => {
+  const mdx = emitArchitectureMdx(buildArchitectureModel(e1Fixture))!;
+  const detailsCount = (mdx.match(/<details className="dropdownBlock">/g) || []).length;
+  // E1 has 2 sections × 2 diagrams each = 4 dropdowns
+  assert.equal(detailsCount, 4);
+});
+
+test('Phase 4: each dropdown has a summary with the diagram name', () => {
+  const mdx = emitArchitectureMdx(buildArchitectureModel(e1Fixture))!;
+  // Two Components dropdowns + two Flow dropdowns (local dev + deploy)
+  const componentsCount = (mdx.match(/<summary>Components<\/summary>/g) || []).length;
+  const flowCount = (mdx.match(/<summary>Flow<\/summary>/g) || []).length;
+  assert.equal(componentsCount, 2);
+  assert.equal(flowCount, 2);
+});
+
+test('Phase 4: section headings still visible outside the dropdowns', () => {
+  const mdx = emitArchitectureMdx(buildArchitectureModel(e1Fixture))!;
+  assert.match(mdx, /^### Local development$/m);
+  assert.match(mdx, /^### Deployment$/m);
+});
+
+test('Phase 4: mermaid fences live inside the details body (blank lines around)', () => {
+  const mdx = emitArchitectureMdx(buildArchitectureModel(e1Fixture))!;
+  // Each details block should contain a mermaid fence between blank lines,
+  // which is the shape MDX needs to re-enter markdown mode inside JSX.
+  assert.match(
+    mdx,
+    /<details className="dropdownBlock">\n<summary>\w+<\/summary>\n\n```mermaid\n/,
+  );
+  assert.match(mdx, /\n```\n\n<\/details>/);
+});
+
+test('Phase 4: E2 (no services) has 2 dropdowns (Deployment only)', () => {
+  const mdx = emitArchitectureMdx(buildArchitectureModel(e2Fixture))!;
+  const detailsCount = (mdx.match(/<details className="dropdownBlock">/g) || []).length;
+  assert.equal(detailsCount, 2);
+});
+
+test('Phase 4: E3 (stack) has 2 dropdowns under ### Overview', () => {
+  const mdx = emitArchitectureMdx(buildArchitectureModel(e3Fixture))!;
+  const detailsCount = (mdx.match(/<details className="dropdownBlock">/g) || []).length;
+  assert.equal(detailsCount, 2);
+  assert.match(mdx, /### Overview/);
+});
+
+test('Phase 4: E4 (overlay) still returns null — no change from Phase 2', () => {
+  assert.equal(emitArchitectureMdx(buildArchitectureModel(e4Fixture)), null);
+});
+
+test('Phase 4: escapeSummary handles angle brackets in diagram names', () => {
+  const model: typeof buildArchitectureModel extends never ? never : ReturnType<typeof buildArchitectureModel> = {
+    sections: [
+      {
+        title: 'Test',
+        diagrams: [{ name: 'API <3', mermaid: 'flowchart LR\n  A --> B' }],
+      },
+    ],
+  };
+  const mdx = emitArchitectureMdx(model)!;
+  // The < and > in "API <3" should be HTML-entity-escaped so MDX's JSX
+  // parser doesn't mis-interpret it as a tag
+  assert.match(mdx, /<summary>API &lt;3<\/summary>/);
+  assert.doesNotMatch(mdx, /<summary>API <3</);
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// Byte-compatibility tests dropped in Phase 4: the output now includes
+// <details> wrappers and an intro sentence, so per-archetype output is
+// no longer byte-identical to the original Phase 1 concatenation. The
+// extensibility tests still hold — adding a diagram or section remains
+// a pure data change.
 // ────────────────────────────────────────────────────────────────────────────
 
 test('buildArchitectureMdx wrapper returns `{ mdx }` shape (backward compat)', () => {

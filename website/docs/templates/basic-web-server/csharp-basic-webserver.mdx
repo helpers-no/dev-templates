@@ -51,7 +51,12 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
 ## Architecture
 
+These diagrams are auto-generated from the template's metadata. Click any diagram to enlarge.
+
 ### Deployment
+
+<details className="dropdownBlock">
+<summary>Components</summary>
 
 ```mermaid
 flowchart LR
@@ -86,6 +91,11 @@ flowchart LR
     dev --> browser
 ```
 
+</details>
+
+<details className="dropdownBlock">
+<summary>Flow</summary>
+
 ```mermaid
 sequenceDiagram
     participant Dev as Developer
@@ -105,6 +115,8 @@ sequenceDiagram
     Argo->>K8s: deploy my-app pod
     Note over Dev,K8s: App now accessible at my-app.localhost via Traefik
 ```
+
+</details>
 
 A minimal ASP.NET Core web server. Displays "Hello World" with current time and date, with hot reload support via `dotnet watch`.
 
