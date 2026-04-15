@@ -11,7 +11,7 @@
 **Last Updated**: 2026-04-13
 
 **Related**:
-- [INVESTIGATE-uis-in-cluster-port.md](./INVESTIGATE-uis-in-cluster-port.md) — addresses the in-cluster port data gap that this work depends on (uses a stopgap until UIS ships the field)
+- [INVESTIGATE-uis-in-cluster-port.md](../backlog/INVESTIGATE-uis-in-cluster-port.md) — addresses the in-cluster port data gap that this work depends on (uses a stopgap until UIS ships the field)
 
 ---
 
@@ -272,7 +272,7 @@ The mock includes lines like:
 postgresql.default.svc.cluster.local:5432
 ```
 
-The in-cluster port (`5432` for postgres) is not currently surfaced anywhere in our data. A separate investigation [INVESTIGATE-uis-in-cluster-port.md](./INVESTIGATE-uis-in-cluster-port.md) addresses this. **Decision**: introduce a stopgap file `scripts/lib/service-ports.ts` with `{postgresql: 5432, redis: 6379, ...}`, used by both the expected-output generator and the existing architecture diagram builder (which currently hardcodes 5432). When UIS ships `inClusterPort` on `services.json`, delete the stopgap file.
+The in-cluster port (`5432` for postgres) is not currently surfaced anywhere in our data. A separate investigation [INVESTIGATE-uis-in-cluster-port.md](../backlog/INVESTIGATE-uis-in-cluster-port.md) addresses this. **Decision**: introduce a stopgap file `scripts/lib/service-ports.ts` with `{postgresql: 5432, redis: 6379, ...}`, used by both the expected-output generator and the existing architecture diagram builder (which currently hardcodes 5432). When UIS ships `inClusterPort` on `services.json`, delete the stopgap file.
 
 ---
 

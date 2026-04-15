@@ -25,8 +25,22 @@ Every template must have a `template-info.yaml` file with metadata fields. This 
 | `docs` | Yes | string | URL to the template source on GitHub. | `https://github.com/helpers-no/...` |
 | `summary` | Yes | string | Detailed description for the template detail page. | `A minimal Python web server...` |
 | `related` | No | list | YAML list of related template IDs. | `[php-basic-webserver]` |
+| `configure_command` | No | string | The literal command a developer runs to provision the backend services this template needs. Rendered on the template's Environment card in the Configure / Install sub-section, and in the architecture diagram's sequence block. Omit for templates with no configure step (e.g. plain app templates without services). | `"dev-template configure"` |
 
 Future fields (for templates with service dependencies): `params`, `requires`, `provides`. See the [unified template system investigation](../ai-developer/plans/completed/INVESTIGATE-unified-template-system.md) for the full specification.
+
+### `configure_command` — when to set it and what to put in it
+
+| Template archetype | Value |
+|---|---|
+| App template with services (`requires:`) | `"dev-template configure"` |
+| Stack template (`provides.services:`) | `"uis template install <template-id>"` |
+| App template without services | Omit the field |
+| Overlay template | Omit the field |
+
+The field is the single source of truth for the configure command across three consumers: the `<TemplateEnvironment>` React component (rendered command line inside the Configure / Install sub-section), `scripts/lib/build-architecture-mermaid.ts` (flowchart `cfg` node label + sequence `Dev->>DCT` step), and `scripts/lib/build-expected-output.ts` (the "Expected output from …" dropdown summary). If you add a new template that needs a configure step, set this field so every downstream renderer reads the same value.
+
+The field is also what fixed the earlier `dev-template-configure` (with hyphen, wrong form) bug — see [PLAN-environment-card-improvements.md Phase 2](../ai-developer/plans/completed/PLAN-environment-card-improvements.md) for the historical context.
 
 ## Valid Categories
 
