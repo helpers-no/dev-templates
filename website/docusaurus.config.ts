@@ -65,6 +65,14 @@ const config: Config = {
     'docusaurus-plugin-image-zoom',
   ],
 
+  // Client modules run on every page load + every SPA route update.
+  // mermaid-zoom wires click-to-enlarge behaviour onto every
+  // .docusaurus-mermaid-container after mermaid has rendered.
+  // Ships as part of PLAN-architecture-diagram-display Phase 3b.
+  clientModules: [
+    require.resolve('./src/client-modules/mermaid-zoom.ts'),
+  ],
+
   themeConfig: {
     image: 'img/social-card.jpg',
     colorMode: {
