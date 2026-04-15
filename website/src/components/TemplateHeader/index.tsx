@@ -14,6 +14,7 @@ interface TemplateHeaderProps {
   name: string;
   version: string;
   description: string;
+  abstract?: string;
   install: string;
   links?: LinkEntry[];
   maintainers?: string[];
@@ -26,6 +27,7 @@ export default function TemplateHeader({
   name,
   version,
   description,
+  abstract,
   install,
   links,
   maintainers,
@@ -43,6 +45,7 @@ export default function TemplateHeader({
           <span className={styles.version}>v{version}</span>
         </div>
         <p className={styles.description}>{description}</p>
+        {abstract && <p className={styles.abstract}>{abstract}</p>}
         {tools && (
           <div className={styles.tools}>
             <span className={styles.toolsLabel}>Tools: </span>{tools}

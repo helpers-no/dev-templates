@@ -18,15 +18,13 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   name="Python Basic Webserver with Database"
   version="1.0.0"
   description="Flask server that connects to PostgreSQL and reads from a tasks table"
+  abstract={"A minimal Flask web server that connects to a PostgreSQL database and reads from a tasks table. Demonstrates the full producer/consumer flow — UIS deploys PostgreSQL, dev-template configure creates the database and wires the connection into .env, and the app reads from it. Includes Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow. Consumer-side companion to the postgresql-demo UIS stack template."}
   install="dev-template python-basic-webserver-database"
   links={[{"url":"https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver-database","title":"Source code","icon":"github"}]}
   maintainers={["terchris"]}
   tags={["python","flask","postgresql","database","webserver","requires"]}
   tools="dev-python"
 />
-
-
-A minimal Flask web server that connects to a PostgreSQL database and reads from a tasks table. Demonstrates the full producer/consumer flow — UIS deploys PostgreSQL, dev-template configure creates the database and wires the connection into .env, and the app reads from it. Includes Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow. Consumer-side companion to the postgresql-demo UIS stack template.
 
 import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 

@@ -46,9 +46,17 @@
 }
 
 .description {
-  margin: 0.25rem 0 0.75rem;
+  margin: 0.25rem 0 0.5rem;
   color: var(--ifm-color-emphasis-700);
   font-size: 0.95rem;
+}
+
+.abstract {
+  margin: 0 0 0.75rem;
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  max-width: 72ch;
 }
 
 .install {
