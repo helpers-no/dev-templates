@@ -138,8 +138,15 @@ for i in $(seq 0 $((template_count - 1))); do
     local_has_requires=$(jq -r ".templates[$i].requires // empty" "$REGISTRY")
     local_has_quickstart=$(jq -r ".templates[$i].quickstart // empty" "$REGISTRY")
 
+    # Pass the abstract as a prop to TemplateHeader so it renders inside
+    # the header card (below the description line) instead of as orphaned
+    # prose between TemplateHeader and the Environment card. JSON-encoded
+    # with jq so newlines and quotes inside the abstract are escaped
+    # cleanly for a JSX string expression.
+    local_abstract_json=$(jq -c ".templates[$i].abstract // null" "$REGISTRY")
+
     # Write MDX file (Phase 1 task 1.2: no separate ## Summary section —
-    # the TemplateHeader description + README intro carry the content)
+    # the TemplateHeader description + abstract carry the content)
     cat > "$page_file" <<MDXEOF
 ---
 title: $name
@@ -155,6 +162,7 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   name="$name"
   version="$version"
   description="$description"
+  abstract={$local_abstract_json}
   install="$local_install_cmd"
   links={$local_links_json}
   maintainers={$local_maintainers_json}
@@ -163,13 +171,6 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
 />
 
 MDXEOF
-
-    # Emit abstract as a paragraph between header and environment card (S2).
-    # Double trailing newline ensures a blank line before the next `import`
-    # statement — MDX requires imports to be separated from prose content.
-    if [[ -n "$abstract" && "$abstract" != "null" ]]; then
-        printf '\n%s\n\n' "$abstract" >> "$page_file"
-    fi
 
     # Emit Environment card if any environment content is present.
     # The component is a dumb renderer — every value is pre-resolved by
