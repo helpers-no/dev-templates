@@ -24,6 +24,22 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   tools=""
 />
 
+
+<div className="templateCard">
+<div className="templateCardEyebrow">GETTING STARTED</div>
+
+### Prerequisites
+
+- [ ] [DCT devcontainer running](https://dct.sovereignsky.no)
+- [ ] [UIS provision-host container running](https://uis.sovereignsky.no)
+- [ ] [Local Kubernetes cluster running (Rancher Desktop)](https://www.rancher.com/products/rancher-desktop)
+
+### Related templates
+
+- [Python Basic Webserver with Database](../basic-web-server-database/python-basic-webserver-database)
+
+</div>
+
 import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
 <TemplateEnvironment
@@ -38,13 +54,6 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
   templateInfoYaml={null}
   expectedOutputBlock={"🔧 UIS Template Install: postgresql-demo\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📄 Reading template-info.yaml...\n   ✓ ID:   postgresql-demo\n   ✓ Type: stack\n\n📝 Parameters:\n   app_name      = demo-app\n   database_name = demo_db\n\n🔧 Provisioning 1 service...\n\n   ─── postgresql ──────────────────────────────────────────────────\n   Database:     demo_db\n   Namespace:    default\n   Init file:    config/init-database.sql (706 bytes, 19 lines)\n\n   📡 Calling UIS:\n      docker exec -i uis-provision-host uis deploy postgresql \\\n        --database demo_db \\\n        --namespace default \\\n        --init-file - \\\n        \u003c config/init-database.sql\n\n   ✓ PostgreSQL deployed\n   ✓ Database demo_db created + seeded\n   ✓ Port-forward: host.docker.internal:35432 → postgresql.default.svc:5432\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n✅ Stack installed (1 service)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📋 Next steps:\n   • Verify:                 uis connect postgresql demo_db\n   • Check port forwards:    uis expose --status\n   • Consumer templates:     see the \"Related\" links on this page"}
 />
-
-
-## Prerequisites
-
-- [ ] [DCT devcontainer running](https://dct.sovereignsky.no)
-- [ ] [UIS provision-host container running](https://uis.sovereignsky.no)
-- [ ] [Local Kubernetes cluster running (Rancher Desktop)](https://www.rancher.com/products/rancher-desktop)
 
 
 <div className="templateCard">
@@ -207,10 +216,4 @@ This template is the minimum viable example. To build your own:
 4. Reference UIS stacks (like `observability`) in `provides.stacks` to include multi-service stacks
 
 See the [contributor docs](https://tmp.sovereignsky.no/docs/contributors/creating-a-template) for the full template authoring guide.
-
----
-
-## Related Templates
-
-- [Python Basic Webserver with Database](../basic-web-server-database/python-basic-webserver-database)
 

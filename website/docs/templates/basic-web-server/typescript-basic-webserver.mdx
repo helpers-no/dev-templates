@@ -25,6 +25,21 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
   tools="dev-typescript"
 />
 
+
+<div className="templateCard">
+<div className="templateCardEyebrow">GETTING STARTED</div>
+
+### Prerequisites
+
+- [ ] [DCT devcontainer running](https://dct.sovereignsky.no)
+
+### Related templates
+
+- [Designsystemet Basic React App](../web-app/designsystemet-basic-react-app)
+- [Python Basic Webserver](../basic-web-server/python-basic-webserver)
+
+</div>
+
 import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
 <TemplateEnvironment
@@ -39,11 +54,6 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
   templateInfoYaml={null}
   expectedOutputBlock={null}
 />
-
-
-## Prerequisites
-
-- [ ] [DCT devcontainer running](https://dct.sovereignsky.no)
 
 
 <div className="templateCard">
@@ -188,11 +198,4 @@ The app will be accessible at `http://<app-name>.localhost` after ArgoCD registr
 ## CI/CD
 
 The GitHub Actions workflow automatically builds and pushes the Docker image to GitHub Container Registry when changes are pushed to the main branch.
-
----
-
-## Related Templates
-
-- [Designsystemet Basic React App](../web-app/designsystemet-basic-react-app)
-- [Python Basic Webserver](../basic-web-server/python-basic-webserver)
 
