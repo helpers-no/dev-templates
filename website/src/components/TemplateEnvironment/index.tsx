@@ -247,7 +247,7 @@ function InitFilesBlock({initFiles}: {initFiles: Record<string, string>}) {
     <div className={styles.subsection}>
       <div className={styles.subsectionTitle}>Schema applied to the database</div>
       {entries.map(([path, content]) => (
-        <details key={path} className={styles.detailsBlock}>
+        <details key={path} className="dropdownBlock">
           <summary>
             <code>{path}</code>
           </summary>
@@ -365,7 +365,7 @@ export default function TemplateEnvironment({
             </>
           )}
           {templateInfoYaml && (
-            <details className={styles.detailsBlock}>
+            <details className="dropdownBlock">
               <summary>
                 <code>template-info.yaml</code> — edit to change defaults
               </summary>
@@ -379,7 +379,7 @@ export default function TemplateEnvironment({
             <code>{configureCommand ?? 'dev-template configure'}</code>
           </pre>
           {expectedOutputBlock && (
-            <details className={styles.detailsBlock}>
+            <details className="dropdownBlock">
               <summary>
                 Expected output from <code>{configureCommand ?? 'dev-template configure'}</code>
               </summary>
@@ -406,7 +406,7 @@ export default function TemplateEnvironment({
           <pre className={styles.commands}>
             <code>{configureCommand ?? 'uis template install'}</code>
           </pre>
-          <details className={styles.detailsBlock}>
+          <details className="dropdownBlock">
             <summary>
               Expected output from <code>{configureCommand ?? 'uis template install'}</code>
             </summary>

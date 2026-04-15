@@ -7,15 +7,19 @@
  * which `generate-docs-markdown.sh` then pastes verbatim into the
  * template's generated MDX page.
  *
- * **Phase 2 contract**: this emitter produces **byte-identical output**
- * to the pre-refactor direct-string-concatenation path. No `<details>`
- * wrappers, no per-diagram dropdowns. The goal of Phase 2 is a pure
- * internal refactor with zero user-visible change.
+ * **Phase 4 output**: each diagram is wrapped in a `<details>` block
+ * with a per-diagram `<summary>`. The outermost `## Architecture`
+ * heading gets a one-sentence intro describing the auto-generation and
+ * the click-to-enlarge affordance. Section headings (`### Local
+ * development`, `### Deployment`, `### Overview`) stay visible as
+ * signposts between the outer heading and the per-diagram dropdowns.
  *
- * Phase 4 of PLAN-architecture-diagram-display will update this emitter
- * to wrap each diagram in a collapsible `<details>` block and add the
- * top-level intro sentence. That change happens in this file and only
- * in this file.
+ * Earlier phases:
+ *   - Phase 2: byte-identical refactor. No user-visible change; this
+ *     emitter produced the same output as the old direct-string-
+ *     concatenation path.
+ *   - Phase 4 (this version): flip on the per-diagram <details>
+ *     wrappers and the intro sentence.
  */
 
 import type {
@@ -24,17 +28,35 @@ import type {
 } from './build-architecture-mermaid.ts';
 
 /**
+ * Default intro sentence rendered below the `## Architecture` heading.
+ * Locked in by PLAN-architecture-diagram-display Q4.
+ */
+const DEFAULT_INTRO =
+  'These diagrams are auto-generated from the template\'s metadata. Click any diagram to enlarge.';
+
+/**
  * Emit the full `## Architecture` MDX block for a model, or null if the
  * model has no sections (overlay templates). The returned string starts
  * with `## Architecture` and ends with a trailing newline.
+ *
+ * Each diagram is wrapped in a `<details className="dropdownBlock">`
+ * element with a `<summary>{diagram.name}</summary>` label. The
+ * dropdown is collapsed by default; readers see the section headings
+ * and dropdown labels without the diagram content forcing its way onto
+ * the page.
+ *
+ * The model's `intro` field overrides the default intro sentence. If
+ * `intro` is an empty string, no intro is emitted (explicit opt-out).
+ * If `intro` is undefined, the DEFAULT_INTRO is used.
  */
 export function emitArchitectureMdx(model: ArchitectureModel): string | null {
   if (model.sections.length === 0) return null;
 
   const parts: string[] = ['## Architecture', ''];
 
-  if (model.intro) {
-    parts.push(model.intro);
+  const intro = model.intro === undefined ? DEFAULT_INTRO : model.intro;
+  if (intro !== '') {
+    parts.push(intro);
     parts.push('');
   }
 
@@ -53,8 +75,11 @@ export function emitArchitectureMdx(model: ArchitectureModel): string | null {
 
 /**
  * Emit one `### Title` sub-section with its list of diagrams.
- * Each diagram becomes a plain ```mermaid fence in Phase 2. Phase 4
- * wraps each fence in a `<details>` block with a per-diagram summary.
+ * Each diagram is wrapped in a `<details>` block with a per-diagram
+ * summary. The blank lines around the mermaid fence inside `<details>`
+ * are load-bearing: MDX's parser needs them to re-enter markdown mode
+ * for the fenced code block (otherwise the fence is treated as inline
+ * JSX content and the mermaid source isn't rendered as a diagram).
  */
 function emitSection(parts: string[], section: ArchitectureSection): void {
   parts.push(`### ${section.title}`);
@@ -62,12 +87,32 @@ function emitSection(parts: string[], section: ArchitectureSection): void {
 
   for (let i = 0; i < section.diagrams.length; i++) {
     const diagram = section.diagrams[i]!;
+    parts.push('<details className="dropdownBlock">');
+    parts.push(`<summary>${escapeSummary(diagram.name)}</summary>`);
+    parts.push('');
     parts.push('```mermaid');
     parts.push(diagram.mermaid);
     parts.push('```');
-    // Blank line between diagrams within a section (but not after the last).
+    parts.push('');
+    parts.push('</details>');
+    // Blank line between dropdowns within a section (but not after the last).
     if (i < section.diagrams.length - 1) {
       parts.push('');
     }
   }
+}
+
+/**
+ * Escape MDX-hostile characters in a summary label. For the current
+ * Components / Flow vocabulary this is a no-op, but future diagram
+ * names might contain `<`, `>`, `&`, or `{`, which MDX would
+ * mis-interpret. Cheap defensive helper.
+ */
+function escapeSummary(name: string): string {
+  return name
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\{/g, '&#123;')
+    .replace(/\}/g, '&#125;');
 }

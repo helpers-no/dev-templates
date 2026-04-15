@@ -81,3 +81,83 @@
   background-color: rgba(255, 255, 255, 0.15);
   color: white !important;
 }
+
+/* ────────────────────────────────────────────────────────────────────── */
+/* .dropdownBlock — shared collapsible <details> styling                */
+/*                                                                        */
+/* Used by:                                                               */
+/*   1. The Environment card's init-SQL, template-info.yaml, and          */
+/*      Expected output dropdowns (PLAN-environment-card-improvements)    */
+/*   2. The auto-generated architecture-diagram dropdowns                 */
+/*      (PLAN-architecture-diagram-display Phase 4)                       */
+/*                                                                        */
+/* Promoted from a component-scoped CSS module class (.detailsBlock) to   */
+/* a global class so MDX-emitted <details> blocks (which cannot import a  */
+/* CSS module) can use the same styling as the React component.          */
+/* ────────────────────────────────────────────────────────────────────── */
+
+.dropdownBlock {
+  margin: 0.5rem 0;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 6px;
+  background: var(--ifm-color-emphasis-100);
+  overflow: hidden;
+}
+
+[data-theme='dark'] .dropdownBlock {
+  background: var(--ifm-color-emphasis-200);
+  border-color: var(--ifm-color-emphasis-400);
+}
+
+.dropdownBlock summary {
+  padding: 0.5rem 0.8rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.85rem;
+  cursor: pointer;
+  user-select: none;
+  color: var(--ifm-color-emphasis-800);
+}
+
+.dropdownBlock summary:hover {
+  background: var(--ifm-color-emphasis-200);
+}
+
+[data-theme='dark'] .dropdownBlock summary:hover {
+  background: var(--ifm-color-emphasis-300);
+}
+
+.dropdownBlock pre {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  max-height: 400px;
+  overflow: auto;
+  background: var(--ifm-color-emphasis-200);
+  border-top: 1px solid var(--ifm-color-emphasis-300);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--ifm-color-emphasis-900);
+}
+
+[data-theme='dark'] .dropdownBlock pre {
+  background: var(--ifm-color-emphasis-300);
+  border-top-color: var(--ifm-color-emphasis-400);
+  color: var(--ifm-color-emphasis-900);
+}
+
+/* For architecture-diagram dropdowns the body holds a mermaid svg, not
+   a <pre><code> block. Give the body its own padding and remove the
+   max-height cap so taller diagrams can breathe. */
+.dropdownBlock > .docusaurus-mermaid-container,
+.dropdownBlock > div > .docusaurus-mermaid-container {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  background: var(--ifm-color-emphasis-200);
+  border-top: 1px solid var(--ifm-color-emphasis-300);
+}
+
+[data-theme='dark'] .dropdownBlock > .docusaurus-mermaid-container,
+[data-theme='dark'] .dropdownBlock > div > .docusaurus-mermaid-container {
+  background: var(--ifm-color-emphasis-300);
+  border-top-color: var(--ifm-color-emphasis-400);
+}

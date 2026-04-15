@@ -51,7 +51,12 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 
 ## Architecture
 
+These diagrams are auto-generated from the template's metadata. Click any diagram to enlarge.
+
 ### Overview
+
+<details className="dropdownBlock">
+<summary>Components</summary>
 
 ```mermaid
 flowchart LR
@@ -75,6 +80,11 @@ flowchart LR
     consumers -.->|use this| svc
 ```
 
+</details>
+
+<details className="dropdownBlock">
+<summary>Flow</summary>
+
 ```mermaid
 sequenceDiagram
     participant Dev as Developer
@@ -90,6 +100,8 @@ sequenceDiagram
     UIS->>UIS: kubectl port-forward 35432
     UIS-->>DCT: return connection JSON
 ```
+
+</details>
 
 A minimal UIS stack template that deploys PostgreSQL and creates a sample database with seed data. Use it to verify your UIS setup, or as a starting point for your own UIS stack templates.
 

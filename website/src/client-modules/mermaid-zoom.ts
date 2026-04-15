@@ -25,7 +25,13 @@
  */
 
 // Docusaurus invokes this default export on every route update.
-// We also run it once on initial mount via the module's top-level code.
+// We also run it once on initial mount via the module's top-level code,
+// and we install a MutationObserver that catches mermaid containers
+// created after mount — which matters because Docusaurus's swizzled
+// <details> theme component only mounts its child content when the
+// dropdown is first opened. Without the observer, a collapsed dropdown
+// containing a mermaid diagram wouldn't get wired for zoom until the
+// next route update.
 export function onRouteUpdate({
   location: _location,
 }: {
@@ -38,9 +44,43 @@ export function onRouteUpdate({
 }
 
 // Initial mount — also fires on the first page load before onRouteUpdate
-// kicks in. Guarded against SSR (no window).
+// kicks in. Guarded against SSR (no window). Installs the persistent
+// MutationObserver on the same tick.
 if (typeof window !== 'undefined') {
   window.setTimeout(wireMermaidContainers, 1000);
+  installMutationObserver();
+}
+
+/**
+ * Watch the DOM for new `.docusaurus-mermaid-container` elements added
+ * after initial mount, and wire them up as soon as they appear. This
+ * catches diagrams rendered inside lazy-mounted dropdowns.
+ *
+ * Installed once per page load; survives route updates because it
+ * observes `document.body` which persists across Docusaurus SPA nav.
+ */
+function installMutationObserver(): void {
+  if (typeof MutationObserver === 'undefined') return;
+  const observer = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      for (const node of Array.from(mutation.addedNodes)) {
+        if (!(node instanceof HTMLElement)) continue;
+        // Check the added node and its descendants for mermaid containers.
+        // Using querySelectorAll on the node covers both cases — the
+        // container itself being added or a wrapper whose children contain
+        // the container.
+        if (node.classList.contains(CONTAINER_CLASS)) {
+          wireMermaidContainers();
+          return;
+        }
+        if (node.querySelector?.(`.${CONTAINER_CLASS}`)) {
+          wireMermaidContainers();
+          return;
+        }
+      }
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
 }
 
 const CONTAINER_CLASS = 'docusaurus-mermaid-container';

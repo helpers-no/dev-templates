@@ -219,51 +219,12 @@
   text-decoration: underline;
 }
 
-.detailsBlock {
-  margin: 0.5rem 0;
-  border: 1px solid var(--ifm-color-emphasis-300);
-  border-radius: 6px;
-  background: var(--ifm-color-emphasis-100);
-  overflow: hidden;
-}
-
-[data-theme='dark'] .detailsBlock {
-  background: var(--ifm-color-emphasis-200);
-  border-color: var(--ifm-color-emphasis-400);
-}
-
-.detailsBlock summary {
-  padding: 0.5rem 0.8rem;
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.85rem;
-  cursor: pointer;
-  user-select: none;
-  color: var(--ifm-color-emphasis-800);
-}
-
-.detailsBlock summary:hover {
-  background: var(--ifm-color-emphasis-200);
-}
-
-[data-theme='dark'] .detailsBlock summary:hover {
-  background: var(--ifm-color-emphasis-300);
-}
-
-.detailsBlock pre {
-  margin: 0;
-  padding: 0.8rem 1rem;
-  max-height: 400px;
-  overflow: auto;
-  background: var(--ifm-color-emphasis-200);
-  border-top: 1px solid var(--ifm-color-emphasis-300);
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.8rem;
-  line-height: 1.4;
-  color: var(--ifm-color-emphasis-900);
-}
-
-[data-theme='dark'] .detailsBlock pre {
-  background: var(--ifm-color-emphasis-300);
-  border-top-color: var(--ifm-color-emphasis-400);
-  color: var(--ifm-color-emphasis-900);
-}
+/*
+ * .dropdownBlock was here — promoted to a global class in
+ * `website/src/css/custom.css` during PLAN-architecture-diagram-display
+ * Phase 4 so MDX-emitted <details> blocks (architecture diagrams) can
+ * share the same styling as the component-rendered dropdowns.
+ *
+ * Callers should use `className="dropdownBlock"` as a literal string
+ * instead of `styles.detailsBlock`.
+ */
