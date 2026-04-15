@@ -83,6 +83,46 @@
 }
 
 /* ────────────────────────────────────────────────────────────────────── */
+/* .templateCard / .templateCardEyebrow — shared card container styling */
+/*                                                                        */
+/* Promoted from TemplateEnvironment/styles.module.css so the             */
+/* auto-generated Architecture section can render as a card with the     */
+/* same visual language as the Environment card.                         */
+/*                                                                        */
+/* Used by:                                                               */
+/*   1. The Environment card (<TemplateEnvironment> React component)     */
+/*   2. The auto-generated Architecture section (MDX-emitted wrapper)    */
+/* ────────────────────────────────────────────────────────────────────── */
+
+.templateCard {
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  background: var(--ifm-color-emphasis-100);
+}
+
+[data-theme='dark'] .templateCard {
+  background: var(--ifm-color-emphasis-100);
+  border-color: var(--ifm-color-emphasis-300);
+}
+
+.templateCardEyebrow {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--ifm-color-emphasis-600);
+  margin-bottom: 1rem;
+}
+
+/* Architecture section inside the card: suppress the default top margin
+   on the first heading/paragraph so the eyebrow + content sit flush. */
+.templateCard > h2:first-of-type,
+.templateCard > h3:first-of-type {
+  margin-top: 0;
+}
+
+/* ────────────────────────────────────────────────────────────────────── */
 /* .dropdownBlock — shared collapsible <details> styling                */
 /*                                                                        */
 /* Used by:                                                               */

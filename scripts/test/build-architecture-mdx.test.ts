@@ -142,11 +142,14 @@ test('emitter: null for empty-sections model (overlay)', () => {
   assert.equal(emitArchitectureMdx({ sections: [] }), null);
 });
 
-test('emitter: E1 output has ## Architecture, both ### headings, 4 mermaid fences', () => {
+test('emitter: E1 output is wrapped in templateCard with ARCHITECTURE eyebrow', () => {
   const mdx = emitArchitectureMdx(buildArchitectureModel(e1Fixture))!;
-  assert.match(mdx, /^## Architecture\n/);
+  assert.match(mdx, /^<div className="templateCard">/);
+  assert.match(mdx, /<div className="templateCardEyebrow">ARCHITECTURE<\/div>/);
+  assert.match(mdx, /## Architecture/);
   assert.match(mdx, /### Local development/);
   assert.match(mdx, /### Deployment/);
+  assert.match(mdx, /<\/div>\n$/);
   const fences = (mdx.match(/```mermaid/g) || []).length;
   assert.equal(fences, 4);
 });

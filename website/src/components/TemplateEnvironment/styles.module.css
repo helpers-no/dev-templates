@@ -1,23 +1,10 @@
-.card {
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  border: 1px solid var(--ifm-color-emphasis-300);
-  border-radius: 8px;
-  background: var(--ifm-color-emphasis-100);
-}
-
-[data-theme='dark'] .card {
-  background: var(--ifm-color-emphasis-100);
-  border-color: var(--ifm-color-emphasis-300);
-}
-
-.eyebrow {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--ifm-color-emphasis-600);
-  margin-bottom: 1rem;
-}
+/*
+ * .card and .eyebrow were here — promoted to global classes
+ * (.templateCard / .templateCardEyebrow) in website/src/css/custom.css
+ * so the auto-generated Architecture MDX section can render inside a
+ * card with the same visual language as the Environment card.
+ * Callers use the class names as string literals, not styles.*.
+ */
 
 .section {
   margin-bottom: 1.25rem;

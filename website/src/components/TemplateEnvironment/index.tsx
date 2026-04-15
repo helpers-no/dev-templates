@@ -317,8 +317,8 @@ export default function TemplateEnvironment({
     : requires?.map((r) => r.service).join(', ') ?? '';
 
   return (
-    <div className={styles.card}>
-      <div className={styles.eyebrow}>ENVIRONMENT</div>
+    <div className="templateCard">
+      <div className="templateCardEyebrow">ENVIRONMENT</div>
 
       {hasWhatGetsSetUp && (
         <div className={styles.section}>

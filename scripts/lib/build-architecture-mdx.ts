@@ -52,7 +52,21 @@ const DEFAULT_INTRO =
 export function emitArchitectureMdx(model: ArchitectureModel): string | null {
   if (model.sections.length === 0) return null;
 
-  const parts: string[] = ['## Architecture', ''];
+  // Wrap the entire Architecture section in a card container that mirrors
+  // the Environment card's visual language. The `.templateCard` and
+  // `.templateCardEyebrow` classes are global (defined in custom.css) —
+  // shared with <TemplateEnvironment> so both sections look the same.
+  //
+  // The `<div>` and the `## Architecture` heading must be separated by a
+  // blank line so MDX re-enters markdown mode to parse the heading.
+  // Same rule applies to the `</div>` at the end.
+  const parts: string[] = [
+    '<div className="templateCard">',
+    '<div className="templateCardEyebrow">ARCHITECTURE</div>',
+    '',
+    '## Architecture',
+    '',
+  ];
 
   const intro = model.intro === undefined ? DEFAULT_INTRO : model.intro;
   if (intro !== '') {
@@ -69,6 +83,9 @@ export function emitArchitectureMdx(model: ArchitectureModel): string | null {
       parts.push('');
     }
   }
+
+  parts.push('');
+  parts.push('</div>');
 
   return parts.join('\n') + '\n';
 }
