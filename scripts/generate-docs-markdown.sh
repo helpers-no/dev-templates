@@ -172,6 +172,58 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
 
 MDXEOF
 
+    # Emit the "Getting started" card: combines Prerequisites + Related
+    # templates into one card with the same .templateCard visual language
+    # as the Environment and Architecture cards. Skipped entirely if both
+    # sub-sections are empty. Either sub-section can be skipped individually
+    # if its source data is empty.
+    local_prereqs_json=$(jq -c ".templates[$i].prerequisites // []" "$REGISTRY")
+    local_prereqs_len=$(echo "$local_prereqs_json" | jq 'length')
+    local_related_ids=$(jq -r ".templates[$i].related[]?" "$REGISTRY")
+    local_related_len=0
+    if [[ -n "$local_related_ids" ]]; then
+        local_related_len=$(echo "$local_related_ids" | wc -l | tr -d ' ')
+    fi
+    if [[ "$local_prereqs_len" -gt 0 || "$local_related_len" -gt 0 ]]; then
+        {
+            echo ""
+            echo '<div className="templateCard">'
+            echo '<div className="templateCardEyebrow">GETTING STARTED</div>'
+            echo ""
+        } >> "$page_file"
+
+        if [[ "$local_prereqs_len" -gt 0 ]]; then
+            {
+                echo "### Prerequisites"
+                echo ""
+            } >> "$page_file"
+            echo "$local_prereqs_json" | jq -r '.[] | if .url then "- [ ] [" + .text + "](" + .url + ")" else "- [ ] " + .text end' >> "$page_file"
+            echo "" >> "$page_file"
+        fi
+
+        if [[ "$local_related_len" -gt 0 ]]; then
+            {
+                echo "### Related templates"
+                echo ""
+            } >> "$page_file"
+            while IFS= read -r rel_id; do
+                [[ -z "$rel_id" ]] && continue
+                rel_name=$(jq -r ".templates[] | select(.id == \"$rel_id\") | .name" "$REGISTRY")
+                rel_cat=$(jq -r ".templates[] | select(.id == \"$rel_id\") | .category" "$REGISTRY")
+                if [[ -n "$rel_name" && "$rel_name" != "null" ]]; then
+                    rel_cat_dir=$(echo "$rel_cat" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
+                    echo "- [$rel_name](../$rel_cat_dir/$rel_id)" >> "$page_file"
+                else
+                    echo "- $rel_id" >> "$page_file"
+                fi
+            done <<< "$local_related_ids"
+            echo "" >> "$page_file"
+        fi
+
+        echo '</div>' >> "$page_file"
+        echo "" >> "$page_file"
+    fi
+
     # Emit Environment card if any environment content is present.
     # The component is a dumb renderer — every value is pre-resolved by
     # generate-registry.ts and passed as JSON props. JSX accepts JSON literals
@@ -214,14 +266,9 @@ import TemplateEnvironment from '@site/src/components/TemplateEnvironment';
 MDXEOF
     fi
 
-    # Emit prerequisites checklist (S4) — between environment card and architecture.
-    local_prereqs_json=$(jq -c ".templates[$i].prerequisites // []" "$REGISTRY")
-    local_prereqs_len=$(echo "$local_prereqs_json" | jq 'length')
-    if [[ "$local_prereqs_len" -gt 0 ]]; then
-        printf '\n## Prerequisites\n\n' >> "$page_file"
-        echo "$local_prereqs_json" | jq -r '.[] | if .url then "- [ ] [" + .text + "](" + .url + ")" else "- [ ] " + .text end' >> "$page_file"
-        echo "" >> "$page_file"
-    fi
+    # Prerequisites previously emitted here as a standalone ## Prerequisites
+    # section. Moved to the "Getting started" card above the Environment
+    # card so it sits alongside Related templates in a single visual unit.
 
     # Emit auto-generated ## Architecture section (PLAN-template-architecture-diagram.md).
     # The full MDX block (headings + fenced mermaid code blocks) is pre-composed
@@ -244,27 +291,11 @@ MDXEOF
         log_info "$tid: no README file — page is fully yaml-driven"
     fi
 
-    # Add related templates
-    local_related=$(jq -r ".templates[$i].related[]?" "$REGISTRY")
-    if [[ -n "$local_related" ]]; then
-        echo "---" >> "$page_file"
-        echo "" >> "$page_file"
-        echo "## Related Templates" >> "$page_file"
-        echo "" >> "$page_file"
-        while IFS= read -r rel_id; do
-            [[ -z "$rel_id" ]] && continue
-            # Look up related template name and category from registry
-            rel_name=$(jq -r ".templates[] | select(.id == \"$rel_id\") | .name" "$REGISTRY")
-            rel_cat=$(jq -r ".templates[] | select(.id == \"$rel_id\") | .category" "$REGISTRY")
-            if [[ -n "$rel_name" && "$rel_name" != "null" ]]; then
-                rel_cat_dir=$(echo "$rel_cat" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
-                echo "- [$rel_name](../$rel_cat_dir/$rel_id)" >> "$page_file"
-            else
-                echo "- $rel_id" >> "$page_file"
-            fi
-        done <<< "$local_related"
-        echo "" >> "$page_file"
-    fi
+    # Related templates previously emitted here as a standalone
+    # ## Related Templates section at the end of the page. Moved to the
+    # "Getting started" card above the Environment card so it's
+    # discoverable alongside Prerequisites without requiring the reader
+    # to scroll to the very bottom.
 
     ((page_count++)) || true
     log_success "$tid → $cat_dir/$tid.mdx"
