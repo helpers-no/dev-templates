@@ -4,7 +4,7 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: In Progress — Phase 1 complete (B2 rejected, switching to B1)
+## Status: Complete
 
 **Goal**: Ship the three changes locked in by the upstream investigation:
 
@@ -14,10 +14,10 @@
 
 **Last Updated**: 2026-04-15
 
-**Upstream investigation**: [INVESTIGATE-architecture-diagram-display.md](../backlog/INVESTIGATE-architecture-diagram-display.md) — all 8 questions and 3 axes decided.
+**Upstream investigation**: [INVESTIGATE-architecture-diagram-display.md](INVESTIGATE-architecture-diagram-display.md) — all 8 questions and 3 axes decided.
 
 **Related**:
-- [PLAN-environment-card-improvements.md](../completed/PLAN-environment-card-improvements.md) — the preceding plan that introduced the shared `.detailsBlock` CSS class this plan reuses
+- [PLAN-environment-card-improvements.md](PLAN-environment-card-improvements.md) — the preceding plan that introduced the shared `.detailsBlock` CSS class this plan reuses
 - [PLAN-architecture-diagram-v2.md](../completed/PLAN-architecture-diagram-v2.md) — the plan that produced the current 4-diagram shape being restructured here
 
 ---

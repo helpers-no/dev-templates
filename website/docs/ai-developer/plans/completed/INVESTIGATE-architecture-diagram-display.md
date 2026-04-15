@@ -11,9 +11,9 @@
 **Last Updated**: 2026-04-15
 
 **Related** (same arc of Environment-card work):
-- [PLAN-environment-card-improvements.md](../completed/PLAN-environment-card-improvements.md) — the just-shipped plan that added the `detailsBlock` CSS class this investigation will reuse
-- [PLAN-architecture-diagram-v2.md](../completed/PLAN-architecture-diagram-v2.md) — the plan that produced the current 4-diagram shape
-- [INVESTIGATE-uis-in-cluster-port.md](./INVESTIGATE-uis-in-cluster-port.md) — parallel UIS-team concern, unrelated to this investigation
+- [PLAN-environment-card-improvements.md](PLAN-environment-card-improvements.md) — the just-shipped plan that added the `detailsBlock` CSS class this investigation reuses
+- [PLAN-architecture-diagram-v2.md](PLAN-architecture-diagram-v2.md) — the plan that produced the current 4-diagram shape
+- [INVESTIGATE-uis-in-cluster-port.md](../backlog/INVESTIGATE-uis-in-cluster-port.md) — parallel UIS-team concern, unrelated to this investigation
 
 ---
 

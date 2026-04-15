@@ -42,6 +42,19 @@ The card has up to four numbered sub-sections:
 
 For deeper details on what each sub-section renders and the full prop interface, see [project-dev-templates.md → Auto-generated documentation sections](../ai-developer/project-dev-templates.md).
 
+## The auto-generated Architecture section
+
+Below the Environment card, non-overlay template pages render an **Architecture section** with per-diagram collapsible dropdowns. Today each sub-section has two diagrams:
+
+- **Components** — a mermaid flowchart showing the named nodes (Developer, DCT, UIS, K8s, app, browser) and how they connect
+- **Flow** — a mermaid sequence diagram showing the ordered steps at runtime (configure call, UIS provisioning, port-forward, .env write, app run)
+
+Both are auto-generated from the template's `template-info.yaml`, the vendored DCT/UIS registry data, and the template's `manifests/deployment.yaml`. Contributors don't write any mermaid by hand. Click any diagram on the rendered docs page to enlarge it in an overlay.
+
+The dropdowns are **collapsed by default** so developers who just want to run the template aren't confronted with a wall of SVGs. Section headings (`### Local development` / `### Deployment` for app templates; `### Overview` for stack templates) stay visible as signposts.
+
+Adding a third diagram (e.g. Errors, Data flow, Network) to an existing section is a pure data change in `scripts/lib/build-architecture-mermaid.ts`'s `buildArchitectureModel` function — push one `{ name, mermaid }` entry onto the section's `diagrams` array. The emitter and the rendering path are unchanged.
+
 ## The `quickstart:` block in `template-info.yaml`
 
 Templates can declare a `quickstart:` block in `template-info.yaml`. It does two things:

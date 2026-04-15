@@ -103,28 +103,33 @@ Rendered by the React component at `website/src/components/TemplateEnvironment/i
 
 ### Architecture section (`## Architecture`)
 
-Added by `scripts/lib/build-architecture-mermaid.ts`. Composes the complete `## Architecture` MDX block — **two diagrams per non-stack template**, each with a flowchart + a paired sequence diagram — during registry generation. The output is stored as a single `architectureMdx` string on each registry entry, and `scripts/generate-docs-markdown.sh` pastes it verbatim into the MDX page with a one-line `jq` read.
+Built by a two-step pipeline split across `scripts/lib/build-architecture-mermaid.ts` (model builder) and `scripts/lib/build-architecture-mdx.ts` (MDX emitter). Per-diagram helpers (`buildLocalDevFlowchart`, `buildLocalDevSequence`, `buildDeployFlowchart`, `buildDeploySequence`, `buildStackFlowchart`, `buildStackSequence`) produce the raw mermaid source strings. `buildArchitectureModel(entry)` assembles them into an `ArchitectureModel` shape, and `emitArchitectureMdx(model)` walks the model to produce the final MDX block. `generate-registry.ts` stores the rendered MDX on each entry as `architectureMdx`, and `generate-docs-markdown.sh` pastes it verbatim into the template's MDX page.
 
-**The two diagrams:**
+**Per-diagram collapsible dropdowns** (PLAN-architecture-diagram-display Phase 4): each mermaid diagram is wrapped in its own collapsed `<details className="dropdownBlock">` block with a per-diagram `<summary>` label. Section headings (`### Local development`, `### Deployment`, `### Overview`) stay visible as signposts so readers know what documentation exists without expanding anything. A one-sentence intro below `## Architecture` prompts the reader to click to enlarge.
 
-- **Local development** (`### Local development`) — How a developer sets up and runs the template locally. Developer runs `dev-template configure`, UIS provisions database + secret + port-forward, app connects via `host.docker.internal`, browser shows the result. Paired with a configure-flow sequence diagram.
-- **Deployment** (`### Deployment`) — What happens when the developer pushes code. GitHub Actions builds the image, ArgoCD deploys the pod, Traefik routes traffic to `<app>.localhost`. Paired with a deploy-flow sequence diagram.
+**Click to enlarge**: a client module at `website/src/client-modules/mermaid-zoom.ts` attaches a click handler to every rendered mermaid SVG. Click opens a native HTML `<dialog>` overlay showing an enlarged copy of the diagram. Escape, backdrop click, or the close button dismisses. Keyboard-accessible via Tab + Enter/Space. A `MutationObserver` catches diagrams rendered inside lazy-mounted dropdowns (Docusaurus's `<details>` theme component only mounts child content when the dropdown is first opened).
+
+**Naming vocabulary**: the two diagrams per sub-section are called **Components** (the flowchart — named nodes and connections) and **Flow** (the sequence diagram — ordered steps at runtime). Future diagrams can extend the vocabulary: `Errors`, `Data flow`, `Network`, `Security`, etc. Adding a new diagram to an existing section is a pure data change — append one entry to the section's `diagrams` array in `buildArchitectureModel`. Adding a new section is pushing to `sections`. No rendering code touches.
 
 An **ArgoCD setup diagram** is documented in `plans/backlog/mermaid-setup-argocd.md` as a design reference but is currently SUPPRESSED until UIS ships the registration command. When UIS adds the command, add it as a third `### ArgoCD setup` sub-section.
 
 **Four archetypes are handled:**
 
-- **App + services + manifest** (e.g. `python-basic-webserver-database`) — both diagrams rendered in full
-- **App + manifest, no services** (e.g. `python-basic-webserver`) — **Local development skipped** (would be a trivial dev → app → browser diagram); only `### Deployment` rendered
-- **Stack template** (e.g. `postgresql-demo`) — single `### Overview` sub-section (stacks don't have separate local-dev/deploy stories)
+- **App + services + manifest** (e.g. `python-basic-webserver-database`) — two sections (Local development, Deployment), each with Components + Flow = **4 dropdowns total**
+- **App + manifest, no services** (e.g. `python-basic-webserver`) — Local development skipped; only Deployment with its two dropdowns
+- **Stack template** (e.g. `postgresql-demo`) — single `### Overview` section with Components + Flow
 - **Overlay template** (e.g. `plan-based-workflow`) — entire section suppressed; `architectureMdx` is `null`
 
-**To change the diagrams**, edit `scripts/lib/build-architecture-mermaid.ts` and its unit tests at `scripts/test/build-architecture-mermaid.test.ts`, then re-run:
+**To add a new diagram to an existing section**, edit `buildArchitectureModel` in `scripts/lib/build-architecture-mermaid.ts`. Push an `{ name, mermaid }` entry onto the section's `diagrams` array. The emitter loop handles the rest — no changes to the emitter, no changes to tests beyond a new assertion for the new diagram.
+
+**To change the mermaid source of an existing diagram**, edit the corresponding `buildXxxFlowchart` or `buildXxxSequence` function in the same file, then re-run:
 
 ```bash
 npx tsx scripts/generate-registry.ts
 bash scripts/generate-docs-markdown.sh --force
 ```
+
+Unit tests live in `scripts/test/build-architecture-mermaid.test.ts` (individual diagram helpers) and `scripts/test/build-architecture-mdx.test.ts` (model shape + emitter output). 33 tests across the two files.
 
 Visual style matches the canonical diagrams in `website/docs/architecture.md` — plain text labels, no emojis, default Mermaid theming. **Design rule**: every edge source is an explicit node (never a subgraph id), to avoid the Mermaid rendering bug where subgraph-id edge sources could silently drop subgraphs.
 
