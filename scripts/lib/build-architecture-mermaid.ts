@@ -54,6 +54,7 @@
  */
 
 import { getInClusterPort } from './service-ports.ts';
+import { emitArchitectureMdx } from './build-architecture-mdx.ts';
 
 /**
  * The subset of a registry entry that the builder reads. Kept narrow so
@@ -95,6 +96,43 @@ export interface TemplateEntry {
 
 export interface ArchitectureResult {
   mdx: string | null;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Structured model (PLAN-architecture-diagram-display Phase 2)
+//
+// The builder's public entry point returns a structured model. An emitter
+// module (build-architecture-mdx.ts) walks the model and produces the
+// final MDX string that generate-registry stores on each entry. The
+// pre-composed MDX string still ships via the backward-compatible
+// buildArchitectureMdx wrapper below, so existing call sites and unit
+// tests continue to work unchanged.
+//
+// Why a model: adding a 3rd, 4th, or Nth diagram per sub-section later
+// is a one-line push onto a `diagrams` array — no rendering code touches.
+// Today each section has exactly 2 diagrams (Components + Flow); tomorrow
+// we might add Errors, Data flow, Network, Security, etc.
+// ────────────────────────────────────────────────────────────────────────────
+
+export interface ArchitectureDiagram {
+  /** Human-readable name — becomes the dropdown summary. Examples: "Components", "Flow". */
+  name: string;
+  /** The raw mermaid source, without the ```mermaid fence. */
+  mermaid: string;
+}
+
+export interface ArchitectureSection {
+  /** Sub-section heading — becomes `### {title}` in the emitted MDX. */
+  title: string;
+  /** One or more diagrams, rendered in order. */
+  diagrams: ArchitectureDiagram[];
+}
+
+export interface ArchitectureModel {
+  /** Optional one-line intro rendered below the `## Architecture` heading. */
+  intro?: string;
+  /** Sub-sections, in render order. Empty for overlay templates → entire section suppressed. */
+  sections: ArchitectureSection[];
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -527,30 +565,38 @@ function buildStackSequence(entry: TemplateEntry): string | null {
  * E3 stack templates emit a single `### Overview` sub-section instead.
  * E4 overlay templates return null.
  */
-export function buildArchitectureMdx(entry: TemplateEntry): ArchitectureResult {
-  if (entry.install_type === 'overlay') return { mdx: null };
-
-  const parts: string[] = ['## Architecture', ''];
+/**
+ * Build the structured model for a template. Walks the existing per-diagram
+ * helpers and assembles them into the `ArchitectureModel` shape that the
+ * emitter then renders. See the interface comments above for the shape.
+ *
+ * Archetype mapping:
+ *   - overlay                      → `{ sections: [] }`
+ *   - stack                        → one "Overview" section with 1–2 diagrams
+ *   - app + services + manifest    → two sections (Local development, Deployment)
+ *   - app + manifest, no services  → one section (Deployment)
+ *
+ * Diagram names are per the Components / Flow vocabulary locked in by the
+ * upstream investigation (PLAN-architecture-diagram-display § Naming).
+ */
+export function buildArchitectureModel(entry: TemplateEntry): ArchitectureModel {
+  if (entry.install_type === 'overlay') {
+    return { sections: [] };
+  }
 
   if (entry.install_type === 'stack') {
-    // Stack templates — single Overview sub-section
     const flowchart = buildStackFlowchart(entry);
     const sequence = buildStackSequence(entry);
 
-    parts.push('### Overview');
-    parts.push('');
-    parts.push('```mermaid');
-    parts.push(flowchart);
-    parts.push('```');
-
+    const diagrams: ArchitectureDiagram[] = [
+      { name: 'Components', mermaid: flowchart },
+    ];
     if (sequence !== null) {
-      parts.push('');
-      parts.push('```mermaid');
-      parts.push(sequence);
-      parts.push('```');
+      diagrams.push({ name: 'Flow', mermaid: sequence });
     }
-
-    return { mdx: parts.join('\n') + '\n' };
+    return {
+      sections: [{ title: 'Overview', diagrams }],
+    };
   }
 
   // App templates (E1 and E2)
@@ -559,38 +605,44 @@ export function buildArchitectureMdx(entry: TemplateEntry): ArchitectureResult {
   const deployFlowchart = buildDeployFlowchart(entry);
   const deploySequence = buildDeploySequence(entry);
 
-  // Local development section — only if the flowchart is non-null
+  const sections: ArchitectureSection[] = [];
+
+  // Local development — only if the flowchart is non-null (E2 skips it)
   if (localDevFlowchart !== null) {
-    parts.push('### Local development');
-    parts.push('');
-    parts.push('```mermaid');
-    parts.push(localDevFlowchart);
-    parts.push('```');
-
+    const diagrams: ArchitectureDiagram[] = [
+      { name: 'Components', mermaid: localDevFlowchart },
+    ];
     if (localDevSequence !== null) {
-      parts.push('');
-      parts.push('```mermaid');
-      parts.push(localDevSequence);
-      parts.push('```');
+      diagrams.push({ name: 'Flow', mermaid: localDevSequence });
     }
-    parts.push('');
+    sections.push({ title: 'Local development', diagrams });
   }
 
-  // Deployment section — always present for app templates
+  // Deployment — always present for app templates
   if (deployFlowchart !== null) {
-    parts.push('### Deployment');
-    parts.push('');
-    parts.push('```mermaid');
-    parts.push(deployFlowchart);
-    parts.push('```');
-
+    const diagrams: ArchitectureDiagram[] = [
+      { name: 'Components', mermaid: deployFlowchart },
+    ];
     if (deploySequence !== null) {
-      parts.push('');
-      parts.push('```mermaid');
-      parts.push(deploySequence);
-      parts.push('```');
+      diagrams.push({ name: 'Flow', mermaid: deploySequence });
     }
+    sections.push({ title: 'Deployment', diagrams });
   }
 
-  return { mdx: parts.join('\n') + '\n' };
+  return { sections };
+}
+
+/**
+ * Backward-compatible wrapper that returns the pre-composed MDX string
+ * inside `{ mdx }`. Kept for existing call sites (`generate-registry.ts`,
+ * unit tests) and for any future caller that just wants the rendered
+ * output without touching the model directly.
+ *
+ * Implementation is a straight pipe: build the model, run the emitter.
+ * The emitter lives in a separate module so its phase-4 changes (wrapping
+ * each diagram in a `<details>` block) don't touch this file.
+ */
+export function buildArchitectureMdx(entry: TemplateEntry): ArchitectureResult {
+  const model = buildArchitectureModel(entry);
+  return { mdx: emitArchitectureMdx(model) };
 }
