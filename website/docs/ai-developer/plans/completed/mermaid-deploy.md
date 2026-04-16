@@ -1,7 +1,8 @@
 # Deploy flowchart — for manual editing
 
-> Edit this file to get the diagram right, then hand it back so I can
-> update the builder to match.
+> **Status: Shipped (2026-04-12)** — Design for the Deployment flowchart. Approved during [INVESTIGATE-architecture-diagram-v2.md](INVESTIGATE-architecture-diagram-v2.md) and implemented in `scripts/lib/build-architecture-mermaid.ts` via `buildDeployFlowchart(entry)` + `buildDeploySequence(entry)`. Preserved here as a historical design reference — the code is the source of truth; this file captures the author's original intent.
+>
+> Original heading kept: "Edit this file to get the diagram right, then hand it back so I can update the builder to match." That workflow is done; left for historical context.
 
 ## CI/CD deployment (E1: python-basic-webserver-database)
 
