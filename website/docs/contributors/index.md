@@ -47,5 +47,5 @@ git push origin feature/my-new-template
 - [Creating a Template](creating-a-template.md) — step-by-step guide for the most common contribution
 - [Template Metadata Reference](template-metadata.md) — all template-info.yaml fields explained
 - [Naming Conventions](naming-conventions.md) — how to name files, folders, and IDs
-- [Scripts Reference](scripts-reference.md) — validation and generation scripts
+- [Scripts Reference](scripts-reference.md) — redirects to the canonical script documentation for every script under `scripts/`
 - [README Structure](readme-structure.md) — standard sections for template READMEs
