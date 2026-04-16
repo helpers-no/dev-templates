@@ -133,8 +133,12 @@ test('E1: app + services + manifest emits Local development + Deployment', () =>
   assert.ok(result.mdx !== null, 'mdx should be non-null');
   const mdx = result.mdx!;
 
-  // Section skeleton
-  assert.match(mdx, /^## Architecture\n/, 'starts with ## Architecture');
+  // Section skeleton — the output is wrapped in a card container
+  // (added by PR #65 — "Architecture as a card") so `## Architecture`
+  // is no longer at column 0. The card wrapper is the new prefix.
+  assert.match(mdx, /^<div className="templateCard">/, 'wrapped in templateCard');
+  assert.match(mdx, /<div className="templateCardEyebrow">ARCHITECTURE<\/div>/);
+  assert.match(mdx, /## Architecture/);
   assert.match(mdx, /### Local development/);
   assert.match(mdx, /### Deployment/);
 

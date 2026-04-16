@@ -153,6 +153,12 @@ function getOrCreateDialog(): HTMLDialogElement {
 
   // Minimal inline styling. Keeps the component self-contained — no
   // CSS module import needed, survives Docusaurus theme swaps.
+  // `backgroundColor` (not the `background` shorthand) uses an explicit
+  // opaque color. The earlier `var(--ifm-background-color, #fff)` didn't
+  // resolve cleanly under Docusaurus's theme, leaving the dialog
+  // see-through — the fallback only kicks in when the variable is
+  // undefined, not when it's defined-but-transparent. Dark-mode is
+  // handled by a stylesheet override below.
   Object.assign(dialog.style, {
     width: 'min(96vw, 1400px)',
     height: 'min(92vh, 1000px)',
@@ -161,7 +167,7 @@ function getOrCreateDialog(): HTMLDialogElement {
     padding: '0',
     border: 'none',
     borderRadius: '8px',
-    background: 'var(--ifm-background-color, #fff)',
+    backgroundColor: '#ffffff',
     boxShadow: '0 10px 40px rgba(0, 0, 0, 0.4)',
   });
 
@@ -188,6 +194,9 @@ function getOrCreateDialog(): HTMLDialogElement {
   dialog.appendChild(closeBtn);
 
   // Body wrapper — holds the cloned SVG, takes full dialog space.
+  // Explicit backgroundColor here too as a belt-and-suspenders so the
+  // mermaid SVG (which has a transparent canvas) never shows through
+  // to the blurred page backdrop.
   const body = document.createElement('div');
   body.setAttribute('data-mermaid-zoom-body', '');
   Object.assign(body.style, {
@@ -199,6 +208,7 @@ function getOrCreateDialog(): HTMLDialogElement {
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'auto',
+    backgroundColor: '#ffffff',
   });
   dialog.appendChild(body);
 
@@ -222,13 +232,23 @@ function ensureBackdropStyle(): void {
   if (backdropStyleInjected) return;
   backdropStyleInjected = true;
   const style = document.createElement('style');
+  // Backdrop opacity bumped from 0.6 to 0.9 so the page behind the
+  // dialog is effectively hidden. At 0.6 the page text still bled
+  // through visibly; at 0.9 only a faint darkened silhouette remains.
+  //
+  // The [data-theme='dark'] rules override the inline light-mode
+  // backgroundColor on the dialog + body so dark-mode readers don't
+  // get a jarring white rectangle.
   style.textContent = `
     dialog#${DIALOG_ID}::backdrop {
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(2px);
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(3px);
     }
     [data-theme='dark'] dialog#${DIALOG_ID} {
-      background: var(--ifm-background-color, #1b1b1d);
+      background-color: #1b1b1d !important;
+    }
+    [data-theme='dark'] dialog#${DIALOG_ID} [data-mermaid-zoom-body] {
+      background-color: #1b1b1d !important;
     }
     .${CONTAINER_CLASS}:hover {
       outline: 2px solid var(--ifm-color-primary-light, #3578e5);

@@ -15,7 +15,7 @@ import {
   buildArchitectureMdx,
   type TemplateEntry,
 } from '../lib/build-architecture-mermaid.ts';
-import { emitArchitectureMdx } from '../lib/build-architecture-mdx.ts';
+import { emitArchitectureMdx, buildMermaidLiveUrl } from '../lib/build-architecture-mdx.ts';
 
 // ────────────────────────────────────────────────────────────────────────────
 // Fixtures — mirrored from the existing mermaid-builder tests
@@ -236,7 +236,10 @@ test('Phase 4: mermaid fences live inside the details body (blank lines around)'
     mdx,
     /<details className="dropdownBlock">\n<summary>\w+<\/summary>\n\n```mermaid\n/,
   );
-  assert.match(mdx, /\n```\n\n<\/details>/);
+  // After F1 shipped, the mermaid fence is followed by the mermaid.live
+  // link (inside the same <details>), then </details>. Assert the
+  // fence-closing → blank-line → link → blank-line → </details> sequence.
+  assert.match(mdx, /\n```\n\n<a href="https:\/\/mermaid\.live[^"]+"[^>]*>[^<]+<\/a>\n\n<\/details>/);
 });
 
 test('Phase 4: E2 (no services) has 2 dropdowns (Deployment only)', () => {
@@ -254,6 +257,67 @@ test('Phase 4: E3 (stack) has 2 dropdowns under ### Overview', () => {
 
 test('Phase 4: E4 (overlay) still returns null — no change from Phase 2', () => {
   assert.equal(emitArchitectureMdx(buildArchitectureModel(e4Fixture)), null);
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// F1 follow-up — mermaid.live link per diagram
+// ────────────────────────────────────────────────────────────────────────────
+
+test('F1: each dropdown emits an "Open in mermaid.live" link', () => {
+  const mdx = emitArchitectureMdx(buildArchitectureModel(e1Fixture))!;
+  // E1 has 4 dropdowns → 4 links
+  const linkCount = (mdx.match(/Open in mermaid\.live/g) || []).length;
+  assert.equal(linkCount, 4);
+});
+
+test('F1: link uses the mermaidLiveLink class and opens in a new tab', () => {
+  const mdx = emitArchitectureMdx(buildArchitectureModel(e1Fixture))!;
+  assert.match(mdx, /<a href="https:\/\/mermaid\.live\/edit#base64:/);
+  assert.match(mdx, /target="_blank"/);
+  assert.match(mdx, /rel="noopener noreferrer"/);
+  assert.match(mdx, /className="mermaidLiveLink"/);
+});
+
+test('F1: buildMermaidLiveUrl round-trips a simple diagram', () => {
+  const source = 'flowchart LR\n    A --> B';
+  const url = buildMermaidLiveUrl(source);
+  assert.ok(url.startsWith('https://mermaid.live/edit#base64:'));
+  const base64 = url.replace('https://mermaid.live/edit#base64:', '');
+  const json = Buffer.from(base64, 'base64').toString('utf8');
+  const state = JSON.parse(json);
+  assert.equal(state.code, source);
+  assert.equal(state.mermaid, '{"theme":"default"}');
+});
+
+test('F1: buildMermaidLiveUrl handles UTF-8 (em-dashes, non-ASCII)', () => {
+  const source = 'flowchart LR\n    A["PostgreSQL — my_app_db"] --> B';
+  const url = buildMermaidLiveUrl(source);
+  const base64 = url.replace('https://mermaid.live/edit#base64:', '');
+  const decoded = Buffer.from(base64, 'base64').toString('utf8');
+  const state = JSON.parse(decoded);
+  assert.equal(state.code, source);
+  // Em-dash must round-trip cleanly
+  assert.match(state.code, /—/);
+});
+
+test('F1: link appears inside the details block, after the mermaid fence', () => {
+  const mdx = emitArchitectureMdx(buildArchitectureModel(e1Fixture))!;
+  // Structural check: for every <details> block, the closing ``` of the
+  // mermaid fence comes before the <a href= line, which comes before
+  // </details>. Do it via a single regex with a non-greedy match.
+  const pattern = /<details className="dropdownBlock">[\s\S]*?```\n\n<a href="https:\/\/mermaid\.live[\s\S]*?<\/a>\n\n<\/details>/;
+  assert.match(mdx, pattern);
+});
+
+test('F1: stack template gets the link on its Overview diagrams too', () => {
+  const mdx = emitArchitectureMdx(buildArchitectureModel(e3Fixture))!;
+  const linkCount = (mdx.match(/Open in mermaid\.live/g) || []).length;
+  assert.equal(linkCount, 2);
+});
+
+test('F1: overlay template emits no link (section suppressed)', () => {
+  const mdx = emitArchitectureMdx(buildArchitectureModel(e4Fixture));
+  assert.equal(mdx, null);
 });
 
 test('Phase 4: escapeSummary handles angle brackets in diagram names', () => {
