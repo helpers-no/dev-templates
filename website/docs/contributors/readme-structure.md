@@ -176,7 +176,7 @@ The auto-generated Configure section will list `params.app_name` and `params.dat
 
 ## VS Code settings pattern (do not ship `.vscode/` files)
 
-**Templates must not ship `.vscode/settings.json` or `.vscode/extensions.json` files.** Per [12MSG in INVESTIGATE-improve-template-docs-with-services.md](../ai-developer/plans/backlog/INVESTIGATE-improve-template-docs-with-services.md), DCT does not implement JSON merge for template files. A template that ships `.vscode/settings.json` would risk overwriting the user's existing VS Code config (including the devcontainer extension recommendation in `extensions.json` that the project needs to start).
+**Templates must not ship `.vscode/settings.json` or `.vscode/extensions.json` files.** Per [12MSG in INVESTIGATE-improve-template-docs-with-services.md](../ai-developer/plans/completed/INVESTIGATE-improve-template-docs-with-services.md), DCT does not implement JSON merge for template files. A template that ships `.vscode/settings.json` would risk overwriting the user's existing VS Code config (including the devcontainer extension recommendation in `extensions.json` that the project needs to start).
 
 **If your template benefits from a specific VS Code workspace setting**, document it in the README under a "VS Code tip" section. The pattern (used by `python-basic-webserver-database`):
 

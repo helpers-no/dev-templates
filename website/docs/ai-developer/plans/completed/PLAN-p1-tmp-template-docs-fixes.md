@@ -10,7 +10,7 @@
 
 **Goal**: Ship the TMP-side Phase 1 work from `INVESTIGATE-improve-template-docs-with-services.md`. Fix the bugs real-user testing surfaced in `python-basic-webserver-database` and `postgresql-demo`, plus the cross-cutting MDX generator and template hygiene issues.
 
-**Investigation**: [INVESTIGATE-improve-template-docs-with-services.md](../backlog/INVESTIGATE-improve-template-docs-with-services.md)
+**Investigation**: [INVESTIGATE-improve-template-docs-with-services.md](INVESTIGATE-improve-template-docs-with-services.md)
 
 **Cross-team dependencies**:
 - **DCT**: shipping `PLAN-p1-dct-shim.md` (items 1.8 + 1.9 in the investigation) — DCT shim + `--namespace`/`--secret-name-prefix` pass-through
@@ -221,7 +221,7 @@ No external dependencies. Can ship as a single PR while DCT and UIS work in para
 
 ## Cross-references
 
-- **Investigation**: [INVESTIGATE-improve-template-docs-with-services.md](../backlog/INVESTIGATE-improve-template-docs-with-services.md)
+- **Investigation**: [INVESTIGATE-improve-template-docs-with-services.md](INVESTIGATE-improve-template-docs-with-services.md)
 - **DCT plan** (cross-team): `helpers-no/devcontainer-toolbox` → `PLAN-p1-dct-shim.md`
 - **UIS plan** (cross-team): `helpers-no/urbalurba-infrastructure` → `PLAN-p1-uis-secret-namespace.md`
 - **Coordination items in the investigation**:
