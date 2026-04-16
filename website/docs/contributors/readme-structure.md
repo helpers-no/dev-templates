@@ -55,6 +55,16 @@ The dropdowns are **collapsed by default** so developers who just want to run th
 
 Adding a third diagram (e.g. Errors, Data flow, Network) to an existing section is a pure data change in `scripts/lib/build-architecture-mermaid.ts`'s `buildArchitectureModel` function — push one `{ name, mermaid }` entry onto the section's `diagrams` array. The emitter and the rendering path are unchanged.
 
+## The auto-generated Files dropdown
+
+Inside the Getting Started card, every template page renders a collapsed **Files (N)** dropdown. When expanded, it shows a tree of every tracked file in the template, with each file linking to its source on GitHub. The list is auto-generated from `git ls-files` at build time — **no curation**, no file patterns to maintain.
+
+- New files you `git add` appear automatically on the next docs build
+- To exclude a file from the dropdown, add it to `.gitignore`
+- Overlay templates show only files under their `template/` subfolder (the installed content), not the metadata `template-info.yaml` that sits one level up
+
+The dropdown is intentionally collapsed by default so it doesn't crowd the Prerequisites and Related-templates sub-sections.
+
 ## The `quickstart:` block in `template-info.yaml`
 
 Templates can declare a `quickstart:` block in `template-info.yaml`. It does two things:

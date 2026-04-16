@@ -172,19 +172,20 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
 
 MDXEOF
 
-    # Emit the "Getting started" card: combines Prerequisites + Related
-    # templates into one card with the same .templateCard visual language
-    # as the Environment and Architecture cards. Skipped entirely if both
-    # sub-sections are empty. Either sub-section can be skipped individually
-    # if its source data is empty.
+    # Emit the "Getting started" card: combines Prerequisites + Files +
+    # Related templates into one card with the same .templateCard visual
+    # language as the Environment and Architecture cards. Skipped entirely
+    # if all three sub-sections are empty. Each sub-section is independently
+    # conditional on its source data being present.
     local_prereqs_json=$(jq -c ".templates[$i].prerequisites // []" "$REGISTRY")
     local_prereqs_len=$(echo "$local_prereqs_json" | jq 'length')
+    local_files_mdx=$(jq -r ".templates[$i].filesMdx // empty" "$REGISTRY")
     local_related_ids=$(jq -r ".templates[$i].related[]?" "$REGISTRY")
     local_related_len=0
     if [[ -n "$local_related_ids" ]]; then
         local_related_len=$(echo "$local_related_ids" | wc -l | tr -d ' ')
     fi
-    if [[ "$local_prereqs_len" -gt 0 || "$local_related_len" -gt 0 ]]; then
+    if [[ "$local_prereqs_len" -gt 0 || -n "$local_files_mdx" || "$local_related_len" -gt 0 ]]; then
         {
             echo ""
             echo '<div className="templateCard">'
@@ -199,6 +200,14 @@ MDXEOF
             } >> "$page_file"
             echo "$local_prereqs_json" | jq -r '.[] | if .url then "- [ ] [" + .text + "](" + .url + ")" else "- [ ] " + .text end' >> "$page_file"
             echo "" >> "$page_file"
+        fi
+
+        # Files dropdown (PLAN-template-files-dropdown). The TS emitter
+        # (buildFilesMdx in scripts/lib/build-files-mdx.ts) pre-rendered the
+        # entire ### Files block — heading, <details>, <summary>, tree — so
+        # this is a pure pass-through.
+        if [[ -n "$local_files_mdx" ]]; then
+            echo "$local_files_mdx" >> "$page_file"
         fi
 
         if [[ "$local_related_len" -gt 0 ]]; then

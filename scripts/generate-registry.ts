@@ -26,6 +26,7 @@
  */
 
 import {readFileSync, writeFileSync, readdirSync, statSync, existsSync} from 'fs';
+import {execFileSync} from 'child_process';
 import {join, dirname, basename} from 'path';
 import {createRequire} from 'module';
 
@@ -37,6 +38,7 @@ import {
 } from './lib/dct-doc-paths.js';
 import {buildArchitectureMdx, type TemplateEntry as ArchitectureTemplateEntry} from './lib/build-architecture-mermaid.js';
 import {buildExpectedOutput} from './lib/build-expected-output.js';
+import {buildFilesMdx} from './lib/build-files-mdx.js';
 
 // Load js-yaml from website/node_modules
 const ROOT = dirname(dirname(new URL(import.meta.url).pathname));
@@ -479,6 +481,34 @@ function findTemplateInfoFiles(folderPath: string): string[] {
   return entries.map((d) => join(folderPath, d, 'template-info.yaml'));
 }
 
+/**
+ * List tracked files under a template's repo-relative path and return
+ * them with the prefix stripped so paths are relative to the template
+ * root. Uses `git ls-files` — authoritative, respects `.gitignore`,
+ * new files appear automatically on next build.
+ *
+ * Returns an empty array if the path is outside the repo or has no
+ * tracked files (e.g. an overlay with an empty `template/` folder).
+ */
+function listTemplateFiles(templateRepoPath: string): string[] {
+  let stdout: string;
+  try {
+    stdout = execFileSync('git', ['ls-files', templateRepoPath], {
+      cwd: ROOT,
+      encoding: 'utf8',
+      maxBuffer: 4 * 1024 * 1024,
+    });
+  } catch {
+    return [];
+  }
+  const prefix = `${templateRepoPath}/`;
+  return stdout
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith(prefix))
+    .map((line) => line.slice(prefix.length));
+}
+
 // --- Validation ---
 
 const errors: string[] = [];
@@ -699,6 +729,26 @@ for (const catFile of categoryFiles) {
     // <details> block in the Environment card's Configure sub-section.
     // Returns null for E2 (app without services) and E4 (overlay).
     entry.expectedOutputBlock = buildExpectedOutput(entry as ArchitectureTemplateEntry);
+
+    // Auto-generated Files dropdown (PLAN-template-files-dropdown).
+    // Overlay templates ship their installed content inside a `template/`
+    // subfolder (template-info.yaml lives one level up, in the metadata
+    // folder, and is intentionally not shown as "the user's files"). For
+    // app and stack templates, the entry's `folder` field already points
+    // at the template root.
+    const templateRepoPath =
+      raw.install_type === 'overlay' ? `${entry.folder}/template` : (entry.folder as string);
+    const filesList = listTemplateFiles(templateRepoPath);
+    entry.files = filesList;
+    entry.templateRepoPath = templateRepoPath;
+    entry.filesMdx = buildFilesMdx({files: filesList, templateRepoPath});
+
+    if (raw.install_type !== 'overlay' && entry.filesMdx === null) {
+      fail(
+        `${file}: git ls-files returned no tracked files under ${templateRepoPath}. ` +
+          `Is the template committed? filesMdx would be null.`,
+      );
+    }
 
     allTemplates.push(entry);
   }

@@ -95,11 +95,15 @@ Templates are installed into new projects via the `dev-template` command inside 
 
 ## Auto-generated documentation sections
 
-Each template's documentation page under `website/docs/templates/**` is generated at build time from `template-info.yaml`, vendored DCT/UIS registries, and the template's README. Two sections in particular are fully auto-generated and should **not** be hand-edited:
+Each template's documentation page under `website/docs/templates/**` is generated at build time from `template-info.yaml`, vendored DCT/UIS registries, and the template's README. Three sections in particular are fully auto-generated and should **not** be hand-edited:
 
 ### Environment card (`<TemplateEnvironment />`)
 
 Rendered by the React component at `website/src/components/TemplateEnvironment/index.tsx`. Shows the resolved tools, services, configure steps, run commands, and init files. Data is pre-resolved by `scripts/generate-registry.ts` and passed as JSON props.
+
+### Files dropdown (`### Files` inside the Getting Started card)
+
+Built by `scripts/lib/build-files-tree.ts` (sorted tree builder) and `scripts/lib/build-files-mdx.ts` (MDX emitter). `generate-registry.ts` shells out to `git ls-files` for each template, stores the raw file list as `entry.files` and the pre-rendered `### Files` block as `entry.filesMdx`. The bash emitter reads `filesMdx` with `jq -r` and echoes it verbatim inside the Getting Started card between Prerequisites and Related templates. Repo base URL and default branch are centralized in `scripts/lib/repo-constants.ts` (`REPO_BASE_URL` + `REPO_BRANCH`). Unit tests in `scripts/test/build-files-tree.test.ts` (12 cases) + `scripts/test/build-files-mdx.test.ts` (10 cases).
 
 ### Architecture section (`## Architecture`)
 
