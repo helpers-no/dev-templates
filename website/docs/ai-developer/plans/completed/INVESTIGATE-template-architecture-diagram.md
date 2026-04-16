@@ -18,7 +18,7 @@ The downstream plan from this investigation (`PLAN-template-architecture-diagram
 
 Both of this investigation's hard prerequisites were either satisfied or worked around during v2:
 - **PLAN-environment-card.md Phase 4** → shipped and in `completed/`
-- **template-info.yaml schema refactor** → still deferred as `INVESTIGATE-template-info-schema.md` in backlog, but v2 worked around the missing `quickstart.run` field by reading the existing `quickstart.commands[]` for its sequence diagrams. Not blocking.
+- **template-info.yaml schema refactor** → tracked in `INVESTIGATE-template-info-schema.md` (now in completed/). v2 worked around the then-missing `quickstart.run` field by reading `quickstart.commands[]`; that schema investigation subsequently shipped the `quickstart.setup` + `quickstart.run` split, so this workaround is no longer active.
 
 Current state of architecture diagrams in the codebase is documented in `website/docs/ai-developer/project-dev-templates.md` § "Auto-generated documentation sections → Architecture section". See also `scripts/lib/build-architecture-mermaid.ts` and its unit tests for the implementation.
 

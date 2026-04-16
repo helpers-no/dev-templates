@@ -12,7 +12,7 @@
 
 **Related**:
 - [PLAN-architecture-diagram-display.md](../completed/PLAN-architecture-diagram-display.md) — introduced the `ArchitectureModel` shape that's extensible to new diagram kinds. This investigation adds "deployment target" as a data source the model could consume.
-- [INVESTIGATE-template-info-schema.md](./INVESTIGATE-template-info-schema.md) — Backstage harmonisation investigation. Any field added here should stay consistent with whatever shape that investigation lands on.
+- [INVESTIGATE-template-info-schema.md](../completed/INVESTIGATE-template-info-schema.md) — Backstage harmonisation investigation (now closed). Any field added here should stay consistent with the schema shape that investigation locked in.
 - [INVESTIGATE-uis-in-cluster-port.md](./INVESTIGATE-uis-in-cluster-port.md) — parallel UIS-team ask; same question of "UIS as canonical source for platform data".
 
 ---

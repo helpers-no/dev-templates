@@ -12,7 +12,7 @@
 
 **Completed**: 2026-04-12 — all 7 phases shipped in commits `b5d9c14` (phases 1-2) and `1cc0333` (phases 3-7).
 
-**Investigation**: [INVESTIGATE-template-info-schema.md](../backlog/INVESTIGATE-template-info-schema.md) — full decision record, Backstage comparison, DCT field audit, ODP positioning.
+**Investigation**: [INVESTIGATE-template-info-schema.md](INVESTIGATE-template-info-schema.md) — full decision record, Backstage comparison, DCT field audit, ODP positioning.
 
 ---
 

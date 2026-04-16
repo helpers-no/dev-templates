@@ -4,13 +4,32 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: In Progress
+## Status: Complete — 10 of 12 items shipped; Q6 deferred; Q11 re-decided (2026-04-16)
 
 **Goal**: Harmonise `template-info.yaml` with Backstage's `catalog-info.yaml` patterns so that our ODP (Open Developer Portal) feels familiar to Backstage users and migration between the two systems is simple. Clean up field redundancy (kill dead fields, clarify overlapping ones). Lay the groundwork for yaml-driven template documentation pages.
 
-**Last Updated**: 2026-04-12
+**Last Updated**: 2026-04-16
 
 **Supersedes**: `INVESTIGATE-backstage.md` (2026-03-31) — that investigation explored generating Backstage Software Template files from our templates. It was written against the old `TEMPLATE_INFO` key=value format and is now outdated. The still-valid ideas (Backstage export generation, repo location, discovery mechanism) are carried forward here.
+
+---
+
+## Closing note (2026-04-16)
+
+Ten of twelve items in the **Decided** section below shipped. Verified against the codebase:
+
+- `summary` killed — no template has it, generator doesn't reference it
+- `links[]` adopted — no `website:` or `docs:` top-level fields remain
+- `maintainers` added — rendered as linked avatars in the TemplateHeader card
+- `prerequisites` added — rendered in the Getting Started card
+- `abstract` kept and rendered inside the TemplateHeader card (moved there in PR #66)
+- `quickstart.setup` + `quickstart.run` split — used across every template
+- Field requirements enforced in `validate-metadata.sh`
+
+Two items did not ship and are resolved here:
+
+- **Q6 (Backstage export generation)** — this was always flagged as "separate investigation for later" (see Q6 below). Remains deferred; no stub filed. When the need surfaces, a fresh investigation should be opened against the current schema (which is now stable post-10-items).
+- **Q11 (readme becomes optional)** — decided at the time, never shipped. Re-decided today: `readme` stays required. Every current template has a README and no concrete use case emerged for omitting it. Per the project's general principle ("don't add features for hypothetical future requirements"), the feature flag waited for a real use case that didn't materialize. If one appears later, flip the flag in `validate-metadata.sh`'s `MANDATORY_FIELDS` at that point.
 
 ---
 
@@ -99,7 +118,7 @@ Fields NOT read by DCT: `summary`, `version`, `tags`, `logo`, `website`, `docs`,
 - [x] **Q8: Split `quickstart.commands`** — rename to `setup`, remove the run command from it. `run` field holds it separately. No redundancy.
 - [x] **Q9: Field requirements** — `maintainers` required, `prerequisites` required (every template needs at least "DCT devcontainer running"), `links` required (at least source code link).
 - [x] **Q10: Render `abstract` on detail page** — between header and environment card.
-- [x] **Q11: `readme` becomes optional** — free text, template developer decides content. Page works without it. Schema cleanup ships first.
+- [x] **Q11: `readme` stays required** (re-decided 2026-04-16 — see Closing note above) — originally decided as "becomes optional, schema cleanup ships first" but never shipped because no concrete use case emerged. Every current template has a README. Keeping the mandatory requirement avoids legislating for a hypothetical future need.
 
 ### Questions to Answer
 
