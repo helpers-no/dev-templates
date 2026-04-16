@@ -45,7 +45,7 @@ All shell commands run inside the devcontainer. Exec pattern: `docker exec <cont
 |---|---|---|
 | **Local development** | How the developer sets up and runs the template locally: Developer runs `dev-template configure`, UIS provisions database + secret + port-forward, app connects via host.docker.internal, browser shows result on port 3000 | Configure flow sequence |
 | **Deployment** | What happens when the developer pushes code: GitHub Actions builds image, ArgoCD deploys pod, Traefik routes traffic to `<app>.localhost` | Deploy flow sequence |
-| **ArgoCD setup** *(suppressed)* | Planned third diagram. Implementation deferred until UIS ships the `uis argocd register` command. Draft stays in [mermaid-setup-argocd.md](../backlog/mermaid-setup-argocd.md) as a design reference. |
+| **ArgoCD setup** *(suppressed)* | Planned third diagram. Implementation deferred until UIS ships the `uis argocd register` command. Draft stays in [mermaid-setup-argocd.md](mermaid-setup-argocd.md) as a design reference. |
 
 ### Per-archetype rendering
 
@@ -91,8 +91,8 @@ Replace `scripts/lib/build-architecture-mermaid.ts` with a new implementation th
 ### Tasks
 
 - [x] 1.1 Study the approved mermaid drafts:
-  - [mermaid-steady-state2.md](../backlog/mermaid-steady-state2.md) — local dev flowchart + configure sequence for E1 (approved)
-  - [mermaid-deploy.md](../backlog/mermaid-deploy.md) — deploy flowchart + deploy sequence for E1 (approved)
+  - [mermaid-steady-state2.md](mermaid-steady-state2.md) — local dev flowchart + configure sequence for E1 (approved)
+  - [mermaid-deploy.md](mermaid-deploy.md) — deploy flowchart + deploy sequence for E1 (approved)
   - Use these as the source of truth for node labels, edge labels, and flow ordering
 
 - [x] 1.2 Rewrite `buildArchitectureMdx(entry)` to compose the new shape. The main function calls five internal builders and returns one composed string. Output:

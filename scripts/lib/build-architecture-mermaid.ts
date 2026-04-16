@@ -19,7 +19,8 @@
  *      Actions builds the image, ArgoCD deploys the pod, Traefik routes
  *      traffic to `<app>.localhost`.
  *
- * An ArgoCD setup diagram is documented in `mermaid-setup-argocd.md` as a
+ * An ArgoCD setup diagram is documented in
+ * `website/docs/ai-developer/plans/completed/mermaid-setup-argocd.md` as a
  * design reference but is SUPPRESSED in v2 until UIS ships the registration
  * command. See PLAN-architecture-diagram-v2.md § ArgoCD setup.
  *

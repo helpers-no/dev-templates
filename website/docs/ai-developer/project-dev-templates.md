@@ -111,7 +111,7 @@ Built by a two-step pipeline split across `scripts/lib/build-architecture-mermai
 
 **Naming vocabulary**: the two diagrams per sub-section are called **Components** (the flowchart — named nodes and connections) and **Flow** (the sequence diagram — ordered steps at runtime). Future diagrams can extend the vocabulary: `Errors`, `Data flow`, `Network`, `Security`, etc. Adding a new diagram to an existing section is a pure data change — append one entry to the section's `diagrams` array in `buildArchitectureModel`. Adding a new section is pushing to `sections`. No rendering code touches.
 
-An **ArgoCD setup diagram** is documented in `plans/backlog/mermaid-setup-argocd.md` as a design reference but is currently SUPPRESSED until UIS ships the registration command. When UIS adds the command, add it as a third `### ArgoCD setup` sub-section.
+An **ArgoCD setup diagram** is documented in `plans/completed/mermaid-setup-argocd.md` as a design reference but is currently SUPPRESSED until UIS ships the registration command. When UIS adds the command, add it as a third `### ArgoCD setup` sub-section.
 
 **Four archetypes are handled:**
 
