@@ -35,6 +35,33 @@ const DEFAULT_INTRO =
   'These diagrams are auto-generated from the template\'s metadata. Click any diagram to enlarge.';
 
 /**
+ * Encode a mermaid diagram source into a mermaid.live editor URL.
+ *
+ * Format: `https://mermaid.live/edit#base64:{base64-encoded-json}`
+ * where the JSON is `{code: mermaidSource, mermaid: "{...config...}"}`.
+ * mermaid.live's URL fragment parser also accepts a `pako:`-scheme
+ * (deflate + base64) but `base64:` is simpler and dependency-free.
+ *
+ * UTF-8 safe: mermaid diagrams routinely contain em-dashes and other
+ * non-ASCII characters from label text; we encode through Buffer to
+ * preserve them correctly.
+ *
+ * Opens the user's clicked diagram in mermaid.live's editor where they
+ * can pan, zoom, edit, export as PNG/SVG, or copy the source to their
+ * own docs. The link is rendered beneath each collapsible diagram
+ * (PLAN-architecture-diagram-display follow-up F1).
+ */
+export function buildMermaidLiveUrl(mermaidSource: string): string {
+  const state = {
+    code: mermaidSource,
+    mermaid: '{"theme":"default"}',
+  };
+  const json = JSON.stringify(state);
+  const encoded = Buffer.from(json, 'utf8').toString('base64');
+  return `https://mermaid.live/edit#base64:${encoded}`;
+}
+
+/**
  * Emit the full `## Architecture` MDX block for a model, or null if the
  * model has no sections (overlay templates). The returned string starts
  * with `## Architecture` and ends with a trailing newline.
@@ -104,12 +131,21 @@ function emitSection(parts: string[], section: ArchitectureSection): void {
 
   for (let i = 0; i < section.diagrams.length; i++) {
     const diagram = section.diagrams[i]!;
+    const mermaidLiveUrl = buildMermaidLiveUrl(diagram.mermaid);
     parts.push('<details className="dropdownBlock">');
     parts.push(`<summary>${escapeSummary(diagram.name)}</summary>`);
     parts.push('');
     parts.push('```mermaid');
     parts.push(diagram.mermaid);
     parts.push('```');
+    parts.push('');
+    // Link to mermaid.live for pan/zoom, editing, and export. Rendered
+    // as a raw <a> element (rather than markdown `[text](url)`) so we
+    // can set target="_blank" and rel="noopener" without relying on a
+    // plugin to rewrite external links.
+    parts.push(
+      `<a href="${mermaidLiveUrl}" target="_blank" rel="noopener noreferrer" className="mermaidLiveLink">↗ Open in mermaid.live</a>`,
+    );
     parts.push('');
     parts.push('</details>');
     // Blank line between dropdowns within a section (but not after the last).

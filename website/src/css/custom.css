@@ -201,3 +201,21 @@
   background: var(--ifm-color-emphasis-300);
   border-top-color: var(--ifm-color-emphasis-400);
 }
+
+/* .mermaidLiveLink — the "↗ Open in mermaid.live" link rendered below
+   each architecture diagram inside its dropdown. Subtle, right-aligned,
+   so it doesn't compete with the diagram itself. Click takes the user
+   to mermaid.live with the diagram source pre-loaded in the editor. */
+.mermaidLiveLink {
+  display: block;
+  margin: 0.4rem 1rem 0.6rem;
+  font-size: 0.78rem;
+  color: var(--ifm-color-emphasis-600);
+  text-align: right;
+  text-decoration: none;
+}
+
+.mermaidLiveLink:hover {
+  color: var(--ifm-color-primary);
+  text-decoration: underline;
+}
