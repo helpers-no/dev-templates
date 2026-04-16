@@ -202,6 +202,33 @@
   border-top-color: var(--ifm-color-emphasis-400);
 }
 
+/* ────────────────────────────────────────────────────────────────────── */
+/* .filesTree — ASCII tree rendering for the Files dropdown             */
+/*                                                                        */
+/* The emitter (scripts/lib/build-files-mdx.ts) produces a <pre> block   */
+/* with ├── / └── / │ glyphs. MDX wraps the first line of flow content  */
+/* in <p>; we neutralize its default margin so the tree sits flush.      */
+/* Anchors inherit the body link color but we drop the underline to      */
+/* keep the tree visually quiet — hover brings it back.                  */
+/* ────────────────────────────────────────────────────────────────────── */
+
+.filesTree {
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.filesTree p {
+  margin: 0;
+}
+
+.filesTree a {
+  text-decoration: none;
+}
+
+.filesTree a:hover {
+  text-decoration: underline;
+}
+
 /* .mermaidLiveLink — the "↗ Open in mermaid.live" link rendered below
    each architecture diagram inside its dropdown. Subtle, right-aligned,
    so it doesn't compete with the diagram itself. Click takes the user
