@@ -132,6 +132,14 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.3rem;
+  align-items: center;
+}
+
+.tagsLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ifm-color-emphasis-600);
+  margin-right: 0.2rem;
 }
 
 .tag {

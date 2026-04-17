@@ -75,11 +75,14 @@ export default function TemplateHeader({
             ))}
           </div>
         )}
-        <div className={styles.tags}>
-          {tags.map((tag) => (
-            <a key={tag} href={`/docs/tags/${tag}`} className={styles.tag}>{tag}</a>
-          ))}
-        </div>
+        {tags.length > 0 && (
+          <div className={styles.tags}>
+            <span className={styles.tagsLabel}>Tags:</span>
+            {tags.map((tag) => (
+              <a key={tag} href={`/docs/tags/${tag}`} className={styles.tag}>{tag}</a>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

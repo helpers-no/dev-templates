@@ -118,12 +118,10 @@ for i in $(seq 0 $((template_count - 1))); do
     # Build tags array for MDX component
     local_tags_mdx=$(jq -r ".templates[$i].tags | @json" "$REGISTRY")
 
-    # Build tags list for frontmatter
-    local_tags_yaml=""
-    while IFS= read -r tag; do
-        local_tags_yaml+="  - $tag
-"
-    done < <(jq -r ".templates[$i].tags[]" "$REGISTRY")
+    # Tags are rendered by the TemplateHeader component (with a "Tags:"
+    # label), NOT via Docusaurus frontmatter. Removed from frontmatter to
+    # avoid the duplicate tag list Docusaurus renders at the bottom of the
+    # page.
 
     # Check whether the template has any environment-card content. The card
     # renders if any of the following are non-empty:
@@ -152,8 +150,7 @@ for i in $(seq 0 $((template_count - 1))); do
 title: $name
 sidebar_label: $name
 description: "$description"
-tags:
-$local_tags_yaml---
+---
 
 import TemplateHeader from '@site/src/components/TemplateHeader';
 

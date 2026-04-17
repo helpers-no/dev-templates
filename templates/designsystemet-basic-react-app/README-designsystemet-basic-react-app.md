@@ -1,86 +1,26 @@
-# Designsystemet Basic React App
+# Designsystemet Basic React App — app notes
 
-A React application using [Designsystemet](https://designsystemet.no/) from Digdir. Displays a blog page with cards using Designsystemet components, built with Vite and TypeScript.
+Full template documentation (install, prerequisites, file tree, tooling, architecture, Docker, Kubernetes, CI/CD) is published at:
 
-## Quick Start
+**[https://tmp.sovereignsky.no/docs/templates/web-app/designsystemet-basic-react-app/](https://tmp.sovereignsky.no/docs/templates/web-app/designsystemet-basic-react-app/)**
 
-1. Update your terminal (tools were installed):
-   ```bash
-   source ~/.bashrc
-   ```
+The sections below describe the **React/Vite app** under **`src/`**.
 
-2. Install dependencies and run:
-   ```bash
-   npm install
-   npm run dev
-   ```
+## What it renders
 
-3. Open in browser: http://localhost:3000
+- **`src/App.tsx`** — page shell: headings and a grid of blog cards.
+- **`src/components/BlogCard/BlogCard.tsx`** — each post using Designsystemet **Card**, **Heading**, **Paragraph** (`@digdir/designsystemet-react`).
+- **`src/data/blog-posts.json`** — post list consumed by `App` (shape matches **`src/types/BlogPost.ts`**).
+- **`src/main.tsx`** — Vite/React entry; imports global CSS and themes.
 
-The dev server auto-reloads on file changes via Vite.
+Static assets for posts live under **`public/`** (paths referenced from the JSON).
 
-## Prerequisites
+## Dev server
 
-Development tools are installed automatically by the devcontainer.
-If you need to reinstall, run: `dev-setup`
+- **Run:** `npm install` then `npm run dev` (Vite HMR on file changes).
+- Default dev URL is shown in the terminal (typically **http://localhost:3000** unless the port is taken).
 
-## Project Structure
+## Changing the app
 
-After installation, your project contains:
-
-```plaintext
-├── app/
-│   ├── App.tsx                            # Main application component
-│   ├── App.css                            # Application styles
-│   ├── main.tsx                           # Entry point
-│   ├── components/
-│   │   └── BlogCard/
-│   │       ├── BlogCard.tsx               # Blog card component
-│   │       └── BlogCard.css
-│   ├── data/
-│   │   └── BlogPosts.json                 # Blog post data
-│   └── types/
-│       └── Blog.ts                        # TypeScript types
-├── public/
-│   └── images/                            # Blog post images
-├── manifests/
-│   ├── deployment.yaml                    # K8s Deployment + Service
-│   └── kustomization.yaml                 # ArgoCD configuration
-├── .github/
-│   └── workflows/
-│       └── urbalurba-build-and-push.yaml  # CI/CD pipeline
-├── Dockerfile                             # Container build
-├── index.html
-├── package.json                           # Node.js dependencies
-├── tsconfig.json                          # TypeScript configuration
-├── vite.config.ts                         # Vite configuration
-├── TEMPLATE_INFO                          # Template metadata
-└── README-designsystemet-basic-react-app.md  # This file
-```
-
-## Development
-
-- Edit `app/App.tsx` — the main application component
-- Edit `app/data/BlogPosts.json` — add or modify blog posts
-- Edit `app/components/BlogCard/BlogCard.tsx` — customise the card component
-- Uses Designsystemet React components (Card, Heading, Paragraph)
-- Changes auto-reload via Vite HMR
-
-## Docker Build
-
-```bash
-docker build -t designsystemet-basic-react-app .
-docker run -p 3000:3000 designsystemet-basic-react-app
-```
-
-## Kubernetes Deployment
-
-```bash
-kubectl apply -k manifests/
-```
-
-The app will be accessible at `http://<app-name>.localhost` after ArgoCD registration.
-
-## CI/CD
-
-The GitHub Actions workflow automatically builds and pushes the Docker image to GitHub Container Registry when changes are pushed to the main branch.
+- Edit copy and layout in **`App.tsx`**; adjust card styling in **`BlogCard.tsx`** / **`BlogCard.module.css`**.
+- Add or edit posts in **`src/data/blog-posts.json`** and place images under **`public/`** as needed.
