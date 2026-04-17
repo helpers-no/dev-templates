@@ -1,5 +1,5 @@
 ---
-sidebar_position: 5
+sidebar_position: 4
 ---
 
 # Case: Red Cross Norway — Volunteer Developer Platform

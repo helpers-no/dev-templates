@@ -1,0 +1,71 @@
+{
+  "version": "1.0.0",
+  "description": "Deployment targets the platform can provision into. Owned by UIS, vendored into TMP.",
+  "targets": [
+    {
+      "id": "local-k8s-argocd",
+      "name": "Rancher Desktop",
+      "description": "Local Kubernetes cluster on the developer's laptop. ArgoCD watches the repo and deploys on every push.",
+      "category": "development",
+      "provisioner": "uis",
+      "supported_ci_platforms": ["github-actions"],
+      "setup_command": "uis deploy argocd",
+      "setup_docs_url": "https://uis.sovereignsky.no/docs/deployment/local-k8s-argocd",
+      "required_secrets": [],
+      "required_services": ["argocd"],
+      "status": "ready"
+    },
+    {
+      "id": "azure-container-apps",
+      "name": "Azure Container Apps",
+      "description": "Serverless containers on Azure. Managed PostgreSQL via Azure Database for PostgreSQL Flexible Server.",
+      "category": "cloud",
+      "provisioner": "uis",
+      "supported_ci_platforms": ["azure-pipelines", "github-actions"],
+      "setup_command": "dev-template configure --target azure-container-apps",
+      "setup_docs_url": "",
+      "required_secrets": ["AZURE_CLIENT_ID", "AZURE_TENANT_ID", "AZURE_SUBSCRIPTION_ID"],
+      "required_services": [],
+      "status": "in-progress"
+    },
+    {
+      "id": "azure-aks",
+      "name": "Azure AKS",
+      "description": "Managed Kubernetes on Azure. Full K8s cluster with ArgoCD or direct deployment via azure/k8s-deploy.",
+      "category": "cloud",
+      "provisioner": "uis",
+      "supported_ci_platforms": ["azure-pipelines", "github-actions"],
+      "setup_command": "",
+      "setup_docs_url": "",
+      "required_secrets": ["AZURE_CLIENT_ID", "AZURE_TENANT_ID", "AZURE_SUBSCRIPTION_ID"],
+      "required_services": [],
+      "status": "rewrite"
+    },
+    {
+      "id": "ubuntu-k8s",
+      "name": "Ubuntu K8s",
+      "description": "Kubernetes on Ubuntu — bare metal server, virtual machine, or cloud instance. UIS installs K8s and configures the cluster.",
+      "category": "on-prem / cloud",
+      "provisioner": "uis",
+      "supported_ci_platforms": ["github-actions"],
+      "setup_command": "",
+      "setup_docs_url": "",
+      "required_secrets": [],
+      "required_services": [],
+      "status": "rewrite"
+    },
+    {
+      "id": "raspberry-pi-k8s",
+      "name": "Raspberry Pi",
+      "description": "Kubernetes on ARM hardware. UIS installs a lightweight K8s distribution on the Pi.",
+      "category": "edge",
+      "provisioner": "uis",
+      "supported_ci_platforms": ["github-actions"],
+      "setup_command": "",
+      "setup_docs_url": "",
+      "required_secrets": [],
+      "required_services": [],
+      "status": "rewrite"
+    }
+  ]
+}

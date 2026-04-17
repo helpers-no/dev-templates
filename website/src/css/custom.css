@@ -1,28 +1,28 @@
 /**
- * SovereignSky brand colors for Dev Templates.
- * Matches the color scheme used by DCT and UIS.
+ * TMP (dev-templates) brand color: Forest Green #2d6a4f
+ * Generated from base #2d6a4f using Docusaurus color shade convention.
  */
 
 :root {
-  --ifm-color-primary: #3a8f5e;
-  --ifm-color-primary-dark: #348053;
-  --ifm-color-primary-darker: #31794f;
-  --ifm-color-primary-darkest: #286441;
-  --ifm-color-primary-light: #409e69;
-  --ifm-color-primary-lighter: #43a56d;
-  --ifm-color-primary-lightest: #52b87c;
+  --ifm-color-primary: #2d6a4f;
+  --ifm-color-primary-dark: #285f47;
+  --ifm-color-primary-darker: #265a43;
+  --ifm-color-primary-darkest: #1f4a37;
+  --ifm-color-primary-light: #327557;
+  --ifm-color-primary-lighter: #347a5b;
+  --ifm-color-primary-lightest: #3d8f6b;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
+  --ifm-color-primary: #52b788;
+  --ifm-color-primary-dark: #43ad7c;
+  --ifm-color-primary-darker: #3ea575;
+  --ifm-color-primary-darkest: #348a62;
+  --ifm-color-primary-light: #65c196;
+  --ifm-color-primary-lighter: #6dc59c;
+  --ifm-color-primary-lightest: #8ad3b1;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
