@@ -1,8 +1,18 @@
 ---
-sidebar_position: 2
+sidebar_position: 6
 ---
 
 # Architecture Overview
+
+:::caution[Under review — 2026-04-17]
+
+This page is being updated to reflect the current platform architecture. Some diagrams and descriptions may be outdated.
+
+:::
+
+The platform is built from three projects — **DCT** (the developer's devcontainer), **UIS** (the infrastructure provisioner), and **TMP** (the template library and this website). Together they give a developer a two-command path from "I picked a template" to "my app is running with a database in a local Kubernetes cluster."
+
+This page shows how the pieces connect.
 
 ## Developer Platform Architecture
 

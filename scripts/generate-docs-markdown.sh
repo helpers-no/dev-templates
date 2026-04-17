@@ -332,7 +332,7 @@ for i in $(seq 0 $((cat_count - 1))); do
     [[ -z "$tmpl_in_cat" ]] && continue
 
     mkdir -p "$DOCS_DIR/$cat_dir"
-    index_file="$DOCS_DIR/$cat_dir/index.md"
+    index_file="$DOCS_DIR/$cat_dir/index.mdx"
 
     cat > "$index_file" <<EOF
 ---
@@ -340,20 +340,14 @@ title: $cat_name
 sidebar_label: $cat_name
 ---
 
+import TemplateList from '@site/src/components/TemplateList';
+
 # $cat_name
 
 $cat_desc
 
-| Template | Description | Install |
-|----------|-------------|---------|
+<TemplateList categoryId="$cat_id" />
 EOF
-
-    while IFS= read -r tmpl_id; do
-        [[ -z "$tmpl_id" ]] && continue
-        tmpl_name=$(jq -r ".templates[] | select(.id == \"$tmpl_id\") | .name" "$REGISTRY")
-        tmpl_desc=$(jq -r ".templates[] | select(.id == \"$tmpl_id\") | .description" "$REGISTRY")
-        echo "| [$tmpl_name]($tmpl_id) | $tmpl_desc | \`dev-template $tmpl_id\` |" >> "$index_file"
-    done <<< "$tmpl_in_cat"
 
     # Generate _category_.json for Docusaurus sidebar
     local_position=$((cat_order + 1))
@@ -378,8 +372,8 @@ cat > "$DOCS_DIR/_category_.json" <<CATEOF
   "label": "Templates",
   "position": 10,
   "link": {
-    "type": "generated-index",
-    "description": "Project templates for the Urbalurba developer platform."
+    "type": "doc",
+    "id": "templates/index"
   }
 }
 CATEOF

@@ -4,130 +4,81 @@ sidebar_position: 1
 
 # Developer Setup Guide
 
-## Prerequisites
+This guide walks you through setting up a local development environment for building apps on the platform. By the end, you will have a working template running on your laptop.
 
-### GitHub Authentication Setup
+When you are ready to deploy to a test environment, continue to [**Publish to Test**](publish-to-test.md).
 
-Before developing applications for the platform, you need to set up GitHub authentication. This is required for repository access and container image management (ArgoCD needs it to deploy to the local cluster).
 
-You'll need a GitHub Personal Access Token with appropriate permissions:
+## Step by step
 
-1. Go to [GitHub's Personal Access Tokens page](https://github.com/settings/tokens)
-2. Click "Generate new token" > "Generate new token (classic)"
-3. Name your token in the Note: field "Urbalurba Infrastructure"
-4. Expiration: Select "No expiration" (or preferably a suitable expiration date)
-5. Select scopes: `repo` and `write:packages`
-6. Click "Generate token" and copy it immediately (it will only be shown once)
+### 1. Create a GitHub repository
 
-For detailed instructions, see the [official GitHub documentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic).
+Create a new private repository in GitHub and clone it to your local machine. This is where your application code will live — just like any other GitHub project.
 
-Keep the token secure and do not share it with anyone. It is used to authenticate your GitHub account and access your repositories.
+### 2. Set up the Developer Toolbox
 
----
+The Developer Toolbox (DCT) is a devcontainer that gives every developer the same tools and the same setup, regardless of whether they are on macOS, Windows, or Linux. Python, TypeScript, Go, Java, C#, PHP — all pre-installed.
 
-## Setting Up for Local Development
+Install it in your project folder.
 
-### 1. Create GitHub Repository
-
-- Create a new private repository in GitHub and clone it to your local machine.
-- Just like any other GitHub repository, this is where the code will be stored and versioned.
-
-### 2. Setup Developer Toolbox
-
-The developer-toolbox is a set of tools for development of various applications. With this you can develop Python, JavaScript/TypeScript, C-sharp etc. It uses devcontainer so that everyone has the same setup, and the setup is the same on all platforms (macOS, Windows, Linux).
-See [devcontainer-toolbox](https://github.com/helpers-no/devcontainer-toolbox) for more information.
-
-- Run the script that sets up the developer-toolbox. It sets up devcontainer and installs all the tools needed for development.
-- Start VS Code and push an initial commit to GitHub.
-- This verifies that the basic Git setup is working properly.
-
-### 3. Select Project Template
-
-- Inside the devcontainer, run `dev-template`
-- This allows you to select an appropriate template for your project type (e.g., `typescript-basic-webserver`, `python-basic-webserver`, etc.)
-- The script sets up the project structure, Kubernetes manifests, and GitHub Actions workflows
-
-### 4. Local Development Environment
-
-- Run the project template locally to verify it works correctly.
-- This ensures the development environment is properly configured.
-- Iterate on the code and test it locally just like any other development setup.
-
-### 5. Push App to GitHub / Test Environment
-
-We use GitHub Actions to build and push the container image to the GitHub Container Registry. All this is automated and the developer does not need to worry about it.
-
-- Push the code to GitHub
-- This triggers the GitHub Actions workflow
-- The workflow builds the container image and pushes it to the GitHub Container Registry
-- Go to the GitHub Actions web page and verify the status of the build
-- If you set up the gh CLI you can also check the status from the command line: `gh run list`
-
-### 6. Deploy App to Test Environment
-
-The test environment is the local Kubernetes cluster on the developer's machine.
-To make the cluster automatically pull the built image from the GitHub Container Registry every time you push code updates to GitHub, register the application with ArgoCD.
-
-This is done once for each project, from the host machine (not inside the devcontainer):
+**Mac/Linux:**
 
 ```bash
-./uis argocd register <app-name> <github-repo-url>
+curl -fsSL https://raw.githubusercontent.com/helpers-no/devcontainer-toolbox/main/install.sh | bash
 ```
 
-For example:
+**Windows PowerShell:**
+
+```powershell
+irm https://raw.githubusercontent.com/helpers-no/devcontainer-toolbox/main/install.ps1 | iex
+```
+
+This creates two files: `.devcontainer/devcontainer.json` and a `.vscode/extensions.json`
+These two files sets up devcontainer functionality on your machine.
+
+
+Open the project in VS Code and click **"Reopen in Container"** when prompted.
+
+See [devcontainer-toolbox](https://github.com/helpers-no/devcontainer-toolbox) for more details.
+
+
+
+### 3. Install a template
+
+The video below shows the full flow — opening VS Code in the devcontainer and selecting a template:
+
+<video controls width="100%">
+  <source src={require('./assets/dev-template-dct-template-select-v1-small.mp4').default} type="video/mp4" />
+</video>
+
+Inside the devcontainer, run:
 
 ```bash
-./uis argocd register my-app https://github.com/username/my-repo
+dev-template python-basic-webserver-database
 ```
 
-This registers the repository with ArgoCD, creates a namespace, and sets up routing so the app is accessible at `http://<app-name>.localhost`.
+This copies in the template's application code, Kubernetes manifests, Dockerfile, and CI/CD pipeline. Pick whichever template matches your language — see the [Templates page](/templates) for the full list.
 
-### 7. Test App in Local Cluster
+### 4. Configure and run
 
-After registration, the application is automatically accessible at `http://<app-name>.localhost` in your browser. The platform creates a Traefik IngressRoute that routes traffic to your application — no manual DNS setup needed.
-
-### 8. Ongoing Development
-
-The development workflow is now set up. Write and run code locally inside the devcontainer. Testing during development is done locally.
-
-When you want to test how the code will run in a production-like environment, push the code to GitHub and ArgoCD will automatically deploy the application to the local Kubernetes cluster.
-
-### 9. Sharing and Handover to Production
-
-When a solution is ready for sharing or evaluation by central IT, the code is already in a structured, familiar format that follows best practices and GitOps workflow.
-
-### 10. Set up GitHub CLI (Optional but Recommended)
-
-Do this inside the devcontainer.
-
-The GitHub CLI allows you to interact with GitHub from the command line. It is simpler to run a command instead of opening a web page to check a status.
-
-Start authentication:
+<video controls width="100%">
+  <source src={require('./assets/dev-template-dct-template-configure-run-v1-small.mp4').default} type="video/mp4" />
+</video>
 
 ```bash
-gh auth login
+dev-template configure
 ```
 
-You will be prompted for several options:
-
-```plaintext
-? What account do you want to log into? GitHub.com
-? What is your preferred protocol for Git operations? HTTPS
-? Authenticate Git with your GitHub credentials? Yes
-? How would you like to authenticate GitHub CLI? Login with a web browser
-
-! First copy your one-time code: XXXX-XXXX
-Press Enter to open github.com in your browser...
-✓ Authentication complete.
-- gh config set -h github.com git_protocol https
-✓ Configured git protocol
-✓ Logged in as yourusername
-```
-
-After authenticating, you can use CLI commands to manage your repositories:
+This provisions the services your template needs (for example, a PostgreSQL database in your local Kubernetes cluster) and writes a `.env` file with the connection details. Then run the app:
 
 ```bash
-gh repo list
+uv run python app/app.py
 ```
 
-See [GitHub CLI documentation](https://cli.github.com/manual/) for more information.
+(Or the equivalent for your template's language — the template's README tells you the exact command.)
+
+### 5. Develop
+
+You now have a working app on your laptop with all services running in your local cluster. Write code, test locally, iterate.
+
+When you are ready to deploy your app to a test environment so it runs inside the Kubernetes cluster (just like it would in production), continue to [**Publish to Test**](publish-to-test.md).

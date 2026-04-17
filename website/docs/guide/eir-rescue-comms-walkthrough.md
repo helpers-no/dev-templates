@@ -1,8 +1,14 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 ---
 
 # Eir's Rescue-Comms App — A Walkthrough
+
+:::caution[Draft — 2026-04-17 11:50]
+
+This story is under development. Details may change as the platform evolves and the Red Cross deployment work progresses.
+
+:::
 
 ## The setup
 
@@ -36,7 +42,7 @@ Many of the applications Red Cross needs have to be built for the exact purpose 
 
 We call this **Helping the Helpers**.
 
-To make it possible, we have created a set of tools — a platform — that lets a developer build a Red Cross app the way Red Cross IT already runs its apps. Same PostgreSQL database, same login provider, same security baseline, same deployment shape. When the app is finished, putting it into production is not a technical problem. It is an administrative one.
+To make it possible, we have created a set of tools — a platform — that lets a developer build a Red Cross app the way Red Cross IT already runs its apps. Same PostgreSQL database, standards-based authentication (the developer uses Authentik locally; Red Cross production uses Okta — swapping is a configuration change, not a rewrite), same security baseline, same deployment shape. When the app is finished, putting it into production is not a technical problem. It is an administrative one.
 
 ---
 
@@ -64,7 +70,7 @@ She gets the first basic version working the first evening. A couple of evenings
 
 Her rescue colleague, **Frigg**, thinks the prototype is great and has ideas on how to improve it. Eir implements the new ideas. Now it starts to look like something that can be presented to more people.
 
-Eir is a programmer, not a designer. The app works, but it does not look great. She looks up the Red Cross GitHub and finds the **Red Cross design system** — the look and feel already defined by Red Cross designers, ready for any app to pick up. All she has to do is use it.
+Eir is a programmer, not a designer. The app works, but it does not look great. She looks up the Red Cross GitHub and finds the [**Red Cross design system**](https://norwegianredcross.github.io/DesignSystem/) — the look and feel already defined by Red Cross designers, ready for any app to pick up. All she has to do is use it.
 
 A couple of hours later, the app not only works; it also looks like a Red Cross app.
 

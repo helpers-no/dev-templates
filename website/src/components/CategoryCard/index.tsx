@@ -1,20 +1,23 @@
 import React from 'react';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import type {Category} from '../../types/category';
-import {getCategoryAnchor} from '../../utils/paths';
+import {getCategoryAnchor, getCategoryFolder} from '../../utils/paths';
 import styles from './styles.module.css';
 
 interface CategoryCardProps {
   category: Category;
   templateCount: number;
+  linkTo?: 'anchor' | 'docs';
 }
 
-export default function CategoryCard({category, templateCount}: CategoryCardProps) {
+export default function CategoryCard({category, templateCount, linkTo = 'anchor'}: CategoryCardProps) {
   const logoUrl = useBaseUrl(`/img/categories/${category.logo}`);
-  const anchor = getCategoryAnchor(category);
+  const href = linkTo === 'docs'
+    ? `/docs/templates/${getCategoryFolder(category)}/`
+    : `#${getCategoryAnchor(category)}`;
 
   return (
-    <a href={`#${anchor}`} className={styles.card}>
+    <a href={href} className={styles.card}>
       <img
         src={logoUrl}
         alt={`${category.name} logo`}

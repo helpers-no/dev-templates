@@ -5,9 +5,10 @@ import styles from './styles.module.css';
 
 interface CategoryGridProps {
   excludeEmpty?: boolean;
+  linkTo?: 'anchor' | 'docs';
 }
 
-export default function CategoryGrid({excludeEmpty = true}: CategoryGridProps) {
+export default function CategoryGrid({excludeEmpty = true, linkTo = 'anchor'}: CategoryGridProps) {
   const categories = getCategories();
 
   return (
@@ -21,6 +22,7 @@ export default function CategoryGrid({excludeEmpty = true}: CategoryGridProps) {
             key={category.id}
             category={category}
             templateCount={count}
+            linkTo={linkTo}
           />
         );
       })}
