@@ -135,7 +135,7 @@ bash scripts/generate-docs-markdown.sh --force
 
 Unit tests live in `scripts/test/build-architecture-mermaid.test.ts` (individual diagram helpers) and `scripts/test/build-architecture-mdx.test.ts` (model shape + emitter output). 33 tests across the two files.
 
-Visual style matches the canonical diagrams in `website/docs/architecture.md` — plain text labels, no emojis, default Mermaid theming. **Design rule**: every edge source is an explicit node (never a subgraph id), to avoid the Mermaid rendering bug where subgraph-id edge sources could silently drop subgraphs.
+Visual style matches the canonical diagrams in `website/docs/guide/architecture.md` — plain text labels, no emojis, default Mermaid theming. **Design rule**: every edge source is an explicit node (never a subgraph id), to avoid the Mermaid rendering bug where subgraph-id edge sources could silently drop subgraphs.
 
 **Current limitations**: multi-service templates throw at build time (only single-service templates are supported for now); the stack "consumer" node is a hardcoded generic label rather than being derived from cross-template data.
 

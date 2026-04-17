@@ -9,9 +9,10 @@ Project templates for the Urbalurba developer platform. Each template provides a
 
 ## What's Here
 
-- **[Architecture](architecture.md)** — Platform architecture diagrams and technical details
-- **[Developer Setup Guide](developer-setup-guide.md)** — Step-by-step local development setup
-- **[Case Study: Red Cross Norway](case-study-red-cross.md)** — Volunteer developer platform case study
+- **[Developer Setup Guide](guide/developer-setup-guide.md)** — Step-by-step local development setup
+- **[Architecture](guide/architecture.md)** — Platform architecture diagrams and technical details
+- **[Eir's Walkthrough](guide/eir-rescue-comms-walkthrough.md)** — From idea to Red Cross production — a volunteer developer's journey
+- **[Case Study: Red Cross Norway](guide/case-study-red-cross.md)** — Volunteer developer platform case study
 - **[AI Developer Guide](ai-developer/README.md)** — AI-assisted development workflow documentation
 
 ## Templates

@@ -1,18 +1,8 @@
-# Doc: Eir's Rescue-Comms App — A Walkthrough
-
-## Status: Working draft (2026-04-16)
-
-> **Placement is TBD.** This file lives in `backlog/` while we shape the narrative.
-> Likely candidate destinations once stable:
->
-> - The project's landing page or "Why dev-templates" intro — landing-page narratives convert readers before they hit the schema
-> - As a standalone "User journeys" doc that the landing page and the Red Cross onboarding materials both link to
-
-**Goal**: Ground the dev-templates value proposition in a concrete person solving a concrete problem. Follow Eir from the moment she sees a problem on a rescue mission through the moment her app is running on Red Cross infrastructure — and show the mechanism that makes that possible: templates that encode organisational standards so adoption becomes administrative, not technical.
-
-**Last Updated**: 2026-04-16
-
 ---
+sidebar_position: 3
+---
+
+# Eir's Rescue-Comms App — A Walkthrough
 
 ## The setup
 
@@ -154,11 +144,3 @@ Families can now open `eirapp.redcross.no` on their phones to receive notificati
 - **"Helping the helpers" works because the platform makes it feasible.** Without the template encoding Red Cross's standards, volunteer developers would have to learn every detail of Red Cross IT before their contributions could land. With it, they can focus on the application logic.
 - **Same codebase, two targets.** The app runs on Eir's laptop in local Kubernetes *and* in Red Cross's Azure — same code, different `deployments[]` entry. Local development stays fast; production lives where it needs to.
 
----
-
-## Next steps
-
-- [ ] Decide canonical placement (landing page / standalone)
-- [ ] Add a one-paragraph "About this walkthrough" intro if it lands somewhere prominent
-- [ ] Check name spellings with Red Cross Norway (e.g. exact form of "Digitaliseringsrådet")
-- [ ] Move out of `backlog/` once placement is decided
