@@ -1,10 +1,8 @@
 # TypeScript Basic Webserver — app notes
 
-Full template documentation (install, prerequisites, file layout, tooling, architecture, Docker, Kubernetes, and CI/CD) is published at:
-
-**[https://tmp.sovereignsky.no/docs/templates/basic-web-server/typescript-basic-webserver/](https://tmp.sovereignsky.no/docs/templates/basic-web-server/typescript-basic-webserver/)**
-
-The sections below describe only what lives in **`app/index.ts`**: behavior you change when you extend the server.
+The TypeScript Basic Webserver template is a simple hello world app that just display "Hello world" on a web page.
+The purpose of this simple app is to verify that the development environment is set up and ready.
+Se more documentation at http://localhost:3000/docs/templates/basic-web-server/typescript-basic-webserver
 
 ## Entry point
 

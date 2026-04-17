@@ -1,10 +1,8 @@
 # Python Basic Webserver — app notes
 
-Full template documentation (install, prerequisites, layout, tooling, architecture, Docker, Kubernetes, CI/CD) is published at:
-
-**[https://tmp.sovereignsky.no/docs/templates/basic-web-server/python-basic-webserver/](https://tmp.sovereignsky.no/docs/templates/basic-web-server/python-basic-webserver/)**
-
-The sections below describe only **`app/app.py`**.
+The Python Basic Webserver template is a simple hello world app built with Flask that displays "Hello world" on a web page.
+The purpose of this simple app is to verify that the development environment is set up and ready.
+See more documentation at http://localhost:3000/docs/templates/basic-web-server/python-basic-webserver
 
 ## HTTP API
 
