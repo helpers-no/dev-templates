@@ -2,11 +2,6 @@
 title: Go Basic Webserver
 sidebar_label: Go Basic Webserver
 description: "Go web server using net/http with health endpoint and Docker support"
-tags:
-  - golang
-  - webserver
-  - api
-  - rest
 ---
 
 import TemplateHeader from '@site/src/components/TemplateHeader';
@@ -155,68 +150,31 @@ sequenceDiagram
 
 </div>
 
-A minimal web server using Go's standard `net/http` package. Displays "Hello World" with current time and date, and provides health check endpoints.
+Full template documentation (install, prerequisites, layout, tooling, architecture, Docker, Kubernetes, CI/CD) is published at:
 
-## Quick Start
+**[https://tmp.sovereignsky.no/docs/templates/basic-web-server/golang-basic-webserver/](https://tmp.sovereignsky.no/docs/templates/basic-web-server/golang-basic-webserver/)**
 
-1. Update your terminal (tools were installed):
-   ```bash
-   source ~/.bashrc
-   ```
+The sections below describe only **`app/main.go`**.
 
-2. Run the app:
-   ```bash
-   go run app/main.go
-   ```
+## HTTP API
 
-3. Open in browser: http://localhost:3000
+| Path | Method | Response |
+|------|--------|----------|
+| `/` | GET | Plain text: greeting, template id `golang-basic-webserver`, and current time/date |
 
-## Prerequisites
+There is no separate health route in the default code.
 
-Development tools are installed automatically by the devcontainer.
-If you need to reinstall, run: `dev-setup`
+## Entry point and port
 
-## Project Structure
-
-After installation, your project contains:
-
-```plaintext
-├── app/
-│   └── main.go                            # Web server using net/http
-├── manifests/
-│   ├── deployment.yaml                    # K8s Deployment + Service
-│   └── kustomization.yaml                 # ArgoCD configuration
-├── .github/
-│   └── workflows/
-│       └── urbalurba-build-and-push.yaml  # CI/CD pipeline
-├── Dockerfile                             # Container build (multi-stage)
-├── go.mod                                 # Go module definition
-├── TEMPLATE_INFO                          # Template metadata
-└── README-golang-basic-webserver.md       # This file
-```
+- **File:** `app/main.go`
+- **Port:** **3000** (string in `main`, passed to `ListenAndServe`)
 
 ## Development
 
-- Edit `app/main.go` — the main application file
-- The `/` endpoint returns "Hello World" with the template name and current time/date
-- Restart the server after changes (`go run app/main.go` again)
+- **Run:** `go run app/main.go`
+- There is no hot reload — stop and re-run after edits.
 
-## Docker Build
+## Changing the app
 
-```bash
-docker build -t golang-basic-webserver .
-docker run -p 3000:3000 golang-basic-webserver
-```
-
-## Kubernetes Deployment
-
-```bash
-kubectl apply -k manifests/
-```
-
-The app will be accessible at `http://<app-name>.localhost` after ArgoCD registration.
-
-## CI/CD
-
-The GitHub Actions workflow automatically builds and pushes the Docker image to GitHub Container Registry when changes are pushed to the main branch.
+- Register more handlers with `http.HandleFunc` (or a router) before `ListenAndServe`.
 

@@ -1,65 +1,24 @@
-# PHP Basic Web Server
+# PHP Basic Webserver — app notes
 
-A minimal PHP web server using PHP's built-in server. Displays "Hello World" with current time and date, and provides health check endpoints.
+Full template documentation (install, prerequisites, layout, tooling, architecture, Docker, Kubernetes, CI/CD) is published at:
 
-## Quick Start
+**[https://tmp.sovereignsky.no/docs/templates/basic-web-server/php-basic-webserver/](https://tmp.sovereignsky.no/docs/templates/basic-web-server/php-basic-webserver/)**
 
-1. Update your terminal (tools were installed):
-   ```bash
-   source ~/.bashrc
-   ```
+The sections below describe only **`app/index.php`**.
 
-2. Run the app:
-   ```bash
-   php -S 0.0.0.0:3000 app/index.php
-   ```
+## HTTP API
 
-3. Open in browser: http://localhost:3000
+| Path | Method | Response |
+|------|--------|----------|
+| `/` | GET | `text/plain`: greeting, template id `php-basic-webserver`, time and date |
 
-## Prerequisites
+There is no separate health route in the default code.
 
-Development tools are installed automatically by the devcontainer.
-If you need to reinstall, run: `dev-setup`
+## Entry point and port
 
-## Project Structure
+- **File:** `app/index.php`
+- **Run:** `php -S 0.0.0.0:3000 app/index.php` (built-in server; **no** auto-reload — restart after edits)
 
-After installation, your project contains:
+## Changing the app
 
-```plaintext
-├── app/
-│   └── index.php                          # Main application
-├── manifests/
-│   ├── deployment.yaml                    # K8s Deployment + Service
-│   └── kustomization.yaml                 # ArgoCD configuration
-├── .github/
-│   └── workflows/
-│       └── urbalurba-build-and-push.yaml  # CI/CD pipeline
-├── Dockerfile                             # Container build (multi-stage)
-├── TEMPLATE_INFO                          # Template metadata
-└── README-php-basic-webserver.md          # This file
-```
-
-## Development
-
-- Edit `app/index.php` — the main application file
-- The `/` endpoint returns "Hello World" with the template name and current time/date
-- Restart the server after changes (PHP's built-in server does not auto-reload)
-
-## Docker Build
-
-```bash
-docker build -t php-basic-webserver .
-docker run -p 3000:3000 php-basic-webserver
-```
-
-## Kubernetes Deployment
-
-```bash
-kubectl apply -k manifests/
-```
-
-The app will be accessible at `http://<app-name>.localhost` after ArgoCD registration.
-
-## CI/CD
-
-The GitHub Actions workflow automatically builds and pushes the Docker image to GitHub Container Registry when changes are pushed to the main branch.
+- Add routing by checking `$_SERVER['REQUEST_URI']` or introduce a small router, or switch to a framework while keeping `app/` as the docroot.

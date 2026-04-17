@@ -1,69 +1,25 @@
-# Java Basic Web Server
+# Java Basic Webserver — app notes
 
-A minimal Spring Boot web server. Displays "Hello World" with current time and date, and provides health check endpoints via Spring Boot Actuator.
+Full template documentation (install, prerequisites, layout, tooling, architecture, Docker, Kubernetes, CI/CD) is published at:
 
-## Quick Start
+**[https://tmp.sovereignsky.no/docs/templates/basic-web-server/java-basic-webserver/](https://tmp.sovereignsky.no/docs/templates/basic-web-server/java-basic-webserver/)**
 
-1. Update your terminal (tools were installed):
-   ```bash
-   source ~/.bashrc
-   ```
+The sections below describe **`app/src/main/java/com/example/App.java`** and Spring Boot **Actuator** from `pom.xml`.
 
-2. Build and run:
-   ```bash
-   mvn clean package
-   java -jar target/*.jar
-   ```
+## HTTP API
 
-3. Open in browser: http://localhost:3000
+| Path | Method | Response |
+|------|--------|----------|
+| `/` | GET | Plain text: greeting, template id `java-basic-webserver`, and formatted time/date |
 
-## Prerequisites
+**Spring Boot Actuator** is on the classpath (`spring-boot-starter-actuator`). Typical health URL: **`GET /actuator/health`** (Spring Boot defaults; no `application.properties` is shipped in this template).
 
-Development tools are installed automatically by the devcontainer.
-If you need to reinstall, run: `dev-setup`
+## Entry point and port
 
-## Project Structure
+- **Main class:** `com.example.App`
+- **Port:** Spring Boot’s default is **8080** unless you set `server.port`. The Dockerfile and Kubernetes manifests in this template use **3000** — add `app/src/main/resources/application.properties` with `server.port=3000`, or pass `--server.port=3000`, to match the container locally.
+- **Run (after build):** `mvn clean package` then `java -jar target/*.jar`
 
-After installation, your project contains:
+## Changing the app
 
-```plaintext
-├── app/
-│   └── src/main/java/com/example/
-│       └── App.java                       # Spring Boot application
-├── manifests/
-│   ├── deployment.yaml                    # K8s Deployment + Service
-│   └── kustomization.yaml                 # ArgoCD configuration
-├── .github/
-│   └── workflows/
-│       └── urbalurba-build-and-push.yaml  # CI/CD pipeline
-├── Dockerfile                             # Container build (multi-stage)
-├── pom.xml                                # Maven dependencies
-├── TEMPLATE_INFO                          # Template metadata
-└── README-java-basic-webserver.md         # This file
-```
-
-## Development
-
-- Edit `app/src/main/java/com/example/App.java` — the main Spring Boot application
-- The `/` endpoint returns "Hello World" with the template name and current time/date
-- Health check endpoints are provided by Spring Boot Actuator
-- Rebuild with `mvn clean package` after changes
-
-## Docker Build
-
-```bash
-docker build -t java-basic-webserver .
-docker run -p 3000:3000 java-basic-webserver
-```
-
-## Kubernetes Deployment
-
-```bash
-kubectl apply -k manifests/
-```
-
-The app will be accessible at `http://<app-name>.localhost` after ArgoCD registration.
-
-## CI/CD
-
-The GitHub Actions workflow automatically builds and pushes the Docker image to GitHub Container Registry when changes are pushed to the main branch.
+- Add `@GetMapping` / `@RestController` methods in `App.java` or split into additional controllers under `com.example`.
