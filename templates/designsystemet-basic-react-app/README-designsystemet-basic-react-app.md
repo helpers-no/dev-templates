@@ -1,10 +1,8 @@
 # Designsystemet Basic React App — app notes
 
-Full template documentation (install, prerequisites, file tree, tooling, architecture, Docker, Kubernetes, CI/CD) is published at:
-
-**[https://tmp.sovereignsky.no/docs/templates/web-app/designsystemet-basic-react-app/](https://tmp.sovereignsky.no/docs/templates/web-app/designsystemet-basic-react-app/)**
-
-The sections below describe the **React/Vite app** under **`src/`**.
+The Designsystemet Basic React App template is a React app that demonstrates how to use the Norwegian government design system (Designsystemet) to build a styled web application.
+The purpose of this app is to verify that the development environment is set up and to provide a starting point for apps that use the Designsystemet component library.
+See more documentation at http://localhost:3000/docs/templates/web-app/designsystemet-basic-react-app
 
 ## What it renders
 

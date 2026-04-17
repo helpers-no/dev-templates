@@ -291,6 +291,11 @@ MDXEOF
     local_readme_file=$(_find_readme "$folder" "$readme") || true
 
     if [[ -n "$local_readme_file" && -f "$local_readme_file" ]]; then
+        {
+            echo ""
+            echo "## Template README"
+            echo ""
+        } >> "$page_file"
         _get_readme_content "$local_readme_file" >> "$page_file"
         echo "" >> "$page_file"
     else
