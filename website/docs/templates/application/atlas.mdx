@@ -1,0 +1,99 @@
+---
+title: Atlas Data
+sidebar_label: Atlas Data
+description: "Norwegian business-register data served as a REST API, with its Dagster pipelines"
+---
+
+import TemplateHeader from '@site/src/components/TemplateHeader';
+
+<TemplateHeader
+  logo="/img/templates/atlas-logo.svg"
+  name="Atlas Data"
+  version="v20260909-853c696"
+  description="Norwegian business-register data served as a REST API, with its Dagster pipelines"
+  abstract={"Installs the atlas data platform as one application: a PostgreSQL database with its migrations, a Dagster code location for the ingestion pipelines, and a PostgREST API over the resulting api_v1 views. Exports the API url for other applications to consume."}
+  install="uis template install atlas"
+  links={[{"url":"https://github.com/users/terchris/packages/container/package/atlas-data","title":"Published container image","icon":"github"}]}
+  maintainers={["terchris"]}
+  tags={["atlas","data","postgresql","dagster","postgrest","api"]}
+  tools=""
+/>
+
+
+<div className="templateCard">
+<div className="templateCardEyebrow">GETTING STARTED</div>
+
+### Prerequisites
+
+- [ ] [UIS provision-host container running](https://uis.sovereignsky.no)
+- [ ] [Local Kubernetes cluster running (Rancher Desktop)](https://www.rancher.com/products/rancher-desktop)
+
+</div>
+
+
+## Template README
+
+
+Atlas serves Norwegian business-register data as a REST API, together with the Dagster
+pipelines that build it.
+
+Installing it with UIS brings up the whole application under one name:
+
+- a **PostgreSQL** database with its migrations applied,
+- a **Dagster code location** for the ingestion pipelines,
+- a **PostgREST** API over the resulting `api_v1` views,
+- and an exported **`api-url`** other applications can consume.
+
+## Install
+
+```bash
+uis template install atlas
+```
+
+### Installing alongside an atlas that is already running
+
+If a tenant is already deployed, installing under the same name configures the **same
+database** and overwrites the running code location. To bring up a parallel tenant
+instead, pass a different application name:
+
+```bash
+uis template install atlas --param app_name=atlas-t
+```
+
+`app_name` isolates everything — database, secret prefix, url prefix and code location —
+so an existing tenant is untouched. Verified by `imac` on urb-agents #481.
+
+## What this directory is, and is not
+
+**This directory is a catalogue pointer, not the application.** There is no atlas source
+code here. The install definition is the OCI artifact named in `template-info.yaml`:
+
+```
+ghcr.io/terchris/atlas-data/uis:v20260909-853c696
+sha256:def7b9d2839180258f962555bd30ed5ca037fc42c52ebe0dd75f75c83d3a6c54
+```
+
+UIS pulls the **digest**. The tag is shown to people and never pulled by, because a tag can
+be re-pointed at a registry and a digest cannot. Bumping atlas therefore means editing
+`source.digest` in a reviewed change — that review is the only thing establishing that a
+human approved this artifact.
+
+The full reasoning lives in `uis-applications/README.md` in the `dev-templates` repository —
+referenced as a path rather than a link, because this page is rendered on the documentation
+site where a relative link to a repository file does not resolve.
+
+`params:` and `provides:` are **not** listed here on purpose. They live in the artifact's
+own `template-info.yaml`; there is one source of truth for what atlas installs and it is
+not this repository.
+
+## Provenance of this entry
+
+The artifact coordinates above are atlas's published values as verified by `imac` against
+the real registry (urb-agents #481) — the `853c696` artifact, which superseded `4b11f3f`
+partway through that test round.
+
+⚠️ **The prose on this page was written by `dev-templates` from the install and test
+records, not by atlas.** The description, abstract and the source link
+(currently the published container package, because `github.com/terchris/atlas-data` is not
+publicly reachable) should be confirmed or replaced by whoever owns atlas.
+

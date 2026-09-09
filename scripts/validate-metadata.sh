@@ -3,7 +3,7 @@
 #
 # Checks that all mandatory fields are present and valid.
 # Exits non-zero if any validation fails (blocks CI build).
-# Uses node + js-yaml from website/node_modules for YAML parsing.
+# Uses node (or bun) + js-yaml from website/node_modules for YAML parsing.
 #
 # Usage: bash scripts/validate-metadata.sh
 
@@ -20,11 +20,31 @@ ERRORS=0
 TEMPLATES=0
 CATEGORIES=0
 
-# Helper: read a YAML field using node + js-yaml
+# JavaScript runtime used to parse YAML (js-yaml, from website/node_modules).
+# CI has node; a developer host may have bun instead, which runs the same -e form.
+#
+# Resolved once, and loudly, because both helpers below send stderr to /dev/null:
+# without this check a missing runtime surfaces as "invalid YAML syntax" on every
+# file rather than as a missing runtime. On 2026-09-09 that reported 15 syntax
+# errors on a tree whose YAML was all valid, and cost a real detour.
+JS_RUNTIME=""
+for _rt in node bun; do
+    if command -v "$_rt" >/dev/null 2>&1; then JS_RUNTIME="$_rt"; break; fi
+done
+if [[ -z "$JS_RUNTIME" ]]; then
+    log_error "no JavaScript runtime on PATH: this script needs 'node' or 'bun' to parse YAML"
+    exit 1
+fi
+if [[ ! -d "$REPO_ROOT/website/node_modules/js-yaml" ]]; then
+    log_error "website/node_modules/js-yaml is missing — run 'npm ci' (or 'bun install') in website/"
+    exit 1
+fi
+
+# Helper: read a YAML field using $JS_RUNTIME + js-yaml
 _yaml_field() {
     local file="$1"
     local field="$2"
-    node -e "
+    "$JS_RUNTIME" -e "
         const yaml = require('$REPO_ROOT/website/node_modules/js-yaml');
         const fs = require('fs');
         const d = yaml.load(fs.readFileSync('$file', 'utf8'));
@@ -37,7 +57,7 @@ _yaml_field() {
 # Helper: check YAML parses
 _yaml_valid() {
     local file="$1"
-    node -e "
+    "$JS_RUNTIME" -e "
         const yaml = require('$REPO_ROOT/website/node_modules/js-yaml');
         const fs = require('fs');
         yaml.load(fs.readFileSync('$file', 'utf8'));
@@ -158,8 +178,8 @@ validate_template_yaml() {
         fi
     fi
 
-    if [[ -n "$install_type" && "$install_type" != "app" && "$install_type" != "overlay" && "$install_type" != "stack" ]]; then
-        log_error "$template_name: install_type must be 'app', 'overlay', or 'stack', got '$install_type'"
+    if [[ -n "$install_type" && "$install_type" != "app" && "$install_type" != "overlay" && "$install_type" != "stack" && "$install_type" != "application" ]]; then
+        log_error "$template_name: install_type must be 'app', 'overlay', 'stack', or 'application', got '$install_type'"
         has_error=true
     fi
 

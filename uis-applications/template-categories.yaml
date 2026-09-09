@@ -1,0 +1,23 @@
+# template-categories.yaml — UIS application templates
+# Installed by `uis template install <id>` in the UIS provision-host container.
+#
+# An APPLICATION differs from a stack in uis-stack-templates/: a stack's
+# definition lives in this repository, while an application's definition is an
+# OCI artifact published beside the application's own image. An entry here is a
+# *pointer* to that artifact plus the display surface for the documentation
+# site. See website/docs/ai-developer/plans/backlog/PLAN-application-catalogue.md
+
+context: uis
+name: Applications
+description: Multi-service applications installed via UIS from a published OCI artifact
+order: 1
+emoji: "\U0001F4E6"
+
+categories:
+  - id: APPLICATION
+    order: 1
+    name: Applications
+    description: Applications whose install definition is published as an OCI artifact
+    tags: application oci multi-service
+    logo: applications-logo.svg
+    emoji: "\U0001F4E6"

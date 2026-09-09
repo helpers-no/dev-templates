@@ -79,7 +79,7 @@ export interface ResolvedService {
  * "stack" (provides services via `provides.services:`). Drives the header
  * label of the cluster section.
  */
-export type TemplateKind = 'app' | 'stack';
+export type TemplateKind = 'app' | 'stack' | 'application';
 
 interface TemplateEnvironmentProps {
   // Legacy props (still emitted by the generator for now — used as fallback)
@@ -142,7 +142,9 @@ function ServicesBlock({
   templateKind: TemplateKind;
 }) {
   const heading =
-    templateKind === 'stack' ? 'Provided to your cluster' : 'In your Kubernetes cluster';
+    templateKind === 'stack' || templateKind === 'application'
+      ? 'Provided to your cluster'
+      : 'In your Kubernetes cluster';
   return (
     <div className={styles.subsection}>
       <div className={styles.subsectionTitle}>{heading}</div>

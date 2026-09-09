@@ -46,6 +46,7 @@ import type { TemplateEntry } from './build-architecture-mermaid.ts';
  */
 export function buildExpectedOutput(entry: TemplateEntry): string | null {
   if (entry.install_type === 'overlay') return null;
+  if (entry.install_type === 'application') return null;
   if (entry.install_type === 'stack') {
     return buildStackExpectedOutput(entry);
   }

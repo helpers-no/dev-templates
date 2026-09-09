@@ -64,7 +64,7 @@ import { emitArchitectureMdx } from './build-architecture-mdx.ts';
 export interface TemplateEntry {
   id: string;
   name: string;
-  install_type: 'app' | 'stack' | 'overlay';
+  install_type: 'app' | 'stack' | 'overlay' | 'application';
   params?: {
     app_name?: string;
     database_name?: string;
@@ -582,6 +582,15 @@ function buildStackSequence(entry: TemplateEntry): string | null {
  */
 export function buildArchitectureModel(entry: TemplateEntry): ArchitectureModel {
   if (entry.install_type === 'overlay') {
+    return { sections: [] };
+  }
+
+  // An application's install definition lives in a published OCI artifact, so this
+  // repository cannot know its shape well enough to draw it. No sections means the
+  // whole `## Architecture` block is suppressed, as for overlay. Deliberate for the
+  // first cut -- tor-agent confirmed on urb-agents #482 that the diagram worth having
+  // is platform-level and already exists in the UIS docs.
+  if (entry.install_type === 'application') {
     return { sections: [] };
   }
 

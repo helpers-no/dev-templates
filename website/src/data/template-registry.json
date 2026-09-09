@@ -1,5 +1,5 @@
 {
-  "generated": "2026-04-17T13:11:43.224Z",
+  "generated": "2026-09-09T17:09:17.475Z",
   "dctDocsBase": "https://dct.sovereignsky.no",
   "uisDocsBase": "https://uis.sovereignsky.no",
   "categories": [
@@ -14,16 +14,6 @@
       "context": "dct"
     },
     {
-      "id": "BASIC_WEB_SERVER",
-      "order": 0,
-      "name": "Basic Web Server Templates",
-      "description": "Minimal web server templates that demonstrate Hello World in multiple languages",
-      "tags": "webserver backend hello-world starter",
-      "logo": "webserver-logo.svg",
-      "emoji": "🌐",
-      "context": "dct"
-    },
-    {
       "id": "DEMO",
       "order": 0,
       "name": "Demo Stacks",
@@ -34,6 +24,16 @@
       "context": "uis"
     },
     {
+      "id": "BASIC_WEB_SERVER",
+      "order": 0,
+      "name": "Basic Web Server Templates",
+      "description": "Minimal web server templates that demonstrate Hello World in multiple languages",
+      "tags": "webserver backend hello-world starter",
+      "logo": "webserver-logo.svg",
+      "emoji": "🌐",
+      "context": "dct"
+    },
+    {
       "id": "WEB_APP",
       "order": 1,
       "name": "Web Application Templates",
@@ -42,6 +42,16 @@
       "logo": "webapp-logo.svg",
       "emoji": "📱",
       "context": "dct"
+    },
+    {
+      "id": "APPLICATION",
+      "order": 1,
+      "name": "Applications",
+      "description": "Applications whose install definition is published as an OCI artifact",
+      "tags": "application oci multi-service",
+      "logo": "applications-logo.svg",
+      "emoji": "📦",
+      "context": "uis"
     },
     {
       "id": "BASIC_WEB_SERVER_DATABASE",
@@ -116,31 +126,29 @@
       "filesMdx": "### Files\n\n<details className=\"dropdownBlock\">\n<summary>Files (12)</summary>\n\n<pre className=\"filesTree\">\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/ai-templates/plan-based-workflow/template/CLAUDE.md\" target=\"_blank\" rel=\"noopener noreferrer\">CLAUDE.md</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/ai-templates/plan-based-workflow/template/README-plan-based-workflow.md\" target=\"_blank\" rel=\"noopener noreferrer\">README-plan-based-workflow.md</a>\n└── docs/\n    └── ai-developer/\n        ├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/ai-templates/plan-based-workflow/template/docs/ai-developer/CLAUDE-template.md\" target=\"_blank\" rel=\"noopener noreferrer\">CLAUDE-template.md</a>\n        ├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/ai-templates/plan-based-workflow/template/docs/ai-developer/DEVCONTAINER.md\" target=\"_blank\" rel=\"noopener noreferrer\">DEVCONTAINER.md</a>\n        ├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/ai-templates/plan-based-workflow/template/docs/ai-developer/GIT.md\" target=\"_blank\" rel=\"noopener noreferrer\">GIT.md</a>\n        ├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/ai-templates/plan-based-workflow/template/docs/ai-developer/PLANS.md\" target=\"_blank\" rel=\"noopener noreferrer\">PLANS.md</a>\n        ├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/ai-templates/plan-based-workflow/template/docs/ai-developer/project-TEMPLATE.md\" target=\"_blank\" rel=\"noopener noreferrer\">project-TEMPLATE.md</a>\n        ├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/ai-templates/plan-based-workflow/template/docs/ai-developer/README.md\" target=\"_blank\" rel=\"noopener noreferrer\">README.md</a>\n        ├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/ai-templates/plan-based-workflow/template/docs/ai-developer/WORKFLOW.md\" target=\"_blank\" rel=\"noopener noreferrer\">WORKFLOW.md</a>\n        └── plans/\n            ├── active/\n            │   └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/ai-templates/plan-based-workflow/template/docs/ai-developer/plans/active/.gitkeep\" target=\"_blank\" rel=\"noopener noreferrer\">.gitkeep</a>\n            ├── backlog/\n            │   └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/ai-templates/plan-based-workflow/template/docs/ai-developer/plans/backlog/.gitkeep\" target=\"_blank\" rel=\"noopener noreferrer\">.gitkeep</a>\n            └── completed/\n                └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/ai-templates/plan-based-workflow/template/docs/ai-developer/plans/completed/.gitkeep\" target=\"_blank\" rel=\"noopener noreferrer\">.gitkeep</a>\n</pre>\n\n</details>\n"
     },
     {
-      "id": "csharp-basic-webserver",
-      "folder": "templates/csharp-basic-webserver",
+      "id": "postgresql-demo",
+      "folder": "uis-stack-templates/postgresql-demo",
       "version": "1.0.0",
-      "name": "C# Basic Webserver",
-      "description": "ASP.NET Core server with health endpoint and Docker support",
-      "category": "BASIC_WEB_SERVER",
-      "install_type": "app",
-      "abstract": "A minimal ASP.NET Core web server with hot reload via dotnet watch. Includes Docker multi-stage build, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
-      "tools": "dev-csharp",
-      "readme": "README-csharp-basic-webserver.md",
+      "name": "PostgreSQL Demo",
+      "description": "Deploys PostgreSQL and creates a sample database with seed data",
+      "category": "DEMO",
+      "install_type": "stack",
+      "abstract": "A minimal UIS template that deploys PostgreSQL and creates a sample tasks table with seed data. Shows the full uis template flow from registry to deployed, configured service. Use this to verify your UIS setup or as a starting point for your own stack templates.",
+      "tools": "",
+      "readme": "README-postgresql-demo.md",
       "tags": [
-        "csharp",
-        "dotnet",
-        "aspnet",
-        "webserver",
-        "api",
-        "rest"
+        "postgresql",
+        "database",
+        "demo",
+        "getting-started"
       ],
-      "logo": "csharp-basic-webserver-logo.svg",
+      "logo": "postgresql-demo-logo.svg",
       "maintainers": [
         "terchris"
       ],
       "links": [
         {
-          "url": "https://github.com/helpers-no/dev-templates/tree/main/templates/csharp-basic-webserver",
+          "url": "https://github.com/helpers-no/dev-templates/tree/main/uis-stack-templates/postgresql-demo",
           "title": "Source code",
           "icon": "github"
         }
@@ -149,53 +157,73 @@
         {
           "text": "DCT devcontainer running",
           "url": "https://dct.sovereignsky.no"
+        },
+        {
+          "text": "UIS provision-host container running",
+          "url": "https://uis.sovereignsky.no"
+        },
+        {
+          "text": "Local Kubernetes cluster running (Rancher Desktop)",
+          "url": "https://www.rancher.com/products/rancher-desktop"
         }
       ],
       "related": [
-        "java-basic-webserver",
-        "golang-basic-webserver"
+        "python-basic-webserver-database"
       ],
-      "context": "dct",
+      "context": "uis",
       "params": {
-        "app_name": "my-app"
+        "app_name": "demo-app",
+        "database_name": "demo_db"
+      },
+      "provides": {
+        "services": [
+          {
+            "service": "postgresql",
+            "config": {
+              "database": "{{ params.database_name }}",
+              "init": "config/init-database.sql"
+            }
+          }
+        ]
       },
       "quickstart": {
-        "title": "Run the ASP.NET Core app",
+        "title": "Verify the database",
         "setup": [],
-        "run": "dotnet watch run",
-        "note": "ASP.NET Core runs on port 3000 with hot reload via dotnet watch. VS Code auto-forwards the port.\n"
+        "run": "uis connect postgresql demo_db",
+        "note": "Inside psql, run: SELECT * FROM tasks;\nYou should see 3 seeded rows. Type \\q to exit.\n"
       },
-      "templateKind": "app",
-      "resolvedTools": [
+      "configureCommand": "uis template install postgresql-demo",
+      "templateKind": "stack",
+      "resolvedTools": [],
+      "resolvedServices": [
         {
-          "id": "dev-csharp",
-          "name": "C# Development Tools",
-          "description": "Installs .NET SDK, ASP.NET Core Runtime, and VS Code extensions for C# development",
-          "website": "https://dotnet.microsoft.com",
-          "docsUrl": "https://dct.sovereignsky.no/docs/tools/development-tools/csharp"
+          "id": "postgresql",
+          "name": "PostgreSQL",
+          "description": "Open-source relational database",
+          "docsUrl": "https://uis.sovereignsky.no/docs/services/databases/postgresql",
+          "website": "https://www.postgresql.org",
+          "exposePort": 35432,
+          "namespace": "default",
+          "helmChart": "bitnami/postgresql",
+          "database": "demo_db",
+          "generatedUser": "demo_app",
+          "initFilePath": "config/init-database.sql",
+          "transitiveRequires": []
         }
       ],
-      "manifest": {
-        "containerPort": 80
+      "resolvedInitFiles": {
+        "config/init-database.sql": "-- PostgreSQL Demo — sample schema with seed data\n-- Applied by: uis configure postgresql --init-file -\n-- Uses psql --set ON_ERROR_STOP=on for fail-fast on syntax errors\n-- All statements are idempotent — safe to re-run\n\nCREATE TABLE IF NOT EXISTS tasks (\n    id SERIAL PRIMARY KEY,\n    title VARCHAR(255) NOT NULL,\n    status VARCHAR(20) DEFAULT 'pending',\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);\n\nINSERT INTO tasks (title, status) VALUES\n    ('Verify uis template install works', 'done'),\n    ('Build your own UIS stack template', 'pending'),\n    ('Deploy it with uis template install', 'pending')\nON CONFLICT DO NOTHING;\n"
       },
-      "resolvedServices": [],
-      "resolvedInitFiles": {},
-      "architectureMdx": "<div className=\"templateCard\">\n<div className=\"templateCardEyebrow\">ARCHITECTURE</div>\n\n## Architecture\n\nThese diagrams are auto-generated from the template's metadata. Click any diagram to enlarge.\n\n### Deployment\n\n<details className=\"dropdownBlock\">\n<summary>Components</summary>\n\n```mermaid\nflowchart LR\n    dev([\"Developer\"])\n    browser[\"Web Browser\"]\n\n    subgraph dct[\"DCT devcontainer\"]\n        src[\"source code\"]\n    end\n\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    subgraph k8s[\"Local Kubernetes Cluster\"]\n        traefik[\"Traefik Ingress\"]\n        argo[\"ArgoCD\"]\n        pod[\"my-app pod\"]\n    end\n\n    dev -->|git push| src\n    src -->|push| repo\n    repo -->|trigger| actions\n    actions -->|build + push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n    traefik -->|routes to| pod\n    browser -->|my-app.localhost| traefik\n    dev --> browser\n```\n\n<a href=\"https://mermaid.live/edit#base64:eyJjb2RlIjoiZmxvd2NoYXJ0IExSXG4gICAgZGV2KFtcIkRldmVsb3BlclwiXSlcbiAgICBicm93c2VyW1wiV2ViIEJyb3dzZXJcIl1cblxuICAgIHN1YmdyYXBoIGRjdFtcIkRDVCBkZXZjb250YWluZXJcIl1cbiAgICAgICAgc3JjW1wic291cmNlIGNvZGVcIl1cbiAgICBlbmRcblxuICAgIHN1YmdyYXBoIGdoW1wiR2l0SHViXCJdXG4gICAgICAgIHJlcG9bXCJyZXBvXCJdXG4gICAgICAgIGFjdGlvbnNbXCJHaXRIdWIgQWN0aW9uc1wiXVxuICAgICAgICBnaGNyW1wiQ29udGFpbmVyIFJlZ2lzdHJ5XCJdXG4gICAgZW5kXG5cbiAgICBzdWJncmFwaCBrOHNbXCJMb2NhbCBLdWJlcm5ldGVzIENsdXN0ZXJcIl1cbiAgICAgICAgdHJhZWZpa1tcIlRyYWVmaWsgSW5ncmVzc1wiXVxuICAgICAgICBhcmdvW1wiQXJnb0NEXCJdXG4gICAgICAgIHBvZFtcIm15LWFwcCBwb2RcIl1cbiAgICBlbmRcblxuICAgIGRldiAtLT58Z2l0IHB1c2h8IHNyY1xuICAgIHNyYyAtLT58cHVzaHwgcmVwb1xuICAgIHJlcG8gLS0+fHRyaWdnZXJ8IGFjdGlvbnNcbiAgICBhY3Rpb25zIC0tPnxidWlsZCArIHB1c2ggaW1hZ2V8IGdoY3JcbiAgICBhcmdvIC0tPnxtb25pdG9yc3wgcmVwb1xuICAgIGdoY3IgLS0+fGltYWdlIHB1bGx8IGFyZ29cbiAgICBhcmdvIC0tPnxkZXBsb3lzfCBwb2RcbiAgICB0cmFlZmlrIC0tPnxyb3V0ZXMgdG98IHBvZFxuICAgIGJyb3dzZXIgLS0+fG15LWFwcC5sb2NhbGhvc3R8IHRyYWVmaWtcbiAgICBkZXYgLS0+IGJyb3dzZXIiLCJtZXJtYWlkIjoie1widGhlbWVcIjpcImRlZmF1bHRcIn0ifQ==\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"mermaidLiveLink\">↗ Open in mermaid.live</a>\n\n</details>\n\n<details className=\"dropdownBlock\">\n<summary>Flow</summary>\n\n```mermaid\nsequenceDiagram\n    participant Dev as Developer\n    participant DCT as DCT devcontainer\n    participant GH as GitHub\n    participant Actions as GitHub Actions\n    participant GHCR as Container Registry\n    participant Argo as ArgoCD\n    participant K8s as Local Kubernetes cluster\n    Dev->>DCT: git push\n    DCT->>GH: push to repo\n    GH->>Actions: trigger workflow\n    Actions->>Actions: build container image\n    Actions->>GHCR: push image\n    Argo->>GH: detects manifest change\n    Argo->>GHCR: pull image\n    Argo->>K8s: deploy my-app pod\n    Note over Dev,K8s: App now accessible at my-app.localhost via Traefik\n```\n\n<a href=\"https://mermaid.live/edit#base64:eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gICAgcGFydGljaXBhbnQgRGV2IGFzIERldmVsb3BlclxuICAgIHBhcnRpY2lwYW50IERDVCBhcyBEQ1QgZGV2Y29udGFpbmVyXG4gICAgcGFydGljaXBhbnQgR0ggYXMgR2l0SHViXG4gICAgcGFydGljaXBhbnQgQWN0aW9ucyBhcyBHaXRIdWIgQWN0aW9uc1xuICAgIHBhcnRpY2lwYW50IEdIQ1IgYXMgQ29udGFpbmVyIFJlZ2lzdHJ5XG4gICAgcGFydGljaXBhbnQgQXJnbyBhcyBBcmdvQ0RcbiAgICBwYXJ0aWNpcGFudCBLOHMgYXMgTG9jYWwgS3ViZXJuZXRlcyBjbHVzdGVyXG4gICAgRGV2LT4+RENUOiBnaXQgcHVzaFxuICAgIERDVC0+PkdIOiBwdXNoIHRvIHJlcG9cbiAgICBHSC0+PkFjdGlvbnM6IHRyaWdnZXIgd29ya2Zsb3dcbiAgICBBY3Rpb25zLT4+QWN0aW9uczogYnVpbGQgY29udGFpbmVyIGltYWdlXG4gICAgQWN0aW9ucy0+PkdIQ1I6IHB1c2ggaW1hZ2VcbiAgICBBcmdvLT4+R0g6IGRldGVjdHMgbWFuaWZlc3QgY2hhbmdlXG4gICAgQXJnby0+PkdIQ1I6IHB1bGwgaW1hZ2VcbiAgICBBcmdvLT4+SzhzOiBkZXBsb3kgbXktYXBwIHBvZFxuICAgIE5vdGUgb3ZlciBEZXYsSzhzOiBBcHAgbm93IGFjY2Vzc2libGUgYXQgbXktYXBwLmxvY2FsaG9zdCB2aWEgVHJhZWZpayIsIm1lcm1haWQiOiJ7XCJ0aGVtZVwiOlwiZGVmYXVsdFwifSJ9\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"mermaidLiveLink\">↗ Open in mermaid.live</a>\n\n</details>\n\n</div>\n",
-      "expectedOutputBlock": null,
+      "architectureMdx": "<div className=\"templateCard\">\n<div className=\"templateCardEyebrow\">ARCHITECTURE</div>\n\n## Architecture\n\nThese diagrams are auto-generated from the template's metadata. Click any diagram to enlarge.\n\n### Overview\n\n<details className=\"dropdownBlock\">\n<summary>Components</summary>\n\n```mermaid\nflowchart LR\n    dev([\"Developer\"])\n\n    subgraph dct[\"DCT devcontainer\"]\n        dev_inside([\"Developer shell\"])\n    end\n\n    subgraph uis_group[\"UIS container\"]\n        uis[\"uis CLI\"]\n    end\n\n    subgraph k8s[\"Local Kubernetes Cluster\"]\n        svc[(\"PostgreSQL<br/>demo_db\")]\n    end\n    consumers[\"Consumer templates\"]\n\n    dev -->|uis template install postgresql-demo| uis\n    uis -->|deploys + seeds| svc\n    consumers -.->|use this| svc\n```\n\n<a href=\"https://mermaid.live/edit#base64:eyJjb2RlIjoiZmxvd2NoYXJ0IExSXG4gICAgZGV2KFtcIkRldmVsb3BlclwiXSlcblxuICAgIHN1YmdyYXBoIGRjdFtcIkRDVCBkZXZjb250YWluZXJcIl1cbiAgICAgICAgZGV2X2luc2lkZShbXCJEZXZlbG9wZXIgc2hlbGxcIl0pXG4gICAgZW5kXG5cbiAgICBzdWJncmFwaCB1aXNfZ3JvdXBbXCJVSVMgY29udGFpbmVyXCJdXG4gICAgICAgIHVpc1tcInVpcyBDTElcIl1cbiAgICBlbmRcblxuICAgIHN1YmdyYXBoIGs4c1tcIkxvY2FsIEt1YmVybmV0ZXMgQ2x1c3RlclwiXVxuICAgICAgICBzdmNbKFwiUG9zdGdyZVNRTDxici8+ZGVtb19kYlwiKV1cbiAgICBlbmRcbiAgICBjb25zdW1lcnNbXCJDb25zdW1lciB0ZW1wbGF0ZXNcIl1cblxuICAgIGRldiAtLT58dWlzIHRlbXBsYXRlIGluc3RhbGwgcG9zdGdyZXNxbC1kZW1vfCB1aXNcbiAgICB1aXMgLS0+fGRlcGxveXMgKyBzZWVkc3wgc3ZjXG4gICAgY29uc3VtZXJzIC0uLT58dXNlIHRoaXN8IHN2YyIsIm1lcm1haWQiOiJ7XCJ0aGVtZVwiOlwiZGVmYXVsdFwifSJ9\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"mermaidLiveLink\">↗ Open in mermaid.live</a>\n\n</details>\n\n<details className=\"dropdownBlock\">\n<summary>Flow</summary>\n\n```mermaid\nsequenceDiagram\n    participant Dev as Developer\n    participant DCT as DCT devcontainer\n    participant UIS as UIS provision-host\n    participant K8s as Local Kubernetes cluster\n    participant DB as PostgreSQL\n    Dev->>DCT: uis template install postgresql-demo\n    DCT->>UIS: install stack\n    UIS->>K8s: deploy PostgreSQL\n    UIS->>DB: create database demo_db + user\n    UIS->>DB: run init-*.sql seed files\n    UIS->>UIS: kubectl port-forward 35432\n    UIS-->>DCT: return connection JSON\n```\n\n<a href=\"https://mermaid.live/edit#base64:eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gICAgcGFydGljaXBhbnQgRGV2IGFzIERldmVsb3BlclxuICAgIHBhcnRpY2lwYW50IERDVCBhcyBEQ1QgZGV2Y29udGFpbmVyXG4gICAgcGFydGljaXBhbnQgVUlTIGFzIFVJUyBwcm92aXNpb24taG9zdFxuICAgIHBhcnRpY2lwYW50IEs4cyBhcyBMb2NhbCBLdWJlcm5ldGVzIGNsdXN0ZXJcbiAgICBwYXJ0aWNpcGFudCBEQiBhcyBQb3N0Z3JlU1FMXG4gICAgRGV2LT4+RENUOiB1aXMgdGVtcGxhdGUgaW5zdGFsbCBwb3N0Z3Jlc3FsLWRlbW9cbiAgICBEQ1QtPj5VSVM6IGluc3RhbGwgc3RhY2tcbiAgICBVSVMtPj5LOHM6IGRlcGxveSBQb3N0Z3JlU1FMXG4gICAgVUlTLT4+REI6IGNyZWF0ZSBkYXRhYmFzZSBkZW1vX2RiICsgdXNlclxuICAgIFVJUy0+PkRCOiBydW4gaW5pdC0qLnNxbCBzZWVkIGZpbGVzXG4gICAgVUlTLT4+VUlTOiBrdWJlY3RsIHBvcnQtZm9yd2FyZCAzNTQzMlxuICAgIFVJUy0tPj5EQ1Q6IHJldHVybiBjb25uZWN0aW9uIEpTT04iLCJtZXJtYWlkIjoie1widGhlbWVcIjpcImRlZmF1bHRcIn0ifQ==\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"mermaidLiveLink\">↗ Open in mermaid.live</a>\n\n</details>\n\n</div>\n",
+      "expectedOutputBlock": "🔧 UIS Template Install: postgresql-demo\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📄 Reading template-info.yaml...\n   ✓ ID:   postgresql-demo\n   ✓ Type: stack\n\n📝 Parameters:\n   app_name      = demo-app\n   database_name = demo_db\n\n🔧 Provisioning 1 service...\n\n   ─── postgresql ──────────────────────────────────────────────────\n   Database:     demo_db\n   Namespace:    default\n   Init file:    config/init-database.sql (706 bytes, 19 lines)\n\n   📡 Calling UIS:\n      docker exec -i uis-provision-host uis deploy postgresql \\\n        --database demo_db \\\n        --namespace default \\\n        --init-file - \\\n        < config/init-database.sql\n\n   ✓ PostgreSQL deployed\n   ✓ Database demo_db created + seeded\n   ✓ Port-forward: host.docker.internal:35432 → postgresql.default.svc:5432\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n✅ Stack installed (1 service)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📋 Next steps:\n   • Verify:                 uis connect postgresql demo_db\n   • Check port forwards:    uis expose --status\n   • Consumer templates:     see the \"Related\" links on this page",
       "files": [
-        ".dockerignore",
-        ".github/workflows/urbalurba-build-and-push.yaml",
         ".gitignore",
-        "Dockerfile",
-        "README-csharp-basic-webserver.md",
-        "manifests/deployment.yaml",
-        "manifests/kustomization.yaml",
-        "src/WebApplication/Program.cs",
-        "src/WebApplication/WebApplication.csproj",
+        "README-postgresql-demo.md",
+        "config/init-database.sql",
         "template-info.yaml"
       ],
-      "templateRepoPath": "templates/csharp-basic-webserver",
-      "filesMdx": "### Files\n\n<details className=\"dropdownBlock\">\n<summary>Files (10)</summary>\n\n<pre className=\"filesTree\">\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/.dockerignore\" target=\"_blank\" rel=\"noopener noreferrer\">.dockerignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/.gitignore\" target=\"_blank\" rel=\"noopener noreferrer\">.gitignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/Dockerfile\" target=\"_blank\" rel=\"noopener noreferrer\">Dockerfile</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/README-csharp-basic-webserver.md\" target=\"_blank\" rel=\"noopener noreferrer\">README-csharp-basic-webserver.md</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/template-info.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">template-info.yaml</a>\n├── .github/\n│   └── workflows/\n│       └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/.github/workflows/urbalurba-build-and-push.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">urbalurba-build-and-push.yaml</a>\n├── manifests/\n│   ├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/manifests/deployment.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">deployment.yaml</a>\n│   └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/manifests/kustomization.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">kustomization.yaml</a>\n└── src/\n    └── WebApplication/\n        ├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/src/WebApplication/Program.cs\" target=\"_blank\" rel=\"noopener noreferrer\">Program.cs</a>\n        └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/src/WebApplication/WebApplication.csproj\" target=\"_blank\" rel=\"noopener noreferrer\">WebApplication.csproj</a>\n</pre>\n\n</details>\n"
+      "templateRepoPath": "uis-stack-templates/postgresql-demo",
+      "filesMdx": "### Files\n\n<details className=\"dropdownBlock\">\n<summary>Files (4)</summary>\n\n<pre className=\"filesTree\">\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/uis-stack-templates/postgresql-demo/.gitignore\" target=\"_blank\" rel=\"noopener noreferrer\">.gitignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/uis-stack-templates/postgresql-demo/README-postgresql-demo.md\" target=\"_blank\" rel=\"noopener noreferrer\">README-postgresql-demo.md</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/uis-stack-templates/postgresql-demo/template-info.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">template-info.yaml</a>\n└── config/\n    └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/uis-stack-templates/postgresql-demo/config/init-database.sql\" target=\"_blank\" rel=\"noopener noreferrer\">init-database.sql</a>\n</pre>\n\n</details>\n"
     },
     {
       "id": "designsystemet-basic-react-app",
@@ -380,6 +408,88 @@
       "filesMdx": "### Files\n\n<details className=\"dropdownBlock\">\n<summary>Files (9)</summary>\n\n<pre className=\"filesTree\">\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/golang-basic-webserver/.dockerignore\" target=\"_blank\" rel=\"noopener noreferrer\">.dockerignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/golang-basic-webserver/.gitignore\" target=\"_blank\" rel=\"noopener noreferrer\">.gitignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/golang-basic-webserver/Dockerfile\" target=\"_blank\" rel=\"noopener noreferrer\">Dockerfile</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/golang-basic-webserver/README-golang-basic-webserver.md\" target=\"_blank\" rel=\"noopener noreferrer\">README-golang-basic-webserver.md</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/golang-basic-webserver/template-info.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">template-info.yaml</a>\n├── .github/\n│   └── workflows/\n│       └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/golang-basic-webserver/.github/workflows/urbalurba-build-and-push.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">urbalurba-build-and-push.yaml</a>\n├── app/\n│   └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/golang-basic-webserver/app/main.go\" target=\"_blank\" rel=\"noopener noreferrer\">main.go</a>\n└── manifests/\n    ├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/golang-basic-webserver/manifests/deployment.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">deployment.yaml</a>\n    └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/golang-basic-webserver/manifests/kustomization.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">kustomization.yaml</a>\n</pre>\n\n</details>\n"
     },
     {
+      "id": "csharp-basic-webserver",
+      "folder": "templates/csharp-basic-webserver",
+      "version": "1.0.0",
+      "name": "C# Basic Webserver",
+      "description": "ASP.NET Core server with health endpoint and Docker support",
+      "category": "BASIC_WEB_SERVER",
+      "install_type": "app",
+      "abstract": "A minimal ASP.NET Core web server with hot reload via dotnet watch. Includes Docker multi-stage build, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
+      "tools": "dev-csharp",
+      "readme": "README-csharp-basic-webserver.md",
+      "tags": [
+        "csharp",
+        "dotnet",
+        "aspnet",
+        "webserver",
+        "api",
+        "rest"
+      ],
+      "logo": "csharp-basic-webserver-logo.svg",
+      "maintainers": [
+        "terchris"
+      ],
+      "links": [
+        {
+          "url": "https://github.com/helpers-no/dev-templates/tree/main/templates/csharp-basic-webserver",
+          "title": "Source code",
+          "icon": "github"
+        }
+      ],
+      "prerequisites": [
+        {
+          "text": "DCT devcontainer running",
+          "url": "https://dct.sovereignsky.no"
+        }
+      ],
+      "related": [
+        "java-basic-webserver",
+        "golang-basic-webserver"
+      ],
+      "context": "dct",
+      "params": {
+        "app_name": "my-app"
+      },
+      "quickstart": {
+        "title": "Run the ASP.NET Core app",
+        "setup": [],
+        "run": "dotnet watch run",
+        "note": "ASP.NET Core runs on port 3000 with hot reload via dotnet watch. VS Code auto-forwards the port.\n"
+      },
+      "templateKind": "app",
+      "resolvedTools": [
+        {
+          "id": "dev-csharp",
+          "name": "C# Development Tools",
+          "description": "Installs .NET SDK, ASP.NET Core Runtime, and VS Code extensions for C# development",
+          "website": "https://dotnet.microsoft.com",
+          "docsUrl": "https://dct.sovereignsky.no/docs/tools/development-tools/csharp"
+        }
+      ],
+      "manifest": {
+        "containerPort": 80
+      },
+      "resolvedServices": [],
+      "resolvedInitFiles": {},
+      "architectureMdx": "<div className=\"templateCard\">\n<div className=\"templateCardEyebrow\">ARCHITECTURE</div>\n\n## Architecture\n\nThese diagrams are auto-generated from the template's metadata. Click any diagram to enlarge.\n\n### Deployment\n\n<details className=\"dropdownBlock\">\n<summary>Components</summary>\n\n```mermaid\nflowchart LR\n    dev([\"Developer\"])\n    browser[\"Web Browser\"]\n\n    subgraph dct[\"DCT devcontainer\"]\n        src[\"source code\"]\n    end\n\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    subgraph k8s[\"Local Kubernetes Cluster\"]\n        traefik[\"Traefik Ingress\"]\n        argo[\"ArgoCD\"]\n        pod[\"my-app pod\"]\n    end\n\n    dev -->|git push| src\n    src -->|push| repo\n    repo -->|trigger| actions\n    actions -->|build + push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n    traefik -->|routes to| pod\n    browser -->|my-app.localhost| traefik\n    dev --> browser\n```\n\n<a href=\"https://mermaid.live/edit#base64:eyJjb2RlIjoiZmxvd2NoYXJ0IExSXG4gICAgZGV2KFtcIkRldmVsb3BlclwiXSlcbiAgICBicm93c2VyW1wiV2ViIEJyb3dzZXJcIl1cblxuICAgIHN1YmdyYXBoIGRjdFtcIkRDVCBkZXZjb250YWluZXJcIl1cbiAgICAgICAgc3JjW1wic291cmNlIGNvZGVcIl1cbiAgICBlbmRcblxuICAgIHN1YmdyYXBoIGdoW1wiR2l0SHViXCJdXG4gICAgICAgIHJlcG9bXCJyZXBvXCJdXG4gICAgICAgIGFjdGlvbnNbXCJHaXRIdWIgQWN0aW9uc1wiXVxuICAgICAgICBnaGNyW1wiQ29udGFpbmVyIFJlZ2lzdHJ5XCJdXG4gICAgZW5kXG5cbiAgICBzdWJncmFwaCBrOHNbXCJMb2NhbCBLdWJlcm5ldGVzIENsdXN0ZXJcIl1cbiAgICAgICAgdHJhZWZpa1tcIlRyYWVmaWsgSW5ncmVzc1wiXVxuICAgICAgICBhcmdvW1wiQXJnb0NEXCJdXG4gICAgICAgIHBvZFtcIm15LWFwcCBwb2RcIl1cbiAgICBlbmRcblxuICAgIGRldiAtLT58Z2l0IHB1c2h8IHNyY1xuICAgIHNyYyAtLT58cHVzaHwgcmVwb1xuICAgIHJlcG8gLS0+fHRyaWdnZXJ8IGFjdGlvbnNcbiAgICBhY3Rpb25zIC0tPnxidWlsZCArIHB1c2ggaW1hZ2V8IGdoY3JcbiAgICBhcmdvIC0tPnxtb25pdG9yc3wgcmVwb1xuICAgIGdoY3IgLS0+fGltYWdlIHB1bGx8IGFyZ29cbiAgICBhcmdvIC0tPnxkZXBsb3lzfCBwb2RcbiAgICB0cmFlZmlrIC0tPnxyb3V0ZXMgdG98IHBvZFxuICAgIGJyb3dzZXIgLS0+fG15LWFwcC5sb2NhbGhvc3R8IHRyYWVmaWtcbiAgICBkZXYgLS0+IGJyb3dzZXIiLCJtZXJtYWlkIjoie1widGhlbWVcIjpcImRlZmF1bHRcIn0ifQ==\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"mermaidLiveLink\">↗ Open in mermaid.live</a>\n\n</details>\n\n<details className=\"dropdownBlock\">\n<summary>Flow</summary>\n\n```mermaid\nsequenceDiagram\n    participant Dev as Developer\n    participant DCT as DCT devcontainer\n    participant GH as GitHub\n    participant Actions as GitHub Actions\n    participant GHCR as Container Registry\n    participant Argo as ArgoCD\n    participant K8s as Local Kubernetes cluster\n    Dev->>DCT: git push\n    DCT->>GH: push to repo\n    GH->>Actions: trigger workflow\n    Actions->>Actions: build container image\n    Actions->>GHCR: push image\n    Argo->>GH: detects manifest change\n    Argo->>GHCR: pull image\n    Argo->>K8s: deploy my-app pod\n    Note over Dev,K8s: App now accessible at my-app.localhost via Traefik\n```\n\n<a href=\"https://mermaid.live/edit#base64:eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gICAgcGFydGljaXBhbnQgRGV2IGFzIERldmVsb3BlclxuICAgIHBhcnRpY2lwYW50IERDVCBhcyBEQ1QgZGV2Y29udGFpbmVyXG4gICAgcGFydGljaXBhbnQgR0ggYXMgR2l0SHViXG4gICAgcGFydGljaXBhbnQgQWN0aW9ucyBhcyBHaXRIdWIgQWN0aW9uc1xuICAgIHBhcnRpY2lwYW50IEdIQ1IgYXMgQ29udGFpbmVyIFJlZ2lzdHJ5XG4gICAgcGFydGljaXBhbnQgQXJnbyBhcyBBcmdvQ0RcbiAgICBwYXJ0aWNpcGFudCBLOHMgYXMgTG9jYWwgS3ViZXJuZXRlcyBjbHVzdGVyXG4gICAgRGV2LT4+RENUOiBnaXQgcHVzaFxuICAgIERDVC0+PkdIOiBwdXNoIHRvIHJlcG9cbiAgICBHSC0+PkFjdGlvbnM6IHRyaWdnZXIgd29ya2Zsb3dcbiAgICBBY3Rpb25zLT4+QWN0aW9uczogYnVpbGQgY29udGFpbmVyIGltYWdlXG4gICAgQWN0aW9ucy0+PkdIQ1I6IHB1c2ggaW1hZ2VcbiAgICBBcmdvLT4+R0g6IGRldGVjdHMgbWFuaWZlc3QgY2hhbmdlXG4gICAgQXJnby0+PkdIQ1I6IHB1bGwgaW1hZ2VcbiAgICBBcmdvLT4+SzhzOiBkZXBsb3kgbXktYXBwIHBvZFxuICAgIE5vdGUgb3ZlciBEZXYsSzhzOiBBcHAgbm93IGFjY2Vzc2libGUgYXQgbXktYXBwLmxvY2FsaG9zdCB2aWEgVHJhZWZpayIsIm1lcm1haWQiOiJ7XCJ0aGVtZVwiOlwiZGVmYXVsdFwifSJ9\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"mermaidLiveLink\">↗ Open in mermaid.live</a>\n\n</details>\n\n</div>\n",
+      "expectedOutputBlock": null,
+      "files": [
+        ".dockerignore",
+        ".github/workflows/urbalurba-build-and-push.yaml",
+        ".gitignore",
+        "Dockerfile",
+        "README-csharp-basic-webserver.md",
+        "manifests/deployment.yaml",
+        "manifests/kustomization.yaml",
+        "src/WebApplication/Program.cs",
+        "src/WebApplication/WebApplication.csproj",
+        "template-info.yaml"
+      ],
+      "templateRepoPath": "templates/csharp-basic-webserver",
+      "filesMdx": "### Files\n\n<details className=\"dropdownBlock\">\n<summary>Files (10)</summary>\n\n<pre className=\"filesTree\">\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/.dockerignore\" target=\"_blank\" rel=\"noopener noreferrer\">.dockerignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/.gitignore\" target=\"_blank\" rel=\"noopener noreferrer\">.gitignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/Dockerfile\" target=\"_blank\" rel=\"noopener noreferrer\">Dockerfile</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/README-csharp-basic-webserver.md\" target=\"_blank\" rel=\"noopener noreferrer\">README-csharp-basic-webserver.md</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/template-info.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">template-info.yaml</a>\n├── .github/\n│   └── workflows/\n│       └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/.github/workflows/urbalurba-build-and-push.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">urbalurba-build-and-push.yaml</a>\n├── manifests/\n│   ├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/manifests/deployment.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">deployment.yaml</a>\n│   └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/manifests/kustomization.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">kustomization.yaml</a>\n└── src/\n    └── WebApplication/\n        ├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/src/WebApplication/Program.cs\" target=\"_blank\" rel=\"noopener noreferrer\">Program.cs</a>\n        └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/csharp-basic-webserver/src/WebApplication/WebApplication.csproj\" target=\"_blank\" rel=\"noopener noreferrer\">WebApplication.csproj</a>\n</pre>\n\n</details>\n"
+    },
+    {
       "id": "java-basic-webserver",
       "folder": "templates/java-basic-webserver",
       "version": "1.0.0",
@@ -459,169 +569,6 @@
       ],
       "templateRepoPath": "templates/java-basic-webserver",
       "filesMdx": "### Files\n\n<details className=\"dropdownBlock\">\n<summary>Files (10)</summary>\n\n<pre className=\"filesTree\">\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/java-basic-webserver/.dockerignore\" target=\"_blank\" rel=\"noopener noreferrer\">.dockerignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/java-basic-webserver/.gitignore\" target=\"_blank\" rel=\"noopener noreferrer\">.gitignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/java-basic-webserver/Dockerfile\" target=\"_blank\" rel=\"noopener noreferrer\">Dockerfile</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/java-basic-webserver/pom.xml\" target=\"_blank\" rel=\"noopener noreferrer\">pom.xml</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/java-basic-webserver/README-java-basic-webserver.md\" target=\"_blank\" rel=\"noopener noreferrer\">README-java-basic-webserver.md</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/java-basic-webserver/template-info.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">template-info.yaml</a>\n├── .github/\n│   └── workflows/\n│       └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/java-basic-webserver/.github/workflows/urbalurba-build-and-push.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">urbalurba-build-and-push.yaml</a>\n├── app/\n│   └── src/\n│       └── main/\n│           └── java/\n│               └── com/\n│                   └── example/\n│                       └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/java-basic-webserver/app/src/main/java/com/example/App.java\" target=\"_blank\" rel=\"noopener noreferrer\">App.java</a>\n└── manifests/\n    ├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/java-basic-webserver/manifests/deployment.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">deployment.yaml</a>\n    └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/java-basic-webserver/manifests/kustomization.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">kustomization.yaml</a>\n</pre>\n\n</details>\n"
-    },
-    {
-      "id": "php-basic-webserver",
-      "folder": "templates/php-basic-webserver",
-      "version": "1.0.0",
-      "name": "PHP Basic Webserver",
-      "description": "PHP web server using built-in server with health endpoint and Docker support",
-      "category": "BASIC_WEB_SERVER",
-      "install_type": "app",
-      "abstract": "A minimal PHP web server using PHP's built-in server with a health check endpoint. Includes Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
-      "tools": "dev-php-laravel",
-      "readme": "README-php-basic-webserver.md",
-      "tags": [
-        "php",
-        "webserver",
-        "api",
-        "rest"
-      ],
-      "logo": "php-basic-webserver-logo.svg",
-      "maintainers": [
-        "terchris"
-      ],
-      "links": [
-        {
-          "url": "https://github.com/helpers-no/dev-templates/tree/main/templates/php-basic-webserver",
-          "title": "Source code",
-          "icon": "github"
-        }
-      ],
-      "prerequisites": [
-        {
-          "text": "DCT devcontainer running",
-          "url": "https://dct.sovereignsky.no"
-        }
-      ],
-      "related": [
-        "python-basic-webserver",
-        "typescript-basic-webserver"
-      ],
-      "context": "dct",
-      "params": {
-        "app_name": "my-app"
-      },
-      "quickstart": {
-        "title": "Run the PHP server",
-        "setup": [],
-        "run": "php -S 0.0.0.0:3000 -t public",
-        "note": "PHP's built-in server runs on port 3000. VS Code auto-forwards the port.\n"
-      },
-      "templateKind": "app",
-      "resolvedTools": [
-        {
-          "id": "dev-php-laravel",
-          "name": "PHP Laravel Development Tools",
-          "description": "Installs PHP 8.4, Composer, Laravel installer, and sets up Laravel development environment",
-          "website": "https://laravel.com",
-          "docsUrl": "https://dct.sovereignsky.no/docs/tools/development-tools/php-laravel"
-        }
-      ],
-      "manifest": {
-        "containerPort": 3000
-      },
-      "resolvedServices": [],
-      "resolvedInitFiles": {},
-      "architectureMdx": "<div className=\"templateCard\">\n<div className=\"templateCardEyebrow\">ARCHITECTURE</div>\n\n## Architecture\n\nThese diagrams are auto-generated from the template's metadata. Click any diagram to enlarge.\n\n### Deployment\n\n<details className=\"dropdownBlock\">\n<summary>Components</summary>\n\n```mermaid\nflowchart LR\n    dev([\"Developer\"])\n    browser[\"Web Browser\"]\n\n    subgraph dct[\"DCT devcontainer\"]\n        src[\"source code\"]\n    end\n\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    subgraph k8s[\"Local Kubernetes Cluster\"]\n        traefik[\"Traefik Ingress\"]\n        argo[\"ArgoCD\"]\n        pod[\"my-app pod\"]\n    end\n\n    dev -->|git push| src\n    src -->|push| repo\n    repo -->|trigger| actions\n    actions -->|build + push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n    traefik -->|routes to| pod\n    browser -->|my-app.localhost| traefik\n    dev --> browser\n```\n\n<a href=\"https://mermaid.live/edit#base64:eyJjb2RlIjoiZmxvd2NoYXJ0IExSXG4gICAgZGV2KFtcIkRldmVsb3BlclwiXSlcbiAgICBicm93c2VyW1wiV2ViIEJyb3dzZXJcIl1cblxuICAgIHN1YmdyYXBoIGRjdFtcIkRDVCBkZXZjb250YWluZXJcIl1cbiAgICAgICAgc3JjW1wic291cmNlIGNvZGVcIl1cbiAgICBlbmRcblxuICAgIHN1YmdyYXBoIGdoW1wiR2l0SHViXCJdXG4gICAgICAgIHJlcG9bXCJyZXBvXCJdXG4gICAgICAgIGFjdGlvbnNbXCJHaXRIdWIgQWN0aW9uc1wiXVxuICAgICAgICBnaGNyW1wiQ29udGFpbmVyIFJlZ2lzdHJ5XCJdXG4gICAgZW5kXG5cbiAgICBzdWJncmFwaCBrOHNbXCJMb2NhbCBLdWJlcm5ldGVzIENsdXN0ZXJcIl1cbiAgICAgICAgdHJhZWZpa1tcIlRyYWVmaWsgSW5ncmVzc1wiXVxuICAgICAgICBhcmdvW1wiQXJnb0NEXCJdXG4gICAgICAgIHBvZFtcIm15LWFwcCBwb2RcIl1cbiAgICBlbmRcblxuICAgIGRldiAtLT58Z2l0IHB1c2h8IHNyY1xuICAgIHNyYyAtLT58cHVzaHwgcmVwb1xuICAgIHJlcG8gLS0+fHRyaWdnZXJ8IGFjdGlvbnNcbiAgICBhY3Rpb25zIC0tPnxidWlsZCArIHB1c2ggaW1hZ2V8IGdoY3JcbiAgICBhcmdvIC0tPnxtb25pdG9yc3wgcmVwb1xuICAgIGdoY3IgLS0+fGltYWdlIHB1bGx8IGFyZ29cbiAgICBhcmdvIC0tPnxkZXBsb3lzfCBwb2RcbiAgICB0cmFlZmlrIC0tPnxyb3V0ZXMgdG98IHBvZFxuICAgIGJyb3dzZXIgLS0+fG15LWFwcC5sb2NhbGhvc3R8IHRyYWVmaWtcbiAgICBkZXYgLS0+IGJyb3dzZXIiLCJtZXJtYWlkIjoie1widGhlbWVcIjpcImRlZmF1bHRcIn0ifQ==\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"mermaidLiveLink\">↗ Open in mermaid.live</a>\n\n</details>\n\n<details className=\"dropdownBlock\">\n<summary>Flow</summary>\n\n```mermaid\nsequenceDiagram\n    participant Dev as Developer\n    participant DCT as DCT devcontainer\n    participant GH as GitHub\n    participant Actions as GitHub Actions\n    participant GHCR as Container Registry\n    participant Argo as ArgoCD\n    participant K8s as Local Kubernetes cluster\n    Dev->>DCT: git push\n    DCT->>GH: push to repo\n    GH->>Actions: trigger workflow\n    Actions->>Actions: build container image\n    Actions->>GHCR: push image\n    Argo->>GH: detects manifest change\n    Argo->>GHCR: pull image\n    Argo->>K8s: deploy my-app pod\n    Note over Dev,K8s: App now accessible at my-app.localhost via Traefik\n```\n\n<a href=\"https://mermaid.live/edit#base64:eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gICAgcGFydGljaXBhbnQgRGV2IGFzIERldmVsb3BlclxuICAgIHBhcnRpY2lwYW50IERDVCBhcyBEQ1QgZGV2Y29udGFpbmVyXG4gICAgcGFydGljaXBhbnQgR0ggYXMgR2l0SHViXG4gICAgcGFydGljaXBhbnQgQWN0aW9ucyBhcyBHaXRIdWIgQWN0aW9uc1xuICAgIHBhcnRpY2lwYW50IEdIQ1IgYXMgQ29udGFpbmVyIFJlZ2lzdHJ5XG4gICAgcGFydGljaXBhbnQgQXJnbyBhcyBBcmdvQ0RcbiAgICBwYXJ0aWNpcGFudCBLOHMgYXMgTG9jYWwgS3ViZXJuZXRlcyBjbHVzdGVyXG4gICAgRGV2LT4+RENUOiBnaXQgcHVzaFxuICAgIERDVC0+PkdIOiBwdXNoIHRvIHJlcG9cbiAgICBHSC0+PkFjdGlvbnM6IHRyaWdnZXIgd29ya2Zsb3dcbiAgICBBY3Rpb25zLT4+QWN0aW9uczogYnVpbGQgY29udGFpbmVyIGltYWdlXG4gICAgQWN0aW9ucy0+PkdIQ1I6IHB1c2ggaW1hZ2VcbiAgICBBcmdvLT4+R0g6IGRldGVjdHMgbWFuaWZlc3QgY2hhbmdlXG4gICAgQXJnby0+PkdIQ1I6IHB1bGwgaW1hZ2VcbiAgICBBcmdvLT4+SzhzOiBkZXBsb3kgbXktYXBwIHBvZFxuICAgIE5vdGUgb3ZlciBEZXYsSzhzOiBBcHAgbm93IGFjY2Vzc2libGUgYXQgbXktYXBwLmxvY2FsaG9zdCB2aWEgVHJhZWZpayIsIm1lcm1haWQiOiJ7XCJ0aGVtZVwiOlwiZGVmYXVsdFwifSJ9\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"mermaidLiveLink\">↗ Open in mermaid.live</a>\n\n</details>\n\n</div>\n",
-      "expectedOutputBlock": null,
-      "files": [
-        ".dockerignore",
-        ".github/workflows/urbalurba-build-and-push.yaml",
-        ".gitignore",
-        "Dockerfile",
-        "README-php-basic-webserver.md",
-        "app/index.php",
-        "manifests/deployment.yaml",
-        "manifests/kustomization.yaml",
-        "template-info.yaml"
-      ],
-      "templateRepoPath": "templates/php-basic-webserver",
-      "filesMdx": "### Files\n\n<details className=\"dropdownBlock\">\n<summary>Files (9)</summary>\n\n<pre className=\"filesTree\">\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/php-basic-webserver/.dockerignore\" target=\"_blank\" rel=\"noopener noreferrer\">.dockerignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/php-basic-webserver/.gitignore\" target=\"_blank\" rel=\"noopener noreferrer\">.gitignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/php-basic-webserver/Dockerfile\" target=\"_blank\" rel=\"noopener noreferrer\">Dockerfile</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/php-basic-webserver/README-php-basic-webserver.md\" target=\"_blank\" rel=\"noopener noreferrer\">README-php-basic-webserver.md</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/php-basic-webserver/template-info.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">template-info.yaml</a>\n├── .github/\n│   └── workflows/\n│       └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/php-basic-webserver/.github/workflows/urbalurba-build-and-push.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">urbalurba-build-and-push.yaml</a>\n├── app/\n│   └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/php-basic-webserver/app/index.php\" target=\"_blank\" rel=\"noopener noreferrer\">index.php</a>\n└── manifests/\n    ├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/php-basic-webserver/manifests/deployment.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">deployment.yaml</a>\n    └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/php-basic-webserver/manifests/kustomization.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">kustomization.yaml</a>\n</pre>\n\n</details>\n"
-    },
-    {
-      "id": "python-basic-webserver",
-      "folder": "templates/python-basic-webserver",
-      "version": "1.0.0",
-      "name": "Python Basic Webserver",
-      "description": "Minimal Flask server with health endpoint and Docker support",
-      "category": "BASIC_WEB_SERVER",
-      "install_type": "app",
-      "abstract": "A minimal Python web server using Flask with a health check endpoint. Includes Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow. Ideal for microservices and API backends.",
-      "tools": "dev-python",
-      "readme": "README-python-basic-webserver.md",
-      "tags": [
-        "python",
-        "flask",
-        "webserver",
-        "api",
-        "rest"
-      ],
-      "logo": "python-basic-webserver-logo.svg",
-      "maintainers": [
-        "terchris"
-      ],
-      "links": [
-        {
-          "url": "https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver",
-          "title": "Source code",
-          "icon": "github"
-        }
-      ],
-      "prerequisites": [
-        {
-          "text": "DCT devcontainer running",
-          "url": "https://dct.sovereignsky.no"
-        }
-      ],
-      "related": [
-        "php-basic-webserver",
-        "typescript-basic-webserver"
-      ],
-      "context": "dct",
-      "params": {
-        "app_name": "my-app"
-      },
-      "quickstart": {
-        "title": "Run the Flask app",
-        "setup": [
-          "uv venv",
-          "uv pip install -r requirements.txt"
-        ],
-        "run": "uv run python app/app.py",
-        "note": "Flask runs on port 3000. VS Code auto-forwards the port — click the globe icon in the Ports tab.\n"
-      },
-      "templateKind": "app",
-      "resolvedTools": [
-        {
-          "id": "dev-python",
-          "name": "Python Development Tools",
-          "description": "Adds ipython, pytest-cov, uv, and VS Code extensions for Python development",
-          "website": "https://python.org",
-          "docsUrl": "https://dct.sovereignsky.no/docs/tools/development-tools/python"
-        }
-      ],
-      "manifest": {
-        "containerPort": 3000
-      },
-      "resolvedServices": [],
-      "resolvedInitFiles": {},
-      "architectureMdx": "<div className=\"templateCard\">\n<div className=\"templateCardEyebrow\">ARCHITECTURE</div>\n\n## Architecture\n\nThese diagrams are auto-generated from the template's metadata. Click any diagram to enlarge.\n\n### Deployment\n\n<details className=\"dropdownBlock\">\n<summary>Components</summary>\n\n```mermaid\nflowchart LR\n    dev([\"Developer\"])\n    browser[\"Web Browser\"]\n\n    subgraph dct[\"DCT devcontainer\"]\n        src[\"source code\"]\n    end\n\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    subgraph k8s[\"Local Kubernetes Cluster\"]\n        traefik[\"Traefik Ingress\"]\n        argo[\"ArgoCD\"]\n        pod[\"my-app pod\"]\n    end\n\n    dev -->|git push| src\n    src -->|push| repo\n    repo -->|trigger| actions\n    actions -->|build + push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n    traefik -->|routes to| pod\n    browser -->|my-app.localhost| traefik\n    dev --> browser\n```\n\n<a href=\"https://mermaid.live/edit#base64:eyJjb2RlIjoiZmxvd2NoYXJ0IExSXG4gICAgZGV2KFtcIkRldmVsb3BlclwiXSlcbiAgICBicm93c2VyW1wiV2ViIEJyb3dzZXJcIl1cblxuICAgIHN1YmdyYXBoIGRjdFtcIkRDVCBkZXZjb250YWluZXJcIl1cbiAgICAgICAgc3JjW1wic291cmNlIGNvZGVcIl1cbiAgICBlbmRcblxuICAgIHN1YmdyYXBoIGdoW1wiR2l0SHViXCJdXG4gICAgICAgIHJlcG9bXCJyZXBvXCJdXG4gICAgICAgIGFjdGlvbnNbXCJHaXRIdWIgQWN0aW9uc1wiXVxuICAgICAgICBnaGNyW1wiQ29udGFpbmVyIFJlZ2lzdHJ5XCJdXG4gICAgZW5kXG5cbiAgICBzdWJncmFwaCBrOHNbXCJMb2NhbCBLdWJlcm5ldGVzIENsdXN0ZXJcIl1cbiAgICAgICAgdHJhZWZpa1tcIlRyYWVmaWsgSW5ncmVzc1wiXVxuICAgICAgICBhcmdvW1wiQXJnb0NEXCJdXG4gICAgICAgIHBvZFtcIm15LWFwcCBwb2RcIl1cbiAgICBlbmRcblxuICAgIGRldiAtLT58Z2l0IHB1c2h8IHNyY1xuICAgIHNyYyAtLT58cHVzaHwgcmVwb1xuICAgIHJlcG8gLS0+fHRyaWdnZXJ8IGFjdGlvbnNcbiAgICBhY3Rpb25zIC0tPnxidWlsZCArIHB1c2ggaW1hZ2V8IGdoY3JcbiAgICBhcmdvIC0tPnxtb25pdG9yc3wgcmVwb1xuICAgIGdoY3IgLS0+fGltYWdlIHB1bGx8IGFyZ29cbiAgICBhcmdvIC0tPnxkZXBsb3lzfCBwb2RcbiAgICB0cmFlZmlrIC0tPnxyb3V0ZXMgdG98IHBvZFxuICAgIGJyb3dzZXIgLS0+fG15LWFwcC5sb2NhbGhvc3R8IHRyYWVmaWtcbiAgICBkZXYgLS0+IGJyb3dzZXIiLCJtZXJtYWlkIjoie1widGhlbWVcIjpcImRlZmF1bHRcIn0ifQ==\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"mermaidLiveLink\">↗ Open in mermaid.live</a>\n\n</details>\n\n<details className=\"dropdownBlock\">\n<summary>Flow</summary>\n\n```mermaid\nsequenceDiagram\n    participant Dev as Developer\n    participant DCT as DCT devcontainer\n    participant GH as GitHub\n    participant Actions as GitHub Actions\n    participant GHCR as Container Registry\n    participant Argo as ArgoCD\n    participant K8s as Local Kubernetes cluster\n    Dev->>DCT: git push\n    DCT->>GH: push to repo\n    GH->>Actions: trigger workflow\n    Actions->>Actions: build container image\n    Actions->>GHCR: push image\n    Argo->>GH: detects manifest change\n    Argo->>GHCR: pull image\n    Argo->>K8s: deploy my-app pod\n    Note over Dev,K8s: App now accessible at my-app.localhost via Traefik\n```\n\n<a href=\"https://mermaid.live/edit#base64:eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gICAgcGFydGljaXBhbnQgRGV2IGFzIERldmVsb3BlclxuICAgIHBhcnRpY2lwYW50IERDVCBhcyBEQ1QgZGV2Y29udGFpbmVyXG4gICAgcGFydGljaXBhbnQgR0ggYXMgR2l0SHViXG4gICAgcGFydGljaXBhbnQgQWN0aW9ucyBhcyBHaXRIdWIgQWN0aW9uc1xuICAgIHBhcnRpY2lwYW50IEdIQ1IgYXMgQ29udGFpbmVyIFJlZ2lzdHJ5XG4gICAgcGFydGljaXBhbnQgQXJnbyBhcyBBcmdvQ0RcbiAgICBwYXJ0aWNpcGFudCBLOHMgYXMgTG9jYWwgS3ViZXJuZXRlcyBjbHVzdGVyXG4gICAgRGV2LT4+RENUOiBnaXQgcHVzaFxuICAgIERDVC0+PkdIOiBwdXNoIHRvIHJlcG9cbiAgICBHSC0+PkFjdGlvbnM6IHRyaWdnZXIgd29ya2Zsb3dcbiAgICBBY3Rpb25zLT4+QWN0aW9uczogYnVpbGQgY29udGFpbmVyIGltYWdlXG4gICAgQWN0aW9ucy0+PkdIQ1I6IHB1c2ggaW1hZ2VcbiAgICBBcmdvLT4+R0g6IGRldGVjdHMgbWFuaWZlc3QgY2hhbmdlXG4gICAgQXJnby0+PkdIQ1I6IHB1bGwgaW1hZ2VcbiAgICBBcmdvLT4+SzhzOiBkZXBsb3kgbXktYXBwIHBvZFxuICAgIE5vdGUgb3ZlciBEZXYsSzhzOiBBcHAgbm93IGFjY2Vzc2libGUgYXQgbXktYXBwLmxvY2FsaG9zdCB2aWEgVHJhZWZpayIsIm1lcm1haWQiOiJ7XCJ0aGVtZVwiOlwiZGVmYXVsdFwifSJ9\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"mermaidLiveLink\">↗ Open in mermaid.live</a>\n\n</details>\n\n</div>\n",
-      "expectedOutputBlock": null,
-      "files": [
-        ".dockerignore",
-        ".github/workflows/urbalurba-build-and-push.yaml",
-        ".gitignore",
-        "Dockerfile",
-        "README-python-basic-webserver.md",
-        "app/app.py",
-        "manifests/deployment.yaml",
-        "manifests/kustomization.yaml",
-        "requirements.txt",
-        "template-info.yaml"
-      ],
-      "templateRepoPath": "templates/python-basic-webserver",
-      "filesMdx": "### Files\n\n<details className=\"dropdownBlock\">\n<summary>Files (10)</summary>\n\n<pre className=\"filesTree\">\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/.dockerignore\" target=\"_blank\" rel=\"noopener noreferrer\">.dockerignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/.gitignore\" target=\"_blank\" rel=\"noopener noreferrer\">.gitignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/Dockerfile\" target=\"_blank\" rel=\"noopener noreferrer\">Dockerfile</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/README-python-basic-webserver.md\" target=\"_blank\" rel=\"noopener noreferrer\">README-python-basic-webserver.md</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/requirements.txt\" target=\"_blank\" rel=\"noopener noreferrer\">requirements.txt</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/template-info.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">template-info.yaml</a>\n├── .github/\n│   └── workflows/\n│       └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/.github/workflows/urbalurba-build-and-push.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">urbalurba-build-and-push.yaml</a>\n├── app/\n│   └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/app/app.py\" target=\"_blank\" rel=\"noopener noreferrer\">app.py</a>\n└── manifests/\n    ├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/manifests/deployment.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">deployment.yaml</a>\n    └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/manifests/kustomization.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">kustomization.yaml</a>\n</pre>\n\n</details>\n"
     },
     {
       "id": "python-basic-webserver-database",
@@ -836,29 +783,30 @@
       "filesMdx": "### Files\n\n<details className=\"dropdownBlock\">\n<summary>Files (12)</summary>\n\n<pre className=\"filesTree\">\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/typescript-basic-webserver/.dockerignore\" target=\"_blank\" rel=\"noopener noreferrer\">.dockerignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/typescript-basic-webserver/.gitignore\" target=\"_blank\" rel=\"noopener noreferrer\">.gitignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/typescript-basic-webserver/Dockerfile\" target=\"_blank\" rel=\"noopener noreferrer\">Dockerfile</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/typescript-basic-webserver/package-lock.json\" target=\"_blank\" rel=\"noopener noreferrer\">package-lock.json</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/typescript-basic-webserver/package.json\" target=\"_blank\" rel=\"noopener noreferrer\">package.json</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/typescript-basic-webserver/README-typescript-basic-webserver.md\" target=\"_blank\" rel=\"noopener noreferrer\">README-typescript-basic-webserver.md</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/typescript-basic-webserver/template-info.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">template-info.yaml</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/typescript-basic-webserver/tsconfig.json\" target=\"_blank\" rel=\"noopener noreferrer\">tsconfig.json</a>\n├── .github/\n│   └── workflows/\n│       └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/typescript-basic-webserver/.github/workflows/urbalurba-build-and-push.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">urbalurba-build-and-push.yaml</a>\n├── app/\n│   └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/typescript-basic-webserver/app/index.ts\" target=\"_blank\" rel=\"noopener noreferrer\">index.ts</a>\n└── manifests/\n    ├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/typescript-basic-webserver/manifests/deployment.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">deployment.yaml</a>\n    └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/typescript-basic-webserver/manifests/kustomization.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">kustomization.yaml</a>\n</pre>\n\n</details>\n"
     },
     {
-      "id": "postgresql-demo",
-      "folder": "uis-stack-templates/postgresql-demo",
+      "id": "python-basic-webserver",
+      "folder": "templates/python-basic-webserver",
       "version": "1.0.0",
-      "name": "PostgreSQL Demo",
-      "description": "Deploys PostgreSQL and creates a sample database with seed data",
-      "category": "DEMO",
-      "install_type": "stack",
-      "abstract": "A minimal UIS template that deploys PostgreSQL and creates a sample tasks table with seed data. Shows the full uis template flow from registry to deployed, configured service. Use this to verify your UIS setup or as a starting point for your own stack templates.",
-      "tools": "",
-      "readme": "README-postgresql-demo.md",
+      "name": "Python Basic Webserver",
+      "description": "Minimal Flask server with health endpoint and Docker support",
+      "category": "BASIC_WEB_SERVER",
+      "install_type": "app",
+      "abstract": "A minimal Python web server using Flask with a health check endpoint. Includes Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow. Ideal for microservices and API backends.",
+      "tools": "dev-python",
+      "readme": "README-python-basic-webserver.md",
       "tags": [
-        "postgresql",
-        "database",
-        "demo",
-        "getting-started"
+        "python",
+        "flask",
+        "webserver",
+        "api",
+        "rest"
       ],
-      "logo": "postgresql-demo-logo.svg",
+      "logo": "python-basic-webserver-logo.svg",
       "maintainers": [
         "terchris"
       ],
       "links": [
         {
-          "url": "https://github.com/helpers-no/dev-templates/tree/main/uis-stack-templates/postgresql-demo",
+          "url": "https://github.com/helpers-no/dev-templates/tree/main/templates/python-basic-webserver",
           "title": "Source code",
           "icon": "github"
         }
@@ -867,7 +815,167 @@
         {
           "text": "DCT devcontainer running",
           "url": "https://dct.sovereignsky.no"
-        },
+        }
+      ],
+      "related": [
+        "php-basic-webserver",
+        "typescript-basic-webserver"
+      ],
+      "context": "dct",
+      "params": {
+        "app_name": "my-app"
+      },
+      "quickstart": {
+        "title": "Run the Flask app",
+        "setup": [
+          "uv venv",
+          "uv pip install -r requirements.txt"
+        ],
+        "run": "uv run python app/app.py",
+        "note": "Flask runs on port 3000. VS Code auto-forwards the port — click the globe icon in the Ports tab.\n"
+      },
+      "templateKind": "app",
+      "resolvedTools": [
+        {
+          "id": "dev-python",
+          "name": "Python Development Tools",
+          "description": "Adds ipython, pytest-cov, uv, and VS Code extensions for Python development",
+          "website": "https://python.org",
+          "docsUrl": "https://dct.sovereignsky.no/docs/tools/development-tools/python"
+        }
+      ],
+      "manifest": {
+        "containerPort": 3000
+      },
+      "resolvedServices": [],
+      "resolvedInitFiles": {},
+      "architectureMdx": "<div className=\"templateCard\">\n<div className=\"templateCardEyebrow\">ARCHITECTURE</div>\n\n## Architecture\n\nThese diagrams are auto-generated from the template's metadata. Click any diagram to enlarge.\n\n### Deployment\n\n<details className=\"dropdownBlock\">\n<summary>Components</summary>\n\n```mermaid\nflowchart LR\n    dev([\"Developer\"])\n    browser[\"Web Browser\"]\n\n    subgraph dct[\"DCT devcontainer\"]\n        src[\"source code\"]\n    end\n\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    subgraph k8s[\"Local Kubernetes Cluster\"]\n        traefik[\"Traefik Ingress\"]\n        argo[\"ArgoCD\"]\n        pod[\"my-app pod\"]\n    end\n\n    dev -->|git push| src\n    src -->|push| repo\n    repo -->|trigger| actions\n    actions -->|build + push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n    traefik -->|routes to| pod\n    browser -->|my-app.localhost| traefik\n    dev --> browser\n```\n\n<a href=\"https://mermaid.live/edit#base64:eyJjb2RlIjoiZmxvd2NoYXJ0IExSXG4gICAgZGV2KFtcIkRldmVsb3BlclwiXSlcbiAgICBicm93c2VyW1wiV2ViIEJyb3dzZXJcIl1cblxuICAgIHN1YmdyYXBoIGRjdFtcIkRDVCBkZXZjb250YWluZXJcIl1cbiAgICAgICAgc3JjW1wic291cmNlIGNvZGVcIl1cbiAgICBlbmRcblxuICAgIHN1YmdyYXBoIGdoW1wiR2l0SHViXCJdXG4gICAgICAgIHJlcG9bXCJyZXBvXCJdXG4gICAgICAgIGFjdGlvbnNbXCJHaXRIdWIgQWN0aW9uc1wiXVxuICAgICAgICBnaGNyW1wiQ29udGFpbmVyIFJlZ2lzdHJ5XCJdXG4gICAgZW5kXG5cbiAgICBzdWJncmFwaCBrOHNbXCJMb2NhbCBLdWJlcm5ldGVzIENsdXN0ZXJcIl1cbiAgICAgICAgdHJhZWZpa1tcIlRyYWVmaWsgSW5ncmVzc1wiXVxuICAgICAgICBhcmdvW1wiQXJnb0NEXCJdXG4gICAgICAgIHBvZFtcIm15LWFwcCBwb2RcIl1cbiAgICBlbmRcblxuICAgIGRldiAtLT58Z2l0IHB1c2h8IHNyY1xuICAgIHNyYyAtLT58cHVzaHwgcmVwb1xuICAgIHJlcG8gLS0+fHRyaWdnZXJ8IGFjdGlvbnNcbiAgICBhY3Rpb25zIC0tPnxidWlsZCArIHB1c2ggaW1hZ2V8IGdoY3JcbiAgICBhcmdvIC0tPnxtb25pdG9yc3wgcmVwb1xuICAgIGdoY3IgLS0+fGltYWdlIHB1bGx8IGFyZ29cbiAgICBhcmdvIC0tPnxkZXBsb3lzfCBwb2RcbiAgICB0cmFlZmlrIC0tPnxyb3V0ZXMgdG98IHBvZFxuICAgIGJyb3dzZXIgLS0+fG15LWFwcC5sb2NhbGhvc3R8IHRyYWVmaWtcbiAgICBkZXYgLS0+IGJyb3dzZXIiLCJtZXJtYWlkIjoie1widGhlbWVcIjpcImRlZmF1bHRcIn0ifQ==\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"mermaidLiveLink\">↗ Open in mermaid.live</a>\n\n</details>\n\n<details className=\"dropdownBlock\">\n<summary>Flow</summary>\n\n```mermaid\nsequenceDiagram\n    participant Dev as Developer\n    participant DCT as DCT devcontainer\n    participant GH as GitHub\n    participant Actions as GitHub Actions\n    participant GHCR as Container Registry\n    participant Argo as ArgoCD\n    participant K8s as Local Kubernetes cluster\n    Dev->>DCT: git push\n    DCT->>GH: push to repo\n    GH->>Actions: trigger workflow\n    Actions->>Actions: build container image\n    Actions->>GHCR: push image\n    Argo->>GH: detects manifest change\n    Argo->>GHCR: pull image\n    Argo->>K8s: deploy my-app pod\n    Note over Dev,K8s: App now accessible at my-app.localhost via Traefik\n```\n\n<a href=\"https://mermaid.live/edit#base64:eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gICAgcGFydGljaXBhbnQgRGV2IGFzIERldmVsb3BlclxuICAgIHBhcnRpY2lwYW50IERDVCBhcyBEQ1QgZGV2Y29udGFpbmVyXG4gICAgcGFydGljaXBhbnQgR0ggYXMgR2l0SHViXG4gICAgcGFydGljaXBhbnQgQWN0aW9ucyBhcyBHaXRIdWIgQWN0aW9uc1xuICAgIHBhcnRpY2lwYW50IEdIQ1IgYXMgQ29udGFpbmVyIFJlZ2lzdHJ5XG4gICAgcGFydGljaXBhbnQgQXJnbyBhcyBBcmdvQ0RcbiAgICBwYXJ0aWNpcGFudCBLOHMgYXMgTG9jYWwgS3ViZXJuZXRlcyBjbHVzdGVyXG4gICAgRGV2LT4+RENUOiBnaXQgcHVzaFxuICAgIERDVC0+PkdIOiBwdXNoIHRvIHJlcG9cbiAgICBHSC0+PkFjdGlvbnM6IHRyaWdnZXIgd29ya2Zsb3dcbiAgICBBY3Rpb25zLT4+QWN0aW9uczogYnVpbGQgY29udGFpbmVyIGltYWdlXG4gICAgQWN0aW9ucy0+PkdIQ1I6IHB1c2ggaW1hZ2VcbiAgICBBcmdvLT4+R0g6IGRldGVjdHMgbWFuaWZlc3QgY2hhbmdlXG4gICAgQXJnby0+PkdIQ1I6IHB1bGwgaW1hZ2VcbiAgICBBcmdvLT4+SzhzOiBkZXBsb3kgbXktYXBwIHBvZFxuICAgIE5vdGUgb3ZlciBEZXYsSzhzOiBBcHAgbm93IGFjY2Vzc2libGUgYXQgbXktYXBwLmxvY2FsaG9zdCB2aWEgVHJhZWZpayIsIm1lcm1haWQiOiJ7XCJ0aGVtZVwiOlwiZGVmYXVsdFwifSJ9\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"mermaidLiveLink\">↗ Open in mermaid.live</a>\n\n</details>\n\n</div>\n",
+      "expectedOutputBlock": null,
+      "files": [
+        ".dockerignore",
+        ".github/workflows/urbalurba-build-and-push.yaml",
+        ".gitignore",
+        "Dockerfile",
+        "README-python-basic-webserver.md",
+        "app/app.py",
+        "manifests/deployment.yaml",
+        "manifests/kustomization.yaml",
+        "requirements.txt",
+        "template-info.yaml"
+      ],
+      "templateRepoPath": "templates/python-basic-webserver",
+      "filesMdx": "### Files\n\n<details className=\"dropdownBlock\">\n<summary>Files (10)</summary>\n\n<pre className=\"filesTree\">\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/.dockerignore\" target=\"_blank\" rel=\"noopener noreferrer\">.dockerignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/.gitignore\" target=\"_blank\" rel=\"noopener noreferrer\">.gitignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/Dockerfile\" target=\"_blank\" rel=\"noopener noreferrer\">Dockerfile</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/README-python-basic-webserver.md\" target=\"_blank\" rel=\"noopener noreferrer\">README-python-basic-webserver.md</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/requirements.txt\" target=\"_blank\" rel=\"noopener noreferrer\">requirements.txt</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/template-info.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">template-info.yaml</a>\n├── .github/\n│   └── workflows/\n│       └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/.github/workflows/urbalurba-build-and-push.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">urbalurba-build-and-push.yaml</a>\n├── app/\n│   └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/app/app.py\" target=\"_blank\" rel=\"noopener noreferrer\">app.py</a>\n└── manifests/\n    ├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/manifests/deployment.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">deployment.yaml</a>\n    └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/python-basic-webserver/manifests/kustomization.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">kustomization.yaml</a>\n</pre>\n\n</details>\n"
+    },
+    {
+      "id": "php-basic-webserver",
+      "folder": "templates/php-basic-webserver",
+      "version": "1.0.0",
+      "name": "PHP Basic Webserver",
+      "description": "PHP web server using built-in server with health endpoint and Docker support",
+      "category": "BASIC_WEB_SERVER",
+      "install_type": "app",
+      "abstract": "A minimal PHP web server using PHP's built-in server with a health check endpoint. Includes Docker containerization, Kubernetes deployment manifests, and GitHub Actions CI/CD workflow.",
+      "tools": "dev-php-laravel",
+      "readme": "README-php-basic-webserver.md",
+      "tags": [
+        "php",
+        "webserver",
+        "api",
+        "rest"
+      ],
+      "logo": "php-basic-webserver-logo.svg",
+      "maintainers": [
+        "terchris"
+      ],
+      "links": [
+        {
+          "url": "https://github.com/helpers-no/dev-templates/tree/main/templates/php-basic-webserver",
+          "title": "Source code",
+          "icon": "github"
+        }
+      ],
+      "prerequisites": [
+        {
+          "text": "DCT devcontainer running",
+          "url": "https://dct.sovereignsky.no"
+        }
+      ],
+      "related": [
+        "python-basic-webserver",
+        "typescript-basic-webserver"
+      ],
+      "context": "dct",
+      "params": {
+        "app_name": "my-app"
+      },
+      "quickstart": {
+        "title": "Run the PHP server",
+        "setup": [],
+        "run": "php -S 0.0.0.0:3000 -t public",
+        "note": "PHP's built-in server runs on port 3000. VS Code auto-forwards the port.\n"
+      },
+      "templateKind": "app",
+      "resolvedTools": [
+        {
+          "id": "dev-php-laravel",
+          "name": "PHP Laravel Development Tools",
+          "description": "Installs PHP 8.4, Composer, Laravel installer, and sets up Laravel development environment",
+          "website": "https://laravel.com",
+          "docsUrl": "https://dct.sovereignsky.no/docs/tools/development-tools/php-laravel"
+        }
+      ],
+      "manifest": {
+        "containerPort": 3000
+      },
+      "resolvedServices": [],
+      "resolvedInitFiles": {},
+      "architectureMdx": "<div className=\"templateCard\">\n<div className=\"templateCardEyebrow\">ARCHITECTURE</div>\n\n## Architecture\n\nThese diagrams are auto-generated from the template's metadata. Click any diagram to enlarge.\n\n### Deployment\n\n<details className=\"dropdownBlock\">\n<summary>Components</summary>\n\n```mermaid\nflowchart LR\n    dev([\"Developer\"])\n    browser[\"Web Browser\"]\n\n    subgraph dct[\"DCT devcontainer\"]\n        src[\"source code\"]\n    end\n\n    subgraph gh[\"GitHub\"]\n        repo[\"repo\"]\n        actions[\"GitHub Actions\"]\n        ghcr[\"Container Registry\"]\n    end\n\n    subgraph k8s[\"Local Kubernetes Cluster\"]\n        traefik[\"Traefik Ingress\"]\n        argo[\"ArgoCD\"]\n        pod[\"my-app pod\"]\n    end\n\n    dev -->|git push| src\n    src -->|push| repo\n    repo -->|trigger| actions\n    actions -->|build + push image| ghcr\n    argo -->|monitors| repo\n    ghcr -->|image pull| argo\n    argo -->|deploys| pod\n    traefik -->|routes to| pod\n    browser -->|my-app.localhost| traefik\n    dev --> browser\n```\n\n<a href=\"https://mermaid.live/edit#base64:eyJjb2RlIjoiZmxvd2NoYXJ0IExSXG4gICAgZGV2KFtcIkRldmVsb3BlclwiXSlcbiAgICBicm93c2VyW1wiV2ViIEJyb3dzZXJcIl1cblxuICAgIHN1YmdyYXBoIGRjdFtcIkRDVCBkZXZjb250YWluZXJcIl1cbiAgICAgICAgc3JjW1wic291cmNlIGNvZGVcIl1cbiAgICBlbmRcblxuICAgIHN1YmdyYXBoIGdoW1wiR2l0SHViXCJdXG4gICAgICAgIHJlcG9bXCJyZXBvXCJdXG4gICAgICAgIGFjdGlvbnNbXCJHaXRIdWIgQWN0aW9uc1wiXVxuICAgICAgICBnaGNyW1wiQ29udGFpbmVyIFJlZ2lzdHJ5XCJdXG4gICAgZW5kXG5cbiAgICBzdWJncmFwaCBrOHNbXCJMb2NhbCBLdWJlcm5ldGVzIENsdXN0ZXJcIl1cbiAgICAgICAgdHJhZWZpa1tcIlRyYWVmaWsgSW5ncmVzc1wiXVxuICAgICAgICBhcmdvW1wiQXJnb0NEXCJdXG4gICAgICAgIHBvZFtcIm15LWFwcCBwb2RcIl1cbiAgICBlbmRcblxuICAgIGRldiAtLT58Z2l0IHB1c2h8IHNyY1xuICAgIHNyYyAtLT58cHVzaHwgcmVwb1xuICAgIHJlcG8gLS0+fHRyaWdnZXJ8IGFjdGlvbnNcbiAgICBhY3Rpb25zIC0tPnxidWlsZCArIHB1c2ggaW1hZ2V8IGdoY3JcbiAgICBhcmdvIC0tPnxtb25pdG9yc3wgcmVwb1xuICAgIGdoY3IgLS0+fGltYWdlIHB1bGx8IGFyZ29cbiAgICBhcmdvIC0tPnxkZXBsb3lzfCBwb2RcbiAgICB0cmFlZmlrIC0tPnxyb3V0ZXMgdG98IHBvZFxuICAgIGJyb3dzZXIgLS0+fG15LWFwcC5sb2NhbGhvc3R8IHRyYWVmaWtcbiAgICBkZXYgLS0+IGJyb3dzZXIiLCJtZXJtYWlkIjoie1widGhlbWVcIjpcImRlZmF1bHRcIn0ifQ==\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"mermaidLiveLink\">↗ Open in mermaid.live</a>\n\n</details>\n\n<details className=\"dropdownBlock\">\n<summary>Flow</summary>\n\n```mermaid\nsequenceDiagram\n    participant Dev as Developer\n    participant DCT as DCT devcontainer\n    participant GH as GitHub\n    participant Actions as GitHub Actions\n    participant GHCR as Container Registry\n    participant Argo as ArgoCD\n    participant K8s as Local Kubernetes cluster\n    Dev->>DCT: git push\n    DCT->>GH: push to repo\n    GH->>Actions: trigger workflow\n    Actions->>Actions: build container image\n    Actions->>GHCR: push image\n    Argo->>GH: detects manifest change\n    Argo->>GHCR: pull image\n    Argo->>K8s: deploy my-app pod\n    Note over Dev,K8s: App now accessible at my-app.localhost via Traefik\n```\n\n<a href=\"https://mermaid.live/edit#base64:eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gICAgcGFydGljaXBhbnQgRGV2IGFzIERldmVsb3BlclxuICAgIHBhcnRpY2lwYW50IERDVCBhcyBEQ1QgZGV2Y29udGFpbmVyXG4gICAgcGFydGljaXBhbnQgR0ggYXMgR2l0SHViXG4gICAgcGFydGljaXBhbnQgQWN0aW9ucyBhcyBHaXRIdWIgQWN0aW9uc1xuICAgIHBhcnRpY2lwYW50IEdIQ1IgYXMgQ29udGFpbmVyIFJlZ2lzdHJ5XG4gICAgcGFydGljaXBhbnQgQXJnbyBhcyBBcmdvQ0RcbiAgICBwYXJ0aWNpcGFudCBLOHMgYXMgTG9jYWwgS3ViZXJuZXRlcyBjbHVzdGVyXG4gICAgRGV2LT4+RENUOiBnaXQgcHVzaFxuICAgIERDVC0+PkdIOiBwdXNoIHRvIHJlcG9cbiAgICBHSC0+PkFjdGlvbnM6IHRyaWdnZXIgd29ya2Zsb3dcbiAgICBBY3Rpb25zLT4+QWN0aW9uczogYnVpbGQgY29udGFpbmVyIGltYWdlXG4gICAgQWN0aW9ucy0+PkdIQ1I6IHB1c2ggaW1hZ2VcbiAgICBBcmdvLT4+R0g6IGRldGVjdHMgbWFuaWZlc3QgY2hhbmdlXG4gICAgQXJnby0+PkdIQ1I6IHB1bGwgaW1hZ2VcbiAgICBBcmdvLT4+SzhzOiBkZXBsb3kgbXktYXBwIHBvZFxuICAgIE5vdGUgb3ZlciBEZXYsSzhzOiBBcHAgbm93IGFjY2Vzc2libGUgYXQgbXktYXBwLmxvY2FsaG9zdCB2aWEgVHJhZWZpayIsIm1lcm1haWQiOiJ7XCJ0aGVtZVwiOlwiZGVmYXVsdFwifSJ9\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"mermaidLiveLink\">↗ Open in mermaid.live</a>\n\n</details>\n\n</div>\n",
+      "expectedOutputBlock": null,
+      "files": [
+        ".dockerignore",
+        ".github/workflows/urbalurba-build-and-push.yaml",
+        ".gitignore",
+        "Dockerfile",
+        "README-php-basic-webserver.md",
+        "app/index.php",
+        "manifests/deployment.yaml",
+        "manifests/kustomization.yaml",
+        "template-info.yaml"
+      ],
+      "templateRepoPath": "templates/php-basic-webserver",
+      "filesMdx": "### Files\n\n<details className=\"dropdownBlock\">\n<summary>Files (9)</summary>\n\n<pre className=\"filesTree\">\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/php-basic-webserver/.dockerignore\" target=\"_blank\" rel=\"noopener noreferrer\">.dockerignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/php-basic-webserver/.gitignore\" target=\"_blank\" rel=\"noopener noreferrer\">.gitignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/php-basic-webserver/Dockerfile\" target=\"_blank\" rel=\"noopener noreferrer\">Dockerfile</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/php-basic-webserver/README-php-basic-webserver.md\" target=\"_blank\" rel=\"noopener noreferrer\">README-php-basic-webserver.md</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/php-basic-webserver/template-info.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">template-info.yaml</a>\n├── .github/\n│   └── workflows/\n│       └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/php-basic-webserver/.github/workflows/urbalurba-build-and-push.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">urbalurba-build-and-push.yaml</a>\n├── app/\n│   └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/php-basic-webserver/app/index.php\" target=\"_blank\" rel=\"noopener noreferrer\">index.php</a>\n└── manifests/\n    ├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/php-basic-webserver/manifests/deployment.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">deployment.yaml</a>\n    └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/templates/php-basic-webserver/manifests/kustomization.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">kustomization.yaml</a>\n</pre>\n\n</details>\n"
+    },
+    {
+      "id": "atlas",
+      "folder": "uis-applications/atlas",
+      "version": "v20260909-853c696",
+      "name": "Atlas Data",
+      "description": "Norwegian business-register data served as a REST API, with its Dagster pipelines",
+      "category": "APPLICATION",
+      "install_type": "application",
+      "abstract": "Installs the atlas data platform as one application: a PostgreSQL database with its migrations, a Dagster code location for the ingestion pipelines, and a PostgREST API over the resulting api_v1 views. Exports the API url for other applications to consume.",
+      "tools": "",
+      "readme": "README-atlas.md",
+      "tags": [
+        "atlas",
+        "data",
+        "postgresql",
+        "dagster",
+        "postgrest",
+        "api"
+      ],
+      "logo": "atlas-logo.svg",
+      "maintainers": [
+        "terchris"
+      ],
+      "links": [
+        {
+          "url": "https://github.com/users/terchris/packages/container/package/atlas-data",
+          "title": "Published container image",
+          "icon": "github"
+        }
+      ],
+      "prerequisites": [
         {
           "text": "UIS provision-host container running",
           "url": "https://uis.sovereignsky.no"
@@ -877,63 +985,24 @@
           "url": "https://www.rancher.com/products/rancher-desktop"
         }
       ],
-      "related": [
-        "python-basic-webserver-database"
-      ],
+      "related": [],
       "context": "uis",
-      "params": {
-        "app_name": "demo-app",
-        "database_name": "demo_db"
+      "source": {
+        "artifact": "ghcr.io/terchris/atlas-data/uis",
+        "tag": "v20260909-853c696",
+        "digest": "sha256:def7b9d2839180258f962555bd30ed5ca037fc42c52ebe0dd75f75c83d3a6c54"
       },
-      "provides": {
-        "services": [
-          {
-            "service": "postgresql",
-            "config": {
-              "database": "{{ params.database_name }}",
-              "init": "config/init-database.sql"
-            }
-          }
-        ]
-      },
-      "quickstart": {
-        "title": "Verify the database",
-        "setup": [],
-        "run": "uis connect postgresql demo_db",
-        "note": "Inside psql, run: SELECT * FROM tasks;\nYou should see 3 seeded rows. Type \\q to exit.\n"
-      },
-      "configureCommand": "uis template install postgresql-demo",
-      "templateKind": "stack",
+      "visibility": "public",
+      "configureCommand": "uis template install atlas",
+      "templateKind": "application",
       "resolvedTools": [],
-      "resolvedServices": [
-        {
-          "id": "postgresql",
-          "name": "PostgreSQL",
-          "description": "Open-source relational database",
-          "docsUrl": "https://uis.sovereignsky.no/docs/services/databases/postgresql",
-          "website": "https://www.postgresql.org",
-          "exposePort": 35432,
-          "namespace": "default",
-          "helmChart": "bitnami/postgresql",
-          "database": "demo_db",
-          "generatedUser": "demo_app",
-          "initFilePath": "config/init-database.sql",
-          "transitiveRequires": []
-        }
-      ],
-      "resolvedInitFiles": {
-        "config/init-database.sql": "-- PostgreSQL Demo — sample schema with seed data\n-- Applied by: uis configure postgresql --init-file -\n-- Uses psql --set ON_ERROR_STOP=on for fail-fast on syntax errors\n-- All statements are idempotent — safe to re-run\n\nCREATE TABLE IF NOT EXISTS tasks (\n    id SERIAL PRIMARY KEY,\n    title VARCHAR(255) NOT NULL,\n    status VARCHAR(20) DEFAULT 'pending',\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);\n\nINSERT INTO tasks (title, status) VALUES\n    ('Verify uis template install works', 'done'),\n    ('Build your own UIS stack template', 'pending'),\n    ('Deploy it with uis template install', 'pending')\nON CONFLICT DO NOTHING;\n"
-      },
-      "architectureMdx": "<div className=\"templateCard\">\n<div className=\"templateCardEyebrow\">ARCHITECTURE</div>\n\n## Architecture\n\nThese diagrams are auto-generated from the template's metadata. Click any diagram to enlarge.\n\n### Overview\n\n<details className=\"dropdownBlock\">\n<summary>Components</summary>\n\n```mermaid\nflowchart LR\n    dev([\"Developer\"])\n\n    subgraph dct[\"DCT devcontainer\"]\n        dev_inside([\"Developer shell\"])\n    end\n\n    subgraph uis_group[\"UIS container\"]\n        uis[\"uis CLI\"]\n    end\n\n    subgraph k8s[\"Local Kubernetes Cluster\"]\n        svc[(\"PostgreSQL<br/>demo_db\")]\n    end\n    consumers[\"Consumer templates\"]\n\n    dev -->|uis template install postgresql-demo| uis\n    uis -->|deploys + seeds| svc\n    consumers -.->|use this| svc\n```\n\n<a href=\"https://mermaid.live/edit#base64:eyJjb2RlIjoiZmxvd2NoYXJ0IExSXG4gICAgZGV2KFtcIkRldmVsb3BlclwiXSlcblxuICAgIHN1YmdyYXBoIGRjdFtcIkRDVCBkZXZjb250YWluZXJcIl1cbiAgICAgICAgZGV2X2luc2lkZShbXCJEZXZlbG9wZXIgc2hlbGxcIl0pXG4gICAgZW5kXG5cbiAgICBzdWJncmFwaCB1aXNfZ3JvdXBbXCJVSVMgY29udGFpbmVyXCJdXG4gICAgICAgIHVpc1tcInVpcyBDTElcIl1cbiAgICBlbmRcblxuICAgIHN1YmdyYXBoIGs4c1tcIkxvY2FsIEt1YmVybmV0ZXMgQ2x1c3RlclwiXVxuICAgICAgICBzdmNbKFwiUG9zdGdyZVNRTDxici8+ZGVtb19kYlwiKV1cbiAgICBlbmRcbiAgICBjb25zdW1lcnNbXCJDb25zdW1lciB0ZW1wbGF0ZXNcIl1cblxuICAgIGRldiAtLT58dWlzIHRlbXBsYXRlIGluc3RhbGwgcG9zdGdyZXNxbC1kZW1vfCB1aXNcbiAgICB1aXMgLS0+fGRlcGxveXMgKyBzZWVkc3wgc3ZjXG4gICAgY29uc3VtZXJzIC0uLT58dXNlIHRoaXN8IHN2YyIsIm1lcm1haWQiOiJ7XCJ0aGVtZVwiOlwiZGVmYXVsdFwifSJ9\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"mermaidLiveLink\">↗ Open in mermaid.live</a>\n\n</details>\n\n<details className=\"dropdownBlock\">\n<summary>Flow</summary>\n\n```mermaid\nsequenceDiagram\n    participant Dev as Developer\n    participant DCT as DCT devcontainer\n    participant UIS as UIS provision-host\n    participant K8s as Local Kubernetes cluster\n    participant DB as PostgreSQL\n    Dev->>DCT: uis template install postgresql-demo\n    DCT->>UIS: install stack\n    UIS->>K8s: deploy PostgreSQL\n    UIS->>DB: create database demo_db + user\n    UIS->>DB: run init-*.sql seed files\n    UIS->>UIS: kubectl port-forward 35432\n    UIS-->>DCT: return connection JSON\n```\n\n<a href=\"https://mermaid.live/edit#base64:eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gICAgcGFydGljaXBhbnQgRGV2IGFzIERldmVsb3BlclxuICAgIHBhcnRpY2lwYW50IERDVCBhcyBEQ1QgZGV2Y29udGFpbmVyXG4gICAgcGFydGljaXBhbnQgVUlTIGFzIFVJUyBwcm92aXNpb24taG9zdFxuICAgIHBhcnRpY2lwYW50IEs4cyBhcyBMb2NhbCBLdWJlcm5ldGVzIGNsdXN0ZXJcbiAgICBwYXJ0aWNpcGFudCBEQiBhcyBQb3N0Z3JlU1FMXG4gICAgRGV2LT4+RENUOiB1aXMgdGVtcGxhdGUgaW5zdGFsbCBwb3N0Z3Jlc3FsLWRlbW9cbiAgICBEQ1QtPj5VSVM6IGluc3RhbGwgc3RhY2tcbiAgICBVSVMtPj5LOHM6IGRlcGxveSBQb3N0Z3JlU1FMXG4gICAgVUlTLT4+REI6IGNyZWF0ZSBkYXRhYmFzZSBkZW1vX2RiICsgdXNlclxuICAgIFVJUy0+PkRCOiBydW4gaW5pdC0qLnNxbCBzZWVkIGZpbGVzXG4gICAgVUlTLT4+VUlTOiBrdWJlY3RsIHBvcnQtZm9yd2FyZCAzNTQzMlxuICAgIFVJUy0tPj5EQ1Q6IHJldHVybiBjb25uZWN0aW9uIEpTT04iLCJtZXJtYWlkIjoie1widGhlbWVcIjpcImRlZmF1bHRcIn0ifQ==\" target=\"_blank\" rel=\"noopener noreferrer\" className=\"mermaidLiveLink\">↗ Open in mermaid.live</a>\n\n</details>\n\n</div>\n",
-      "expectedOutputBlock": "🔧 UIS Template Install: postgresql-demo\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📄 Reading template-info.yaml...\n   ✓ ID:   postgresql-demo\n   ✓ Type: stack\n\n📝 Parameters:\n   app_name      = demo-app\n   database_name = demo_db\n\n🔧 Provisioning 1 service...\n\n   ─── postgresql ──────────────────────────────────────────────────\n   Database:     demo_db\n   Namespace:    default\n   Init file:    config/init-database.sql (706 bytes, 19 lines)\n\n   📡 Calling UIS:\n      docker exec -i uis-provision-host uis deploy postgresql \\\n        --database demo_db \\\n        --namespace default \\\n        --init-file - \\\n        < config/init-database.sql\n\n   ✓ PostgreSQL deployed\n   ✓ Database demo_db created + seeded\n   ✓ Port-forward: host.docker.internal:35432 → postgresql.default.svc:5432\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n✅ Stack installed (1 service)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📋 Next steps:\n   • Verify:                 uis connect postgresql demo_db\n   • Check port forwards:    uis expose --status\n   • Consumer templates:     see the \"Related\" links on this page",
-      "files": [
-        ".gitignore",
-        "README-postgresql-demo.md",
-        "config/init-database.sql",
-        "template-info.yaml"
-      ],
-      "templateRepoPath": "uis-stack-templates/postgresql-demo",
-      "filesMdx": "### Files\n\n<details className=\"dropdownBlock\">\n<summary>Files (4)</summary>\n\n<pre className=\"filesTree\">\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/uis-stack-templates/postgresql-demo/.gitignore\" target=\"_blank\" rel=\"noopener noreferrer\">.gitignore</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/uis-stack-templates/postgresql-demo/README-postgresql-demo.md\" target=\"_blank\" rel=\"noopener noreferrer\">README-postgresql-demo.md</a>\n├── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/uis-stack-templates/postgresql-demo/template-info.yaml\" target=\"_blank\" rel=\"noopener noreferrer\">template-info.yaml</a>\n└── config/\n    └── <a href=\"https://github.com/helpers-no/dev-templates/blob/main/uis-stack-templates/postgresql-demo/config/init-database.sql\" target=\"_blank\" rel=\"noopener noreferrer\">init-database.sql</a>\n</pre>\n\n</details>\n"
+      "resolvedServices": [],
+      "resolvedInitFiles": {},
+      "architectureMdx": null,
+      "expectedOutputBlock": null,
+      "files": [],
+      "templateRepoPath": null,
+      "filesMdx": null
     }
   ]
 }

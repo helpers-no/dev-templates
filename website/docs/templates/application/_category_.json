@@ -1,0 +1,8 @@
+{
+  "label": "Applications",
+  "position": 2,
+  "link": {
+    "type": "doc",
+    "id": "templates/application/index"
+  }
+}

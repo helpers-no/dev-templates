@@ -1,0 +1,60 @@
+# template-info.yaml — atlas application catalogue entry
+#
+# This is the CATALOGUE POINTER, not the install definition. The definition is the
+# OCI artifact named in `source:` below, published by atlas beside its own image.
+# `params:` and `provides:` deliberately do not appear here — they come from the
+# artifact's own template-info.yaml. See ../README.md.
+
+id: atlas
+version: "v20260909-853c696"
+name: Atlas Data
+description: Norwegian business-register data served as a REST API, with its Dagster pipelines
+category: APPLICATION
+install_type: application
+abstract: >
+  Installs the atlas data platform as one application: a PostgreSQL database with
+  its migrations, a Dagster code location for the ingestion pipelines, and a
+  PostgREST API over the resulting api_v1 views. Exports the API url for other
+  applications to consume.
+tools: ""
+readme: README-atlas.md
+tags:
+  - atlas
+  - data
+  - postgresql
+  - dagster
+  - postgrest
+  - api
+logo: atlas-logo.svg
+maintainers:
+  - terchris
+links:
+  - url: https://github.com/users/terchris/packages/container/package/atlas-data
+    title: Published container image
+    icon: github
+
+# Where the install definition actually lives.
+#
+# The digest is authored and committed, never resolved at build time: a tag is
+# mutable at a registry, so a build that re-resolved it would let a re-pointed tag
+# be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
+# to `digest` here.
+#
+# These values are atlas's published artifact as verified by imac on urb-agents
+# #481 against the real registry — the `853c696` artifact, which superseded
+# `4b11f3f` mid-test.
+source:
+  artifact: ghcr.io/terchris/atlas-data/uis
+  tag: v20260909-853c696
+  digest: "sha256:def7b9d2839180258f962555bd30ed5ca037fc42c52ebe0dd75f75c83d3a6c54"
+
+# Top-level, NOT inside source: that is where UIS reads it from.
+visibility: public
+
+configure_command: "uis template install atlas"
+
+prerequisites:
+  - text: "UIS provision-host container running"
+    url: "https://uis.sovereignsky.no"
+  - text: "Local Kubernetes cluster running (Rancher Desktop)"
+    url: "https://www.rancher.com/products/rancher-desktop"

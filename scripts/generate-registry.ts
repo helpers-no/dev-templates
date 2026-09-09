@@ -78,6 +78,14 @@ interface TemplateInfoYaml {
   description: string;
   category: string;
   install_type: string;
+  /** Applications only: where the install definition is published. */
+  source?: {
+    artifact: string;
+    tag: string;
+    digest: string;
+  };
+  /** Applications only: 'public' (default) or 'private'. Top-level, not inside source. */
+  visibility?: string;
   abstract: string;
   tools: string;
   readme: string;
@@ -169,7 +177,7 @@ interface ResolvedService {
   transitiveRequires?: TransitiveDep[];
 }
 
-type TemplateKind = 'app' | 'stack';
+type TemplateKind = 'app' | 'stack' | 'application';
 
 interface DeploymentManifestExtract {
   envVar?: string;
@@ -534,6 +542,44 @@ function validateCategory(cat: CategoryYaml, file: string): void {
   }
 }
 
+/**
+ * Applications only: the pointer to the published OCI artifact that carries the
+ * install definition.
+ *
+ * Checked entirely offline. The digest is authored and committed, never resolved
+ * here: a tag is mutable at a registry, so resolving at build time would let a
+ * re-pointed tag be blessed by the next unrelated docs build. Pulling by digest
+ * gives integrity; only authoring it gives provenance. See
+ * plans/backlog/INVESTIGATE-application-catalogue-entries.md, Decision 2.
+ */
+const ARTIFACT_ALLOWLIST = ['ghcr.io/helpers-no/', 'ghcr.io/terchris/'];
+const MUTABLE_TAGS = ['latest', 'main', 'master', 'head'];
+
+function validateSource(source: TemplateInfoYaml['source'], file: string): void {
+  if (!source) {
+    fail(`${file}: install_type 'application' requires a source: block`);
+    return;
+  }
+  if (!source.artifact) {
+    fail(`${file}: source.artifact is required`);
+  } else if (!ARTIFACT_ALLOWLIST.some((prefix) => source.artifact.startsWith(prefix))) {
+    fail(
+      `${file}: source.artifact '${source.artifact}' is not under an allowed registry ` +
+        `(${ARTIFACT_ALLOWLIST.join(', ')})`,
+    );
+  }
+  if (!source.tag) {
+    fail(`${file}: source.tag is required`);
+  } else if (MUTABLE_TAGS.includes(source.tag.toLowerCase())) {
+    fail(`${file}: source.tag must not be a mutable tag, got '${source.tag}'`);
+  }
+  if (!source.digest) {
+    fail(`${file}: source.digest is required — it is what UIS actually pulls`);
+  } else if (!/^sha256:[0-9a-f]{64}$/.test(source.digest)) {
+    fail(`${file}: source.digest must be 'sha256:' followed by 64 hex characters`);
+  }
+}
+
 function validateTemplate(
   tmpl: TemplateInfoYaml,
   file: string,
@@ -551,8 +597,22 @@ function validateTemplate(
   if (!validCategories.has(tmpl.category)) {
     fail(`${file}: category '${tmpl.category}' not defined in any template-categories.yaml`);
   }
-  if (!tmpl.install_type || !['app', 'overlay', 'stack'].includes(tmpl.install_type)) {
-    fail(`${file}: install_type must be 'app', 'overlay', or 'stack', got '${tmpl.install_type}'`);
+  if (
+    !tmpl.install_type ||
+    !['app', 'overlay', 'stack', 'application'].includes(tmpl.install_type)
+  ) {
+    fail(
+      `${file}: install_type must be 'app', 'overlay', 'stack', or 'application', ` +
+        `got '${tmpl.install_type}'`,
+    );
+  }
+  if (tmpl.install_type === 'application') {
+    validateSource(tmpl.source, file);
+    if (tmpl.visibility && !['public', 'private'].includes(tmpl.visibility)) {
+      fail(`${file}: visibility must be 'public' or 'private', got '${tmpl.visibility}'`);
+    }
+  } else if (tmpl.source) {
+    fail(`${file}: source: is only valid for install_type 'application'`);
   }
   if (!tmpl.abstract) fail(`${file}: missing abstract`);
   if (!tmpl.readme) fail(`${file}: missing readme`);
@@ -660,6 +720,8 @@ for (const catFile of categoryFiles) {
     };
 
     // Optional fields — only include if present
+    if (raw.source) entry.source = raw.source;
+    if (raw.visibility) entry.visibility = raw.visibility;
     if (raw.params) entry.params = raw.params;
     if (raw.requires) entry.requires = raw.requires;
     if (raw.provides) entry.provides = raw.provides;
@@ -682,11 +744,21 @@ for (const catFile of categoryFiles) {
     // declares. Stack templates use `provides.services:`; everything else
     // (app, overlay) consumes services via `requires:` (if any). The kind
     // drives the header label of the cluster section in the Environment card.
-    const templateKind: TemplateKind = raw.install_type === 'stack' ? 'stack' : 'app';
+    const templateKind: TemplateKind =
+      raw.install_type === 'stack'
+        ? 'stack'
+        : raw.install_type === 'application'
+          ? 'application'
+          : 'app';
     entry.templateKind = templateKind;
 
     // Pick the service list from whichever field applies.
-    const serviceList = templateKind === 'stack' ? raw.provides?.services : raw.requires;
+    const serviceList =
+      templateKind === 'application'
+        ? undefined
+        : templateKind === 'stack'
+          ? raw.provides?.services
+          : raw.requires;
 
     // Resolve tools (DCT)
     entry.resolvedTools = resolveTools(raw.tools, dctTools, raw.id);
@@ -736,16 +808,29 @@ for (const catFile of categoryFiles) {
     // folder, and is intentionally not shown as "the user's files"). For
     // app and stack templates, the entry's `folder` field already points
     // at the template root.
-    const templateRepoPath =
-      raw.install_type === 'overlay' ? `${entry.folder}/template` : (entry.folder as string);
-    const filesList = listTemplateFiles(templateRepoPath);
-    entry.files = filesList;
-    entry.templateRepoPath = templateRepoPath;
-    entry.filesMdx = buildFilesMdx({files: filesList, templateRepoPath});
+    // An application ships no files here — its definition is the published
+    // artifact — so it gets no repo path and no Files dropdown, rather than a
+    // path into a directory that holds only the pointer.
+    if (templateKind === 'application') {
+      entry.files = [];
+      entry.templateRepoPath = null;
+      entry.filesMdx = null;
+    } else {
+      const templateRepoPath =
+        raw.install_type === 'overlay' ? `${entry.folder}/template` : (entry.folder as string);
+      const filesList = listTemplateFiles(templateRepoPath);
+      entry.files = filesList;
+      entry.templateRepoPath = templateRepoPath;
+      entry.filesMdx = buildFilesMdx({files: filesList, templateRepoPath});
+    }
 
-    if (raw.install_type !== 'overlay' && entry.filesMdx === null) {
+    if (
+      raw.install_type !== 'overlay' &&
+      templateKind !== 'application' &&
+      entry.filesMdx === null
+    ) {
       fail(
-        `${file}: git ls-files returned no tracked files under ${templateRepoPath}. ` +
+        `${file}: git ls-files returned no tracked files under ${entry.templateRepoPath}. ` +
           `Is the template committed? filesMdx would be null.`,
       );
     }

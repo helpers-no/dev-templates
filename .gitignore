@@ -18,3 +18,7 @@ website/static/img/brand/tmp/
 # DevContainer Toolbox - devcontainer.json backups from dev-update
 .devcontainer/backup/
 .claude/
+
+# bun is used on some dev hosts; CI installs with npm, so package-lock.json
+# stays the single committed lockfile and bun's is local-only.
+bun.lock
