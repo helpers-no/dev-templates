@@ -45,7 +45,21 @@ export default function TemplateHeader({
           <span className={styles.version}>v{version}</span>
         </div>
         <p className={styles.description}>{description}</p>
-        {abstract && <p className={styles.abstract}>{abstract}</p>}
+        {abstract &&
+          // An abstract may hold several paragraphs, separated by a blank line.
+          // A single `<p>` would collapse them into one run of text, which is how
+          // atlas's four-paragraph abstract first rendered (urb-agents #489).
+          // Single-paragraph abstracts -- every other template today -- split to
+          // one chunk and render exactly as before.
+          abstract
+            .split(/\n\s*\n/)
+            .map((para) => para.trim())
+            .filter((para) => para.length > 0)
+            .map((para, i) => (
+              <p key={i} className={styles.abstract}>
+                {para}
+              </p>
+            ))}
         {tools && (
           <div className={styles.tools}>
             <span className={styles.toolsLabel}>Tools: </span>{tools}

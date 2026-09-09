@@ -8,15 +8,30 @@
 id: atlas
 version: "v20260909-853c696"
 name: Atlas Data
-description: The Norwegian NGO sector in one place, served as a REST API with its Dagster pipelines
+description: >-
+  Norway's civil-society sector as a REST API — municipality-level indicators of
+  humanitarian need, and the NGOs and local chapters that respond to them.
 category: APPLICATION
 install_type: application
-abstract: >
-  Atlas brings the Norwegian NGO sector together in one place. Installing it with
-  UIS brings up the whole application under one name: a PostgreSQL database with
-  its migrations, a Dagster code location for the ingestion pipelines, and a
-  PostgREST API over the resulting api_v1 views. Exports the API url for other
-  applications to consume.
+# Authored by atlas (urb-agents #489), not by this repository. Replace only on
+# atlas's word.
+abstract: |-
+  Installs the Atlas data platform as one application: a PostgreSQL database with
+  its migrations, a Dagster code location running the ingest and dbt transforms,
+  and a PostgREST API over the curated api_v1 views.
+
+  The data is an open semantic layer over Norwegian public sources — SSB
+  statistics, FHI public-health and living-conditions indicators, Bufdir child-poverty
+  figures and the Brønnøysund business register — joined to NGO supply data, so
+  that humanitarian need and the organisations responding to it can be queried
+  together at kommune level.
+
+  The API is self-describing: meta_sources, meta_endpoints and meta_dimensions let
+  a consumer discover what is available without out-of-band documentation.
+
+  A fresh install serves an empty API until the first pipeline run — the schema and
+  grants exist from install, the data arrives on the ingest schedule. Exports
+  api-url for other applications to consume.
 tools: ""
 readme: README-atlas.md
 tags:

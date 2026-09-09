@@ -1,7 +1,12 @@
 # Atlas Data
 
-Atlas brings the Norwegian NGO sector together in one place, and serves it as a REST API
-alongside the Dagster pipelines that build it.
+Atlas serves **Norway's civil-society sector as a REST API** — municipality-level indicators
+of humanitarian need, and the NGOs and local chapters that respond to them.
+
+The data is an open semantic layer over Norwegian public sources: SSB statistics, FHI
+public-health and living-conditions indicators, Bufdir child-poverty figures and the
+Brønnøysund business register, joined to NGO supply data, so that need and the organisations
+responding to it can be queried together at kommune level.
 
 Installing it with UIS brings up the whole application under one name:
 
@@ -15,6 +20,18 @@ Installing it with UIS brings up the whole application under one name:
 ```bash
 uis template install atlas
 ```
+
+### ⚠️ A fresh install serves an empty API until the first pipeline run
+
+This is correct behaviour, not a broken install. The schema and grants exist from install; the
+data arrives on the ingest schedule, when Dagster first runs. The API answers and returns zero
+rows until then.
+
+Stated here because it is the state most likely to be read as failure by someone installing for
+the first time.
+
+The API is also self-describing — `meta_sources`, `meta_endpoints` and `meta_dimensions` let a
+consumer discover what is available without any out-of-band documentation.
 
 ### Installing alongside an atlas that is already running
 
@@ -64,8 +81,20 @@ published registry (urb-agents #486) — `deploy postgresql`, `configure postgre
 `configure postgrest --schemas api_v1 --url-prefix api-atlas`, `deploy postgrest`, `deploy dagster`,
 the `atlas-data` code location, then `deploy dagster` again.
 
-⚠️ **The prose on this page was written by `dev-templates`, not by atlas**, and one earlier version
-of it was wrong: it described atlas as "Norwegian business-register data", inferred from the
-`brreg_enheter` table in the test records. `github.com/terchris/atlas` describes itself as *"the
-Norwegian NGO sector, in one place"* — the business register is a source it draws on, not what it
-is. Corrected here, but atlas still owns this text and should replace it.
+The entry's `description` and `abstract` are **atlas's own words**, supplied on urb-agents #489.
+Change them only on atlas's word.
+
+⚠️ **Two earlier versions of this description were wrong**, and the sequence is worth keeping:
+
+1. `dev-templates` first wrote *"Norwegian business-register data"*, inferred from the
+   `brreg_enheter` table in the install records.
+2. Corrected to *"the Norwegian NGO sector, in one place"* from the repository's own one-liner —
+   better, but still not the framing atlas uses.
+3. atlas supplied the text above and explained why the first attempt was worst:
+   **`brreg_enheter` is one raw table out of 47.** FHI contributes 21 and SSB 17. Brønnøysund
+   supplies organisation *identity* — how an NGO gets a stable `orgnr` — so leading with it
+   described the smallest source as though it were the subject.
+
+The lesson recorded rather than the words: a domain inferred from a table name reads plausibly and
+is not evidence. The prose in this repository is a stand-in until the owning application supplies
+its own.
