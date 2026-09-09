@@ -22,7 +22,6 @@ AI coding assistants are powerful but need structure to be effective. This syste
 | [PLANS.md](PLANS.md) | Plan structure, investigation guidance, templates | When creating or implementing a plan |
 | [DEVCONTAINER.md](DEVCONTAINER.md) | How to work inside the devcontainer | When running commands or installing tools |
 | [GIT.md](GIT.md) | Git safety rules and platform operations | When doing git operations |
-| [TALK.md](TALK.md) | AI-to-AI testing protocol | When working with a tester |
 
 ---
 
@@ -34,7 +33,7 @@ When starting a new session, read files in this order:
 2. **Read all `template-*.md` files** (if any) — tech stack from installed templates
 3. **Read [WORKFLOW.md](WORKFLOW.md)** when starting new work
 4. **Read [PLANS.md](PLANS.md)** when creating or implementing a plan
-5. **Reference** [DEVCONTAINER.md](DEVCONTAINER.md), [GIT.md](GIT.md), [TALK.md](TALK.md) as needed
+5. **Reference** [DEVCONTAINER.md](DEVCONTAINER.md), [GIT.md](GIT.md) as needed
 
 ---
 

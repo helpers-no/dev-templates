@@ -34,7 +34,6 @@ No development tools are required. This template installs documentation and work
   - `PLANS.md` — Plan structure, templates, and best practices
   - `DEVCONTAINER.md` — How to work inside the devcontainer
   - `GIT.md` — Git safety rules and platform operations
-  - `TALK.md` — AI-to-AI testing protocol
 
 - **Plan folder structure:**
   - `docs/ai-developer/plans/backlog/` — Approved plans waiting for implementation
@@ -65,7 +64,6 @@ docs/ai-developer/
 ├── PLANS.md               # How to write plans
 ├── DEVCONTAINER.md        # Devcontainer guide
 ├── GIT.md                 # Git safety rules
-├── TALK.md                # AI-to-AI testing protocol
 └── plans/
     ├── backlog/           # Plans waiting to start
     ├── active/            # Plans in progress

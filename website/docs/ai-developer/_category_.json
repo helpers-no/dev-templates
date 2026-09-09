@@ -1,0 +1,8 @@
+{
+  "label": "AI Developer Workflow",
+  "position": 90,
+  "link": {
+    "type": "doc",
+    "id": "ai-developer/README"
+  }
+}

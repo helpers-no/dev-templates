@@ -11,7 +11,24 @@
 5. Read [website/docs/ai-developer/WORKFLOW.md](website/docs/ai-developer/WORKFLOW.md) for the full process
 6. Read [website/docs/ai-developer/PLANS.md](website/docs/ai-developer/PLANS.md) for plan structure
 
-All commands must run inside the devcontainer. Never run directly on the host.
+**Where commands run.** Project commands — package managers, builds, tests, tooling — run inside
+the devcontainer; see [DEVCONTAINER.md](website/docs/ai-developer/DEVCONTAINER.md). Your own agent
+session runs on the **host**, in tmux: reading files, `git`, and the bus client
+(`~/.local/bin/urb`) are host commands and are not covered by that rule. Do not refuse fleet work
+because of it.
+
+## Fleet coordination
+
+You are **`dev-templates`**, an agent on the URB fleet. Fleet work does not arrive in this repo.
+
+- Your inbox is a **query, not a directory**: `~/.local/bin/urb inbox --id dev-templates`
+  (open issues labelled `to:dev-templates` in `terchris/urb-agents`).
+- The protocol is `protocol/communication.md` in `terchris/urb-agents`, read **remotely**.
+  Do not clone that repository and do not copy `protocol/` here.
+- See [COORDINATION.md](website/docs/ai-developer/COORDINATION.md) for where `gh` applies and
+  where `urb` does.
+- **There is no file bus.** The bus is GitHub issues; `talk/` and `mailboxes/` directories are not
+  read by anything. Do not create one.
 
 ## Project Details
 
