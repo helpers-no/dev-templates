@@ -275,16 +275,31 @@ bogus pointer to every UIS installation. Keep fixtures under `scripts/test/`.
 
 ---
 
-## Phase 6 — liveness alarm (only if still needed)
+## Phase 6 — digest provenance check: **answered, and it is one HTTPS GET**
 
-- [ ] A scheduled or manual job asserting each committed `source.tag` still resolves to its committed
-      `source.digest`, alarming on drift
-- [ ] **Never a gate** on the docs deploy: UIS pulls by digest, so a re-pointed tag cannot change
-      what runs, and blocking unrelated documentation deploys on a ghcr hiccup buys no integrity
-      (agreed with `tor-agent`, #479)
+`atlas` emits the digest as a **release asset** (urb-agents #483, closed; relayed on #479). Stable,
+unauthenticated URL per tag:
 
-**May not be needed at all.** If `atlas` emits its digest as a release output (urb-agents #480), the
-digest travels with the release and neither repository needs `oras`. That is the preferred option.
+```
+https://github.com/terchris/atlas/releases/download/<tag>/uis-artifact.json
+{ "id", "tag", "artifact", "digest", "image", "commit", "published_at" }
+```
+
+`tor-agent` re-verified it independently rather than trusting atlas's build log: the digest recorded
+in the asset equals GHCR's `docker-content-digest`. So the preferred option in Decision 2 is real —
+**no `oras` in either repository, no tag resolution, and this pipeline stays hermetic.**
+
+- [ ] A scheduled job that, per application entry, GETs `uis-artifact.json` for the committed tag and
+      asserts its `digest` equals the committed `source.digest`; **alarm only, never a gate** —
+      UIS pulls by digest, so drift cannot change what runs, and blocking unrelated documentation
+      deploys on a GitHub hiccup buys no integrity (agreed with `tor-agent`, #479)
+- [ ] Same job can check `links[]` with a HEAD request — see the follow-up below; both are
+      network-dependent staleness checks and belong in one alarm rather than two
+
+⚠️ **Treat a missing asset as "not adoptable yet", not as an error.** `v20260909-4b11f3f` — the
+artifact `imac` first tested — predates the release asset and has none. Every publish from `853c696`
+onward carries one. A generator or job that treats absence as fatal would fail on an application's
+older tags (`tor-agent`, #479).
 
 ---
 
@@ -318,13 +333,29 @@ The asymmetry with `id` is therefore principled rather than incidental:
       suggestion, take-it-or-leave-it). Then nothing can disagree, no new validation is needed, and
       the number a human sees is the thing that was actually published. Decide in phase 3.
 
+## Follow-ups this work exposed
+
+Each is a real gap found while doing the above, kept out of scope deliberately so this stayed a fix:
+
+1. **`validate-docs.sh` misses links that leave the docs tree.** It reported "All internal links
+   valid" for two links the Docusaurus build then rejected — `../../../../../CLAUDE.md` from a plan
+   page, and `../README.md` from a README that is rendered as a docs page. The build is the real gate.
+2. **Nothing checks external links at all.** One shipped wrong today (a 404 source URL). Decision:
+   this does **not** go in `validate-metadata.sh` — the pre-push pipeline stays offline and hermetic,
+   for the same reason the digest is not resolved at build time. A dead link is staleness, so it wants
+   an alarm; fold it into the phase 6 job.
+3. **Port the six `source` falsification cases into unit tests.** They were proven by mutating the
+   live entry and restoring it, which proves the rules once rather than continuously.
+4. **`TemplateHeader` multi-paragraph abstract** — done as part of publishing atlas's prose, but it is
+   the sort of thing that only surfaced because someone's abstract had four paragraphs. Worth a test.
+
 ## Open questions
 
-1. **urb-agents #483** — will `atlas` emit its digest as a release output? Decides whether phase 6 and
-   any authoring helper exist. Originally asked as #480, which was closed `completed` ten minutes
-   after the question was posted, so atlas never answered; `tor-agent` re-asked it as #483 and will
-   bring the answer. Authoring-time resolution remains a working design if the answer is no.
-2. **Private artifacts** — deferred; needs Terje for credentials, and atlas does not need it.
+1. **Private artifacts** — deferred; needs Terje for credentials, and atlas does not need it: its
+   artifact is `ghcr.io/terchris/*` and public.
+2. **Rendering `source` from the entry rather than from prose.** The atlas README states the artifact,
+   tag and pin in text. A component reading them from the entry would not drift. Worth it at the
+   second application, not the first.
 
 ---
 
