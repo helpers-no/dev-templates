@@ -1,7 +1,7 @@
 # Atlas Data
 
-Atlas serves Norwegian business-register data as a REST API, together with the Dagster
-pipelines that build it.
+Atlas brings the Norwegian NGO sector together in one place, and serves it as a REST API
+alongside the Dagster pipelines that build it.
 
 Installing it with UIS brings up the whole application under one name:
 
@@ -58,7 +58,14 @@ The artifact coordinates above are atlas's published values as verified by `imac
 the real registry (urb-agents #481) — the `853c696` artifact, which superseded `4b11f3f`
 partway through that test round.
 
-⚠️ **The prose on this page was written by `dev-templates` from the install and test
-records, not by atlas.** The description, abstract and the source link
-(currently the published container package, because `github.com/terchris/atlas-data` is not
-publicly reachable) should be confirmed or replaced by whoever owns atlas.
+The three services listed above are not inferred: they are the plan
+`uis template install atlas --dry-run` produces from this pin, as run by `tor-agent` against the
+published registry (urb-agents #486) — `deploy postgresql`, `configure postgresql`,
+`configure postgrest --schemas api_v1 --url-prefix api-atlas`, `deploy postgrest`, `deploy dagster`,
+the `atlas-data` code location, then `deploy dagster` again.
+
+⚠️ **The prose on this page was written by `dev-templates`, not by atlas**, and one earlier version
+of it was wrong: it described atlas as "Norwegian business-register data", inferred from the
+`brreg_enheter` table in the test records. `github.com/terchris/atlas` describes itself as *"the
+Norwegian NGO sector, in one place"* — the business register is a source it draws on, not what it
+is. Corrected here, but atlas still owns this text and should replace it.

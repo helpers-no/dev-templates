@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-09T17:09:17.475Z",
+  "generated": "2026-09-09T17:24:29.005Z",
   "dctDocsBase": "https://dct.sovereignsky.no",
   "uisDocsBase": "https://uis.sovereignsky.no",
   "categories": [
@@ -950,14 +950,15 @@
       "folder": "uis-applications/atlas",
       "version": "v20260909-853c696",
       "name": "Atlas Data",
-      "description": "Norwegian business-register data served as a REST API, with its Dagster pipelines",
+      "description": "The Norwegian NGO sector in one place, served as a REST API with its Dagster pipelines",
       "category": "APPLICATION",
       "install_type": "application",
-      "abstract": "Installs the atlas data platform as one application: a PostgreSQL database with its migrations, a Dagster code location for the ingestion pipelines, and a PostgREST API over the resulting api_v1 views. Exports the API url for other applications to consume.",
+      "abstract": "Atlas brings the Norwegian NGO sector together in one place. Installing it with UIS brings up the whole application under one name: a PostgreSQL database with its migrations, a Dagster code location for the ingestion pipelines, and a PostgREST API over the resulting api_v1 views. Exports the API url for other applications to consume.",
       "tools": "",
       "readme": "README-atlas.md",
       "tags": [
         "atlas",
+        "ngo",
         "data",
         "postgresql",
         "dagster",
@@ -970,8 +971,8 @@
       ],
       "links": [
         {
-          "url": "https://github.com/users/terchris/packages/container/package/atlas-data",
-          "title": "Published container image",
+          "url": "https://github.com/terchris/atlas",
+          "title": "Source code",
           "icon": "github"
         }
       ],
