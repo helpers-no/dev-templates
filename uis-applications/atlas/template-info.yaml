@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260910-d7fa93c"
+version: "v20260910-bfda7b6"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -53,6 +53,12 @@ links:
   - url: https://github.com/terchris/atlas
     title: Source code
     icon: github
+  # Written from ops's production install; its "Things that look like failure and are not"
+  # section covers the transform_checks slowness that cost three people a wrong conclusion.
+  # Checked by hand (HTTP 200) -- no pipeline stage validates an external link.
+  - url: https://github.com/terchris/atlas/blob/main/website/docs/contributors/installing-on-uis.md
+    title: Installing on UIS
+    icon: github
 
 # Where the install definition actually lives.
 #
@@ -61,21 +67,27 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning, three independent sources in agreement (urb-agents #514):
-#   atlas's own message      sha256:c1fb585b…ee19b
-#   release asset            .../releases/download/v20260910-d7fa93c/uis-artifact.json
+# Verified before pinning, three independent sources in agreement (urb-agents #630):
+#   atlas's own message      sha256:39a8b1d5…ac4ac
+#   release asset            .../releases/download/v20260910-bfda7b6/uis-artifact.json
 #   GHCR docker-content-digest for the tag
-# The artifact's template-info.yaml was pulled from the registry at this digest and
-# decoded: `kind: application`, `id: atlas` (so UIS's identity check has something to
-# bite on), and its own `tag:` equals this pin.
+#
+# No cluster load was required for this bump, and that was measured rather than taken on
+# trust. The image manifest digest DOES change between tags (8a676e54 -> 8052692b), so
+# "functionally identical" is not the same claim as "the same image". Comparing the two
+# amd64 manifests: 29 of 31 layers bit-identical; layers 26-27 differ in digest but their
+# CONTENTS are identical -- 1112 files compared, zero added, removed or changed -- so the
+# difference is tar metadata from a non-reproducible build, not code. cadence.py and
+# schedules.py live in the bit-identical layers. The runtime filesystem is therefore
+# content-identical to the image imac loaded at d7fa93c (#517).
 #
 # ⚠️ Do NOT pin v20260910-4e9f13c or v20260910-6429719. Their first_data names three
 # jobs and omits brreg-enheter, so a user following the artifact ends with that source
 # empty and the freshness test red (imac, #507).
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260910-d7fa93c
-  digest: "sha256:c1fb585bc9bb9fc46c92f724142c70d62a38f33102d75c40c1e1feb4a10ee19b"
+  tag: v20260910-bfda7b6
+  digest: "sha256:39a8b1d52b71249e188b7c536f8906254fd293f5d29d522df2bc9d59e08ac4ac"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public
