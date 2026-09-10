@@ -4,7 +4,7 @@
 > - [WORKFLOW.md](../../WORKFLOW.md) - The implementation process
 > - [PLANS.md](../../PLANS.md) - Plan structure and best practices
 
-## Status: Phases 1-4 DONE and verified; `atlas` is live in the registry. Phase 5 with `tor-agent`/`imac`; phase 6 pending #483
+## Status: Phases 1-5 DONE and verified end to end on a cluster. Phases 6 and 7 open; one confirmation owed by UIS
 
 **Goal**: Support a third entry kind in `template-registry.json` — an **application**, whose install
 definition is an OCI artifact published beside the application's own image rather than living in this
@@ -262,11 +262,22 @@ is meant to be a fix and not a rewrite.
 
 ## Phase 5 — hand the generated registry to `tor-agent`
 
-- [ ] Generate `template-registry.json` containing a **fixture** application entry
-- [ ] Check it against UIS's shipped 1.6.25 `list` filter (command in the investigation)
-- [ ] Send it to `tor-agent`, who installs from it via `REGISTRY_URL_PRIMARY` as a `file://` URL —
-      no cluster, no catalogue deploy, no risk to `main` (offered on #479)
-- [ ] Act on the report before anything changes what this repository publishes
+**Superseded by stronger evidence — the fixture route was never needed.** The plan was to stage a
+fixture registry and have `tor-agent` install from it via `file://`. What actually happened is better:
+
+- [x] Checked against UIS's shipped 1.6.25 `list` filter, before publishing anything
+- [x] `tor-agent` ran `list`, `info` and `install --dry-run` against the **published** registry — no
+      override, no local file — and confirmed the entry resolves to the same plan `imac` had executed
+      from a fixture (#486). The published route and the staged route are indistinguishable to the
+      installer
+- [x] `imac` installed **and removed** it on a cluster beside a live tenant, `EXIT=0` both ways (#487)
+- [x] `imac` then did a full wipe and a novice install from the published catalogue: install works,
+      four `first_data` jobs run clean, 10.8 min, 2,906,194 rows, 47 raw / 64 marts, 13 `api_v1`
+      views, `brreg_enheter` 122 rows, meta endpoints 200 (#520)
+
+Keep the `file://` route documented anyway, for `imac`'s reason rather than the original one: a
+fixture that has actually been installed is evidence in a way a field table is not, and it is the
+safer way to test a *change* before publishing it.
 
 ⚠️ **The fixture must not be committed to a published tree.** UIS reads
 `https://raw.githubusercontent.com/helpers-no/dev-templates/main/website/src/data/template-registry.json`
@@ -326,9 +337,9 @@ The asymmetry with `id` is therefore principled rather than incidental:
 | a disagreement causes | an application recorded under a name its definition never claimed | a human reads a stale number |
 | the pin | not `id` | not `version` — **the pin is the digest** |
 
-- [ ] **Keep requiring `version`** in `validateTemplate`. `uis template info` prints `\(.version)`
-      **unguarded**, so an entry without it renders `Version: null`. The existing requirement is doing
-      real work for UIS.
+- [x] **Keep requiring `version`** in `validateTemplate` — already required, and it must stay.
+      `uis template info` prints `\(.version)` **unguarded**, so an entry without it renders
+      `Version: null`. Recorded as a do-not-remove rather than as work.
 - [ ] **Consider deriving the display version from `source.tag`** at generation time (`tor-agent`'s
       suggestion, take-it-or-leave-it). Then nothing can disagree, no new validation is needed, and
       the number a human sees is the thing that was actually published. Decide in phase 3.
