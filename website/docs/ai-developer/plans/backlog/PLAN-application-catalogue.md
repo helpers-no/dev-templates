@@ -333,6 +333,44 @@ The asymmetry with `id` is therefore principled rather than incidental:
       suggestion, take-it-or-leave-it). Then nothing can disagree, no new validation is needed, and
       the number a human sees is the thing that was actually published. Decide in phase 3.
 
+## When to hold a pin bump
+
+A pin bump normally needs no round-trip: the digest is verified from the release asset and GHCR, and
+publishing is a reviewed diff. **Hold it in exactly one case — when the bump moves a container image
+that no cluster has loaded.**
+
+That condition is narrow and checkable before asking: compare the artifact's `image:`/`tag:` between
+the current and proposed pins, and ask whether anyone has run it. A bump that moves only entry text
+does not earn a round-trip.
+
+The asymmetry that justifies it (agreed with `imac`, urb-agents #517): **bad advice in an entry is
+recoverable by the next bump; an image that fails to import is a broken install** for whoever installs
+next, and a code location that fails to import takes the whole location down. First applied to
+`v20260910-d7fa93c` — cost one redeploy and about forty minutes, and it turned up that the new job
+covers `raw/brreg_enheter`, which was the reason the previous pin's `first_data` was unachievable.
+
+`imac`'s method is the part to reuse: **ask the product, not the pod.** A code location whose module
+fails to import sits in a `Running` pod while the location is in error, so `loadStatus = LOADED` and
+the job list are the evidence; pod phase is not readiness.
+
+### Verifying a digest before pinning
+
+Three independent sources, all at authoring time — never in the build:
+
+```bash
+# 1. the release asset (unauthenticated)
+curl -sL https://github.com/terchris/atlas/releases/download/<tag>/uis-artifact.json
+
+# 2. GHCR's own answer for that tag
+TOK=$(curl -s "https://ghcr.io/token?scope=repository%3A<owner>%2F<image>%3Apull&service=ghcr.io" | jq -r .token)
+curl -sI -H "Authorization: Bearer $TOK" \
+  -H "Accept: application/vnd.oci.image.manifest.v1+json" \
+  https://ghcr.io/v2/<owner>/<image>/manifests/<tag> | grep -i docker-content-digest
+
+# 3. the artifact's own template-info.yaml, pulled at the digest and decoded --
+#    confirms kind/id and that its own tag matches the pin
+```
+
 ## Follow-ups this work exposed
 
 Each is a real gap found while doing the above, kept out of scope deliberately so this stayed a fix:
