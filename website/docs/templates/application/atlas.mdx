@@ -98,6 +98,35 @@ is correct.
 ⚠️ **The cadence lives in the image, not in this entry.** It changes when the pinned tag changes,
 with nothing here to review. If that matters to you, diff `cadence.py` between tags.
 
+### Getting data on day one
+
+Enabling the schedules does **not** backfill. Every schedule is `on_cron`, which means *next fire* —
+so a Thursday install waits until Sunday 02:00 for raw data, and until the 1st for the monthly
+sources. The API stays empty in the meantime, with nothing to explain why.
+
+To get data immediately, launch these four jobs from the Dagster UI, **in this order**:
+
+| order | job | ~time |
+|---|---|---|
+| 1 | `annual_sources_refresh` | 6.3 min |
+| 2 | `klass_refresh` | 1.0 min |
+| 3 | `seed_sources_refresh` | 0.8 min |
+| 4 | `transform_and_publish` | 2.8 min |
+
+**Total ~11 minutes**, producing ~2.9M rows across 47 `raw` and 64 `marts` tables, 13 `api_v1` views
+and 14 API endpoints.
+
+Measured end to end by `imac` on a wiped cluster from this published pin (urb-agents #520): 10.8
+minutes, 2,906,194 rows, zero failures. `seed_sources_refresh` is the job that covers
+`raw/brreg_enheter` — without it that source stays empty and the freshness test goes red.
+
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260910-d7fa93c`.** It is
+> duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
+> `operational` block, so this page is the only place an operator can read it. It is therefore
+> **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
+> section from the artifact at authoring time is the intended fix; see
+> `PLAN-application-catalogue.md`.
+
 ### Installing alongside an atlas that is already running
 
 If a tenant is already deployed, installing under the same name configures the **same

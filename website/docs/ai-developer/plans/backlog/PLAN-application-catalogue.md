@@ -371,6 +371,48 @@ curl -sI -H "Authorization: Bearer $TOK" \
 #    confirms kind/id and that its own tag matches the pin
 ```
 
+## Phase 7 — generate the operational section from the artifact (authoring time)
+
+**Why this is now the priority rather than a nicety.** `imac`'s novice run from the published
+catalogue (urb-agents #520) measured that `uis template info atlas` renders **none** of the
+artifact's `operational` block — 0 matches for `operational|first_data|seed_sources|11 minutes|
+deploys` in its complete output. So the four-job `first_data` list that atlas shipped, and that this
+repository held a round-trip to pin, reaches nobody through the CLI.
+
+The catalogue page is currently the **only** surface carrying it, and it carries it by hand:
+`README-atlas.md` now duplicates `operational.first_data` with a ⚠️ naming the pin it was copied from
+and the fact it can go stale. That is a deliberate stopgap, not the design.
+
+- [ ] At authoring time — not build time — read `operational:` from the artifact at the pinned digest
+      and generate the section, so a pin bump produces one diff containing both the new pin and the
+      operational text it implies
+- [ ] Fail the bump if the artifact has no `operational:` block, rather than silently emitting nothing
+- [ ] Remove the hand-maintained duplication from `README-atlas.md` once generated
+
+Authoring time is the right moment because **the moment the two could diverge is the bump itself**.
+Build-time generation would need a network call in a pipeline deliberately kept hermetic; a
+hand-maintained copy can be fixed instantly but drifts silently. atlas named the real cost of
+generating (a generated section is only as fresh as the pin) and it is the correct trade only if
+generation happens where the pin changes.
+
+### The failure shape this belongs to
+
+`imac` named it, and it is the third instance this week: **a producer publishes a field, a consumer
+never reads it, and both sides pass their own checks.** atlas's gates prove `first_data` covers every
+automated source; this repository's verification proves the blob decodes and the digest matches;
+neither asks whether anything *displays* it. The other two: atlas's `measured:` field truncated by a
+YAML comment with all four gates green, and a lint that resolved a path one directory short, found
+nothing, and reported ALL TESTS PASSED.
+
+Division of surfaces, to be agreed with `tor-agent` rather than assumed — the artifact currently has
+a contract with nobody:
+
+| surface | owner | should show |
+|---|---|---|
+| `uis template info <id>` | UIS | `operational` — will-install, first-data jobs, takes |
+| install completion summary | UIS | the same three lines, beside the endpoint it already prints |
+| catalogue page / README | this repo | the same content, generated from the artifact at the pin |
+
 ## Follow-ups this work exposed
 
 Each is a real gap found while doing the above, kept out of scope deliberately so this stayed a fix:
