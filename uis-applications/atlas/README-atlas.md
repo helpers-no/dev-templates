@@ -24,14 +24,45 @@ uis template install atlas
 ### ⚠️ A fresh install serves an empty API until the first pipeline run
 
 This is correct behaviour, not a broken install. The schema and grants exist from install; the
-data arrives on the ingest schedule, when Dagster first runs. The API answers and returns zero
-rows until then.
+data arrives on the first pipeline run, which **an operator has to start** — see the next section.
+The API answers and returns zero rows until then.
 
 Stated here because it is the state most likely to be read as failure by someone installing for
 the first time.
 
 The API is also self-describing — `meta_sources`, `meta_endpoints` and `meta_dimensions` let a
 consumer discover what is available without any out-of-band documentation.
+
+### What happens after you install
+
+**Installing starts nothing.** The Dagster schedules ship **stopped**. No data is fetched, and no
+external service is contacted, until an operator turns them on. Turning them on is the go-live
+decision.
+
+**First ingest loads roughly 2.9 million rows** across 47 `raw` tables and 60 `marts` tables, from
+about 40 sources, in a single pass.
+
+**Once schedules are on**, Atlas polls on this cadence (Europe/Oslo):
+
+| when | what |
+|---|---|
+| Sunday 02:00 | ~37 annual public-sector sources — SSB, FHI, Bufdir |
+| Sunday 03:30 | scraper-based sources |
+| 1st of month, 01:00 | SSB Klass classifications (kommune/fylke) |
+| Daily 05:00 | dbt transform and publish — no external calls |
+
+**The external services Atlas calls** are SSB (Statistics Norway), FHI (Folkehelseinstituttet),
+Bufdir and Brønnøysundregistrene. All are public-sector APIs. The cadence is deliberately
+conservative — an annual statistical table is polled weekly, not nightly, because fetching annual
+tables every night would be roughly 15,000 pointless requests a year against services Atlas depends
+on staying welcome at.
+
+**Two sources are deliberately unscheduled** (`redcross-branches`, `frr`) pending a credential. They
+never self-trigger; invoking them by hand on a cluster without the private data repo fails, and that
+is correct.
+
+⚠️ **The cadence lives in the image, not in this entry.** It changes when the pinned tag changes,
+with nothing here to review. If that matters to you, diff `cadence.py` between tags.
 
 ### Installing alongside an atlas that is already running
 

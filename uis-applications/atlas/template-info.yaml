@@ -32,6 +32,10 @@ abstract: |-
   A fresh install serves an empty API until the first pipeline run — the schema and
   grants exist from install, the data arrives on the ingest schedule. Exports
   api-url for other applications to consume.
+
+  Installing does not start anything: the schedules ship stopped, so no data is
+  fetched until an operator turns them on. That is a deliberate go-live decision,
+  not a side effect of installing.
 tools: ""
 readme: README-atlas.md
 tags:

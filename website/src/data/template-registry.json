@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-09T17:27:17.404Z",
+  "generated": "2026-09-10T05:31:47.287Z",
   "dctDocsBase": "https://dct.sovereignsky.no",
   "uisDocsBase": "https://uis.sovereignsky.no",
   "categories": [
@@ -953,7 +953,7 @@
       "description": "Norway's civil-society sector as a REST API — municipality-level indicators of humanitarian need, and the NGOs and local chapters that respond to them.",
       "category": "APPLICATION",
       "install_type": "application",
-      "abstract": "Installs the Atlas data platform as one application: a PostgreSQL database with\nits migrations, a Dagster code location running the ingest and dbt transforms,\nand a PostgREST API over the curated api_v1 views.\n\nThe data is an open semantic layer over Norwegian public sources — SSB\nstatistics, FHI public-health and living-conditions indicators, Bufdir child-poverty\nfigures and the Brønnøysund business register — joined to NGO supply data, so\nthat humanitarian need and the organisations responding to it can be queried\ntogether at kommune level.\n\nThe API is self-describing: meta_sources, meta_endpoints and meta_dimensions let\na consumer discover what is available without out-of-band documentation.\n\nA fresh install serves an empty API until the first pipeline run — the schema and\ngrants exist from install, the data arrives on the ingest schedule. Exports\napi-url for other applications to consume.",
+      "abstract": "Installs the Atlas data platform as one application: a PostgreSQL database with\nits migrations, a Dagster code location running the ingest and dbt transforms,\nand a PostgREST API over the curated api_v1 views.\n\nThe data is an open semantic layer over Norwegian public sources — SSB\nstatistics, FHI public-health and living-conditions indicators, Bufdir child-poverty\nfigures and the Brønnøysund business register — joined to NGO supply data, so\nthat humanitarian need and the organisations responding to it can be queried\ntogether at kommune level.\n\nThe API is self-describing: meta_sources, meta_endpoints and meta_dimensions let\na consumer discover what is available without out-of-band documentation.\n\nA fresh install serves an empty API until the first pipeline run — the schema and\ngrants exist from install, the data arrives on the ingest schedule. Exports\napi-url for other applications to consume.\n\nInstalling does not start anything: the schedules ship stopped, so no data is\nfetched until an operator turns them on. That is a deliberate go-live decision,\nnot a side effect of installing.",
       "tools": "",
       "readme": "README-atlas.md",
       "tags": [
