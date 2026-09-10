@@ -42,12 +42,12 @@ decision.
 **First ingest loads roughly 2.9 million rows** across 47 `raw` tables and 60 `marts` tables, from
 about 40 sources, in a single pass.
 
-**Once schedules are on**, Atlas polls on this cadence (Europe/Oslo):
+**Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
+`operational.cadence` in the artifact at pin `v20260910-bfda7b6`:
 
 | when | what |
 |---|---|
 | Sunday 02:00 | ~37 annual public-sector sources — SSB, FHI, Bufdir |
-| Sunday 03:30 | scraper-based sources |
 | 1st of month, 01:00 | SSB Klass classifications (kommune/fylke) |
 | Daily 05:00 | dbt transform and publish — no external calls |
 
