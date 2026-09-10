@@ -386,8 +386,69 @@ and the fact it can go stale. That is a deliberate stopgap, not the design.
 - [ ] At authoring time — not build time — read `operational:` from the artifact at the pinned digest
       and generate the section, so a pin bump produces one diff containing both the new pin and the
       operational text it implies
-- [ ] Fail the bump if the artifact has no `operational:` block, rather than silently emitting nothing
-- [ ] Remove the hand-maintained duplication from `README-atlas.md` once generated
+- [ ] **Treat a missing `operational:` as "not adoptable yet", never as an error** — see the contract
+      below. If this catalogue ever requires it for *listing*, that is legitimate, but it must be
+      stated as **the catalogue's** rule, not the platform's, so a tenant reading a refusal knows who
+      is refusing (`tor-agent`, #540)
+- [ ] **Assert `first_data.jobs` is a sequence.** Order is meaningful — both UIS renderers join it
+      with `->` — and a tenant who writes a scalar there gets a single job name and no complaint from
+      anything. This is the one shape worth checking at authoring time
+- [ ] Remove the hand-maintained duplication from `README-atlas.md` once generated. **Not urgent** —
+      a labelled copy that a novice can read today beats an empty section
+
+### The `operational:` contract, as measured by `tor-agent` (#540)
+
+**Supported, documented, optional.** Nothing in UIS requires it: `_validate_template_info` does not
+mention it, no path returns non-zero on its absence, and top-level keys are not allowlisted at all —
+unknown ones are ignored by design. (`config:` keys *are* allowlisted, because a typo there silently
+drops a `configure` flag.)
+
+These twelve paths and no others:
+
+```
+operational.automation
+operational.timezone
+operational.install.{deploys, takes, note}
+operational.first_data.{why, how, jobs, takes}
+operational.cadence[].{cron, what}
+operational.external_services
+operational.unscheduled
+```
+
+⚠️ **UIS reads them and validates nothing** — no required subfields, no type checks beyond "a list
+joins, a scalar prints".
+
+**Why it is deliberately not required**, and the argument is worth keeping: a mandatory field whose
+content nothing can verify produces filler, and *a wrong `automation:` line is worse than a missing
+one* — it is the line an operator acts on. An application that deploys one service and runs nothing
+has nothing useful to say here and should not be made to say it.
+
+### 🔴 The same critique applies to this repository's own `validateSource()`
+
+atlas's formulation (#538), via `tor-agent`:
+
+> a guard that checks a field is **well-formed** does not check that it is **true**
+
+`validateSource()` is exactly a well-formedness guard. It proves `source.digest` matches
+`sha256:` + 64 hex; **it proves nothing about whether that digest is the artifact the application
+published.** A digest for a different artifact, or a stale one, passes every check this repository
+has. What actually establishes truth is the three-source comparison done by hand at authoring time —
+which is discipline, not enforcement, and discipline is what fails on the tenth bump at 17:00.
+
+- [ ] Phase 7 should therefore **also** fetch the release asset for the pinned tag and assert its
+      `digest` equals the committed `source.digest`, failing the bump if they disagree. Same
+      authoring-time moment, one more HTTPS GET, and it converts today's habit into a check
+
+## UIS's half is shipped — and I have not verified it
+
+`tor-agent` reports `uis template info` rendering `operational` in **1.6.44** and the install
+completion summary in **1.6.45**, which between them should close the dead end `imac` measured.
+
+⚠️ **Taken on their word.** There is no UIS on this host, so this repository cannot test either
+surface. Given that this entire phase exists because a field was verified as correct and never
+checked for being *displayed*, "tor-agent says it renders" is not the same class of evidence as
+`imac`'s 0-match grep that started it. Worth one confirming grep on a real install before anyone
+records the dead end as closed.
 
 Authoring time is the right moment because **the moment the two could diverge is the bump itself**.
 Build-time generation would need a network call in a pipeline deliberately kept hermetic; a
