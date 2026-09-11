@@ -39,11 +39,13 @@ consumer discover what is available without any out-of-band documentation.
 external service is contacted, until an operator turns them on. Turning them on is the go-live
 decision.
 
-**First ingest loads roughly 2.9 million rows** across 47 `raw` tables and 60 `marts` tables, from
-about 40 sources, in a single pass.
+**First ingest loads roughly 4.1 million rows** across 48 `raw` tables and 64 `marts` tables, from
+about 41 sources. That is `imac`'s measured 2,906,194 plus the 1,173,878-record Enhetsregisteret bulk
+load, so the row count is arithmetic on two measured figures — the combined wall time is **not**
+measured and is deliberately not stated.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260910-bfda7b6`:
+`operational.cadence` in the artifact at pin `v20260911-f4bf175`:
 
 | when | what |
 |---|---|
@@ -70,23 +72,42 @@ Enabling the schedules does **not** backfill. Every schedule is `on_cron`, which
 so a Thursday install waits until Sunday 02:00 for raw data, and until the 1st for the monthly
 sources. The API stays empty in the meantime, with nothing to explain why.
 
-To get data immediately, launch these four jobs from the Dagster UI, **in this order**:
+To get data immediately, launch these five jobs from the Dagster UI, **serially, in exactly this
+order**:
 
 | order | job | ~time |
 |---|---|---|
 | 1 | `annual_sources_refresh` | 6.3 min |
 | 2 | `klass_refresh` | 1.0 min |
 | 3 | `seed_sources_refresh` | 0.8 min |
-| 4 | `transform_and_publish` | 2.8 min |
+| 4 | `brreg_bootstrap` | **not yet measured** |
+| 5 | `transform_and_publish` | 2.8 min |
 
-**Total ~11 minutes**, producing ~2.9M rows across 47 `raw` and 64 `marts` tables, 13 `api_v1` views
-and 14 API endpoints.
+**The order is not arbitrary.** `seed_sources_refresh` contains `raw/_migrations` and runs third, so
+the migrations apply after two source jobs have already written. That is safe because they are
+idempotent, but reordering has not been tested.
 
-Measured end to end by `imac` on a wiped cluster from this published pin (urb-agents #520): 10.8
-minutes, 2,906,194 rows, zero failures. `seed_sources_refresh` is the job that covers
-`raw/brreg_enheter` — without it that source stays empty and the freshness test goes red.
+Together these produce **~4.1M rows** across 48 `raw` and 64 `marts` tables from ~41 sources — the
+1,173,878-record Enhetsregisteret bulk load on top of `imac`'s measured 2,906,194.
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260910-d7fa93c`.** It is
+⚠️ **Do not read "~11 minutes" as the total.** That figure is `imac`'s measurement of the first four
+jobs on a clean cluster (10.8 min, 2,906,194 rows, zero failures — urb-agents #507, #520) and
+**predates `brreg_bootstrap`**. The Brreg download alone is 210 MB / 52 s and its database write time
+is not yet measured, so the combined wall time is unknown rather than estimated.
+
+### 🔴 `brreg_bootstrap` is the one most likely to be skipped
+
+It has **no schedule and no automation condition, on purpose.** Re-running a 1.17M-record bulk load
+against a populated database is the only genuinely destructive-looking operation in this pipeline, so
+nothing self-triggers it. **Run it once, here.**
+
+- **Skipping it** leaves the organisation register empty, with nothing saying why.
+- **Running it twice** is safe — it upserts and never truncates — but pointless.
+
+It is deliberately *not* in the unscheduled list further down: that list means *cannot* run.
+`brreg_bootstrap` is the opposite — it **must** run once, on day one, and then be left alone.
+
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260911-f4bf175`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this

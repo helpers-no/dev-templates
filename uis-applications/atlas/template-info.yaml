@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260910-bfda7b6"
+version: "v20260911-f4bf175"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -67,27 +67,21 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning, three independent sources in agreement (urb-agents #630):
-#   atlas's own message      sha256:39a8b1d5…ac4ac
-#   release asset            .../releases/download/v20260910-bfda7b6/uis-artifact.json
-#   GHCR docker-content-digest for the tag
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #715):
+#   release asset  .../releases/download/v20260911-f4bf175/uis-artifact.json
+#   GHCR docker-content-digest for the tag  — agrees
+#   artifact blob pulled AT the digest: hash matches the manifest, and it declares
+#   kind: application, id: atlas, tag: v20260911-f4bf175
 #
-# No cluster load was required for this bump, and that was measured rather than taken on
-# trust. The image manifest digest DOES change between tags (8a676e54 -> 8052692b), so
-# "functionally identical" is not the same claim as "the same image". Comparing the two
-# amd64 manifests: 29 of 31 layers bit-identical; layers 26-27 differ in digest but their
-# CONTENTS are identical -- 1112 files compared, zero added, removed or changed -- so the
-# difference is tar metadata from a non-reproducible build, not code. cadence.py and
-# schedules.py live in the bit-identical layers. The runtime filesystem is therefore
-# content-identical to the image imac loaded at d7fa93c (#517).
-#
-# ⚠️ Do NOT pin v20260910-4e9f13c or v20260910-6429719. Their first_data names three
-# jobs and omits brreg-enheter, so a user following the artifact ends with that source
-# empty and the freshness test red (imac, #507).
+# ⚠️ atlas published TWO artifacts in seven minutes on 2026-09-11. Only this one is
+# the Enhetsregisteret definition:
+#   v20260911-908209f  22:24:57Z  first_data.jobs = 4  — NO brreg_bootstrap, do not pin
+#   v20260911-f4bf175  22:31:45Z  first_data.jobs = 5  — brreg_bootstrap present
+# Selected by decoding both and comparing the job list, not by publish order.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260910-bfda7b6
-  digest: "sha256:39a8b1d52b71249e188b7c536f8906254fd293f5d29d522df2bc9d59e08ac4ac"
+  tag: v20260911-f4bf175
+  digest: "sha256:d25b99d1b0df3c969ae62dc4a870b9be2a685cd679111df4fa4766893494c699"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public
