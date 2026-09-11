@@ -36,7 +36,27 @@ IMG=terchris/atlas-data                                  # the image repo; artif
 
 ---
 
-## 1. Verify the digest — three independent sources
+## 1. Verify the digest — one command
+
+```bash
+bash scripts/verify-application-pin.sh --app atlas --tag "$TAG" --expect-digest sha256:...
+```
+
+Exits non-zero and writes nothing if anything disagrees. It asserts all five checks below, prints
+`operational.first_data.jobs` **with its length and order** so step 4 has what it needs, and leaves
+the decoded artifact at `/tmp/artifact-template-info.yaml`.
+
+Falsified four ways when it was written: wrong expected digest, a tag that does not exist, an older
+tag with the current digest expected, and an artifact published before release assets existed — each
+rejected, the good pin still passing.
+
+⚠️ **A missing release asset fails the script deliberately**, with a note rather than a verdict:
+that artifact is *not adoptable by this check*, and you verify by hand below and say so on the bus.
+
+The manual form follows, because a script you cannot reconstruct is a script you cannot trust when
+it disagrees with you.
+
+### The same thing by hand — three independent sources
 
 Never pin a digest you were handed without checking it. All three must agree.
 
