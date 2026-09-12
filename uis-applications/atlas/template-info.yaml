@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260912-50fded5"
+version: "v20260912-8930afb"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -33,9 +33,11 @@ abstract: |-
   grants exist from install, the data arrives on the ingest schedule. Exports
   api-url for other applications to consume.
 
-  Installing does not start anything: the schedules ship stopped, so no data is
-  fetched until an operator turns them on. That is a deliberate go-live decision,
-  not a side effect of installing.
+  Installing does not start anything: the schedules and sensors ship stopped, so
+  no data is fetched until an operator turns them on. That is a deliberate go-live
+  decision, not a side effect of installing — and enabling them starts the NEXT
+  scheduled run rather than backfilling, so a fresh install stays empty until the
+  first-data jobs are launched by hand.
 tools: ""
 readme: README-atlas.md
 tags:
@@ -67,22 +69,23 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #743):
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #764):
 #   release asset and GHCR docker-content-digest agree on the ARTIFACT digest
 #   blob pulled AT that digest hashes to the manifest
-#   declares kind: application, id: atlas, tag: v20260912-50fded5
-#   operational: byte-identical to the previous pin — no prose re-derived
+#   declares kind: application, id: atlas, tag: v20260912-8930afb
 #
-# 🔴 THIS DEFINITION CONTAINS TWO DIGESTS. The one below is the ARTIFACT digest —
-# what UIS pulls and what belongs here. The definition also declares
-#   sha256:86c5aed1…  the code-location IMAGE digest (new in atlas PR #250)
-# which is a different thing and must NOT be pinned here. Both are sha256 + 64 hex
-# and both are real; the verifier resolves the artifact digest independently from
-# the release asset and GHCR, and flags the other one as not-the-one.
+# 🔴 TWO DIGESTS in this definition. Below is the ARTIFACT digest. The definition
+# also declares sha256:c8f8a6af… — the code-location IMAGE digest — which must NOT
+# be pinned here.
+#
+# This pin catches up THREE nominations: e348dab (16:28), fb9bbb2 (16:54) and
+# 8930afb (17:25). 8930afb descends from the other two, so one pin lands all three;
+# they are not alternatives. The catalogue sat on 50fded5 because two of the three
+# were nominated on threads this agent was not on (#758, #760) — see #764.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260912-50fded5
-  digest: "sha256:2b4c97f27f5f099f55275ebdebf400c10766eb7381abdf910c6dfa28e1a0b4ee"
+  tag: v20260912-8930afb
+  digest: "sha256:d260135a9d10d3fa119322bfae6b1f2b270a067f21551f593d96b6965fed9dec"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public

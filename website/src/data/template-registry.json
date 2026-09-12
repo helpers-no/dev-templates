@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-12T09:35:06.789Z",
+  "generated": "2026-09-12T17:29:50.827Z",
   "dctDocsBase": "https://dct.sovereignsky.no",
   "uisDocsBase": "https://uis.sovereignsky.no",
   "categories": [
@@ -948,12 +948,12 @@
     {
       "id": "atlas",
       "folder": "uis-applications/atlas",
-      "version": "v20260912-50fded5",
+      "version": "v20260912-8930afb",
       "name": "Atlas Data",
       "description": "Norway's civil-society sector as a REST API — municipality-level indicators of humanitarian need, and the NGOs and local chapters that respond to them.",
       "category": "APPLICATION",
       "install_type": "application",
-      "abstract": "Installs the Atlas data platform as one application: a PostgreSQL database with\nits migrations, a Dagster code location running the ingest and dbt transforms,\nand a PostgREST API over the curated api_v1 views.\n\nThe data is an open semantic layer over Norwegian public sources — SSB\nstatistics, FHI public-health and living-conditions indicators, Bufdir child-poverty\nfigures and the Brønnøysund business register — joined to NGO supply data, so\nthat humanitarian need and the organisations responding to it can be queried\ntogether at kommune level.\n\nThe API is self-describing: meta_sources, meta_endpoints and meta_dimensions let\na consumer discover what is available without out-of-band documentation.\n\nA fresh install serves an empty API until the first pipeline run — the schema and\ngrants exist from install, the data arrives on the ingest schedule. Exports\napi-url for other applications to consume.\n\nInstalling does not start anything: the schedules ship stopped, so no data is\nfetched until an operator turns them on. That is a deliberate go-live decision,\nnot a side effect of installing.",
+      "abstract": "Installs the Atlas data platform as one application: a PostgreSQL database with\nits migrations, a Dagster code location running the ingest and dbt transforms,\nand a PostgREST API over the curated api_v1 views.\n\nThe data is an open semantic layer over Norwegian public sources — SSB\nstatistics, FHI public-health and living-conditions indicators, Bufdir child-poverty\nfigures and the Brønnøysund business register — joined to NGO supply data, so\nthat humanitarian need and the organisations responding to it can be queried\ntogether at kommune level.\n\nThe API is self-describing: meta_sources, meta_endpoints and meta_dimensions let\na consumer discover what is available without out-of-band documentation.\n\nA fresh install serves an empty API until the first pipeline run — the schema and\ngrants exist from install, the data arrives on the ingest schedule. Exports\napi-url for other applications to consume.\n\nInstalling does not start anything: the schedules and sensors ship stopped, so\nno data is fetched until an operator turns them on. That is a deliberate go-live\ndecision, not a side effect of installing — and enabling them starts the NEXT\nscheduled run rather than backfilling, so a fresh install stays empty until the\nfirst-data jobs are launched by hand.",
       "tools": "",
       "readme": "README-atlas.md",
       "tags": [
@@ -995,8 +995,8 @@
       "context": "uis",
       "source": {
         "artifact": "ghcr.io/terchris/atlas-data/uis",
-        "tag": "v20260912-50fded5",
-        "digest": "sha256:2b4c97f27f5f099f55275ebdebf400c10766eb7381abdf910c6dfa28e1a0b4ee"
+        "tag": "v20260912-8930afb",
+        "digest": "sha256:d260135a9d10d3fa119322bfae6b1f2b270a067f21551f593d96b6965fed9dec"
       },
       "visibility": "public",
       "configureCommand": "uis template install atlas",

@@ -35,9 +35,12 @@ consumer discover what is available without any out-of-band documentation.
 
 ### What happens after you install
 
-**Installing starts nothing.** The Dagster schedules ship **stopped**. No data is fetched, and no
-external service is contacted, until an operator turns them on. Turning them on is the go-live
-decision.
+**Installing starts nothing.** The Dagster **schedules and sensors** ship **stopped**. No data is
+fetched, and no external service is contacted, until an operator turns them on. Turning them on is the
+go-live decision.
+
+⚠️ **Turning them on does not backfill.** It starts the *next* scheduled run, so a fresh install stays
+empty until the first-data jobs below are launched by hand.
 
 **First ingest loads roughly 4.1 million rows** across 48 `raw` tables and 64 `marts` tables, from
 about 41 sources. That is `imac`'s measured 2,906,194 plus the 1,173,878-record Enhetsregisteret bulk
@@ -45,7 +48,7 @@ load, so the row count is arithmetic on two measured figures — the combined wa
 measured and is deliberately not stated.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260912-50fded5`:
+`operational.cadence` in the artifact at pin `v20260912-8930afb`:
 
 | when | what |
 |---|---|
@@ -144,7 +147,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches`, `frr` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260912-50fded5`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260912-8930afb`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
