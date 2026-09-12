@@ -165,11 +165,20 @@ if kind!='application': fails.append(f"kind is {kind!r}, expected 'application'"
 if aid!=app:           fails.append(f"artifact id is {aid!r}, expected {app!r} (UIS refuses a mismatch)")
 if atag!=tag:          fails.append(f"artifact's own tag is {atag!r}, expected {tag!r}")
 has_op = re.search(r'^operational:', data, re.M) is not None
+# From atlas PR #250 the code_location block carries its own `digest:` beside `tag:`.
+# That is the IMAGE digest and is NOT the artifact digest being pinned. The script
+# never reads it -- this exists so a human reading the decoded file at 02:00 does not
+# copy the wrong one. Two digests in one file is a trap worth labelling.
+cl_digest = re.search(r'^[ \t]+digest:[ \t]*(\S+)', data, re.M)
 jobs = re.search(r'^\s*jobs:\s*\[(.*?)\]', data, re.M|re.S)
 for f in fails: print("FAIL "+f)
 print("INFO blob hash matches manifest" if actual==blob else "")
 print(f"INFO kind={kind} id={aid} tag={atag}")
 print(f"INFO operational block present: {has_op}")
+if cl_digest:
+    print(f"NOTE the definition also carries a code-location IMAGE digest: {cl_digest.group(1)[:26]}…")
+    print("NOTE that is NOT the artifact digest you pin. The artifact digest is the one")
+    print("NOTE this script resolved and printed above.")
 if jobs:
     js=[j.strip() for j in jobs.group(1).split(',') if j.strip()]
     print(f"INFO first_data.jobs ({len(js)}, order matters): {', '.join(js)}")
