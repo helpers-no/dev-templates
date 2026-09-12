@@ -216,6 +216,35 @@ validate_template_yaml() {
         fi
     fi
 
+    # An application's README carries prose copied by hand from the artifact's
+    # `operational:` block, each copy labelled with the pin it came from:
+    #
+    #     ...in the artifact at pin `v20260911-f4bf175`.
+    #
+    # That label is the only thing making the copy's staleness visible. On
+    # 2026-09-11 it was itself two bumps out of date -- the marker that exists to
+    # catch staleness had gone stale -- and nothing noticed, because nothing
+    # compared it to source.tag. It is compared here now.
+    #
+    # This does NOT check that the prose is current, only that it does not claim a
+    # pin the entry is not on. Phase 7 replaces the copies with generation.
+    if [[ "$install_type" == "application" ]]; then
+        local src_tag readme_path
+        src_tag=$(_yaml_field "$info_file" "(d.source || {}).tag")
+        readme_path="$template_dir/$readme"
+        if [[ -n "$src_tag" && -f "$readme_path" ]]; then
+            local marker
+            while IFS= read -r marker; do
+                [[ -z "$marker" ]] && continue
+                if [[ "$marker" != "$src_tag" ]]; then
+                    log_error "$template_name: $readme says its prose came from pin '$marker', but source.tag is '$src_tag'"
+                    log_error "  a stale marker hides stale prose — re-derive from the artifact's operational: block"
+                    has_error=true
+                fi
+            done < <(sed -n 's/.*artifact at pin `\([^`]*\)`.*/\1/p' "$readme_path" | sort -u)
+        fi
+    fi
+
     if [[ "$has_error" == "true" ]]; then
         ((ERRORS++)) || true
     else
