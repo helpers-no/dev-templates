@@ -48,17 +48,25 @@ load, so the row count is arithmetic on two measured figures — the combined wa
 measured and is deliberately not stated.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260912-8930afb`:
+`operational.cadence` in the artifact at pin `v20260912-5b46a8a`:
 
 | when | what |
 |---|---|
 | Sunday 02:00 | ~37 annual public-sector sources — SSB, FHI, Bufdir |
 | 1st of month, 01:00 | SSB Klass classifications (kommune/fylke) |
-| Daily 04:00 | Brønnøysundregistrene — the day's Enhetsregister changes (~3,000 records, measured median over 30 days), plus a full re-walk of Frivillighetsregisteret (~727 requests; it has no change feed of its own) |
+| **Every 30 min** (:00, :30) | Brønnøysundregistrene **change feed** — only what moved, ~114 records per cycle at the measured 3.8 changes a minute. Half-hourly because the register is a live subscription, not a daily table |
+| **Every 30 min** (:10, :40) | Brreg **reconciliation into marts** — one incremental model, ten minutes behind each poll |
+| Daily 04:00 | **Frivillighetsregisteret** — a full re-walk of ~72,800 organisations (~727 requests) |
 | Daily 05:00 | dbt transform and publish — no external calls |
 
-The 04:00 feed is deliberately **one hour before** the 05:00 transform, so a day's changes and the
-transform that publishes them reach the API the same morning rather than a day apart.
+**The ten-minute offset is deliberate.** The reconciliation runs at `:10`/`:40` rather than alongside
+the feed at `:00`/`:30` because firing on the same tick would reconcile data the feed had not yet
+written, leaving the dimension permanently one cycle behind.
+
+⚠️ **Frivillighetsregisteret is daily and did *not* move to the feed's cadence.** It has no change
+feed, so every refresh is the whole register — ~727 requests. At half-hourly that would be ~35,000
+requests a day against a public-sector API, a 48× increase on someone else's service. The two Brreg
+ingests are on separate schedules for that reason and must stay that way.
 
 **The external services Atlas calls** are SSB (Statistics Norway), FHI (Folkehelseinstituttet),
 Bufdir and Brønnøysundregistrene. All are public-sector APIs. The cadence is deliberately
@@ -147,7 +155,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches`, `frr` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260912-8930afb`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260912-5b46a8a`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
