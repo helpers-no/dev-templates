@@ -293,6 +293,30 @@ Your local file is not the deliverable — the raw URL on `main` is what UIS rea
 
 ---
 
+## 7b. 🔴 Wait for the raw CDN before telling anyone to clear a cache
+
+**`raw.githubusercontent.com` caches for five minutes.** Measured 2026-09-12: after a push, the API
+and `git log` showed the new commit immediately while the raw endpoint served the previous pin for
+several more minutes — `cache-control: max-age=300`, with `source-age` counting up to it.
+
+```bash
+# the deliverable is what the raw URL serves, not what git says
+until [ "$(curl -s "$RAW_URL" | jq -r '.templates[]|select(.id=="atlas")|.source.tag')" = "$TAG" ]; do sleep 15; done
+```
+
+🔴 **This interacts badly with step 8, and the wrong order makes things worse rather than slower.**
+UIS caches the catalogue for an hour. So if the installer clears its cache *during* the five-minute
+window, it re-fetches the **stale** pin and caches that for another hour — worse than not clearing at
+all, and it looks exactly like the catalogue never being updated.
+
+**Confirm the raw URL serves the new tag, and only then say "clear the cache".**
+
+⚠️ `--drift` reports **BEHIND** during this window, and that is correct rather than a false positive:
+it reads the same raw URL UIS reads, so while the CDN is stale the published catalogue genuinely is
+behind. Do not "fix" it by making the check read git.
+
+---
+
 ## 8. 🔴 Tell the installer to clear the registry cache
 
 ```
