@@ -60,6 +60,28 @@ status` before every commit on these nights.
 
 ---
 
+## Detecting that you are behind, without being told
+
+A nomination can be made on a thread this agent is not on — it happened three times in one afternoon
+(urb-agents #758, #760, #764), no ring arrived, and the catalogue sat three artifacts behind until a
+tester forced a catalogue read for an unrelated reason. **A missed ring is silent.**
+
+```bash
+bash scripts/verify-application-pin.sh --app atlas --drift
+```
+
+Compares the **published** catalogue pin against the newest artifact the application has published,
+by asking both registries directly. It needs no ring, no thread and no nomination — which is the
+point, because those are the things that failed.
+
+Exits non-zero when behind, and prints the command to fix it. Run it at the start of a session and
+after any gap.
+
+⚠️ If either side is unreadable it reports **UNKNOWN, not clean**, and still exits non-zero. A drift
+check that goes quiet when it cannot see is the failure it exists to prevent.
+
+---
+
 ## 0. Pre-flight
 
 `/opt/homebrew/bin` is not on `PATH` in a non-interactive shell, and this host has no `node`/`docker`:

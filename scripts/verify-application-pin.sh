@@ -27,7 +27,7 @@
 
 set -uo pipefail
 
-APP=""; TAG=""; EXPECT=""; RELEASE_REPO=""; OUT="/tmp/artifact-template-info.yaml"
+APP=""; TAG=""; EXPECT=""; RELEASE_REPO=""; OUT="/tmp/artifact-template-info.yaml"; DRIFT=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --app) APP="${2:?}"; shift 2 ;;
@@ -35,17 +35,26 @@ while [ $# -gt 0 ]; do
     --expect-digest) EXPECT="${2:?}"; shift 2 ;;
     --release-repo) RELEASE_REPO="${2:?}"; shift 2 ;;
     --out) OUT="${2:?}"; shift 2 ;;
+    --drift) DRIFT=1; shift ;;
     -h|--help)
       printf 'usage: %s --app <id> --tag <tag> [--expect-digest sha256:...] [--release-repo owner/name] [--out path]\n' "$0"; exit 0 ;;
     *) printf 'unknown argument: %s\n' "$1" >&2; exit 2 ;;
   esac
 done
-[ -n "$APP" ] && [ -n "$TAG" ] || { printf 'need --app and --tag\n' >&2; exit 2; }
+[ -n "$APP" ] || { printf 'need --app\n' >&2; exit 2; }
+[ -n "$TAG" ] || [ -n "$DRIFT" ] || { printf 'need --tag (or --drift)\n' >&2; exit 2; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 INFO="$REPO_ROOT/uis-applications/$APP/template-info.yaml"
 [ -f "$INFO" ] || { printf 'no committed entry at %s\n' "$INFO" >&2; exit 2; }
+
+tok_for_early() {
+  curl -s "https://ghcr.io/token?scope=repository%3A$(printf '%s' "$1" | sed 's#/#%2F#g')%3Apull&service=ghcr.io" \
+    | python3 -c 'import json,sys
+try: print(json.load(sys.stdin)["token"])
+except Exception: print("")'
+}
 
 FAIL=0
 ok()   { printf '  \033[0;32m✓\033[0m %s\n' "$1"; }
@@ -65,6 +74,50 @@ if [ -z "$RELEASE_REPO" ]; then
   RELEASE_REPO="$(sed -n 's#.*https://github.com/\([A-Za-z0-9_.-]\{1,\}/[A-Za-z0-9_.-]\{1,\}\).*#\1#p' "$INFO" | head -1)"
 fi
 [ -n "$RELEASE_REPO" ] || { printf 'could not determine the release repo; pass --release-repo\n' >&2; exit 2; }
+
+# ── drift: is the PUBLISHED catalogue behind what the application has published? ──
+#
+# The chain's detection gap (urb-agents #764): nominations can be made on threads
+# this agent is not on, so a ring may never arrive and a stale pin is silent. This
+# asks the two registries directly and needs no ring, no thread and no nomination.
+if [ -n "$DRIFT" ]; then
+  LIVE_URL="https://raw.githubusercontent.com/helpers-no/dev-templates/main/website/src/data/template-registry.json"
+  LIVE_TAG="$(curl -s --max-time 30 "$LIVE_URL" | python3 -c '
+import json,sys
+try:
+    d=json.load(sys.stdin)
+    print([t for t in d["templates"] if t["id"]==sys.argv[1]][0]["source"]["tag"])
+except Exception: print("")' "$APP")"
+  TOKD="$(tok_for_early "$REPO_PATH")"
+  NEWEST="$(curl -s -H "Authorization: Bearer $TOKD" "https://ghcr.io/v2/$REPO_PATH/tags/list" \
+    | python3 -c '
+import json,sys,subprocess
+tags=json.load(sys.stdin).get("tags",[])
+best=None
+for t in tags:
+    try:
+        out=subprocess.run(["curl","-sL","--max-time","12",
+            f"https://github.com/{sys.argv[1]}/releases/download/{t}/uis-artifact.json"],
+            capture_output=True,text=True).stdout
+        d=json.loads(out); p=d.get("published_at")
+        if p and (best is None or p>best[1]): best=(t,p)
+    except Exception: pass
+print(best[0] if best else "")' "$RELEASE_REPO")"
+  printf '\nDrift check for %s\n' "$APP"
+  printf '  published catalogue pins  %s\n' "${LIVE_TAG:-<unreadable>}"
+  printf '  newest published artifact %s\n\n' "${NEWEST:-<unreadable>}"
+  if [ -z "$LIVE_TAG" ] || [ -z "$NEWEST" ]; then
+    bad "could not read both sides; drift is UNKNOWN, not clean"
+    exit 1
+  elif [ "$LIVE_TAG" = "$NEWEST" ]; then
+    ok "catalogue is current"
+    exit 0
+  else
+    bad "CATALOGUE IS BEHIND — a nomination may never have reached this agent"
+    note "pin it: scripts/verify-application-pin.sh --app $APP --tag $NEWEST"
+    exit 1
+  fi
+fi
 
 printf '\nVerifying %s at %s\n' "$APP" "$TAG"
 printf '  artifact     %s\n  release repo %s\n\n' "$ARTIFACT" "$RELEASE_REPO"
