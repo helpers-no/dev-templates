@@ -16,6 +16,50 @@ stage that catches broken links.
 
 ---
 
+## When the tester verifies FIRST — the four-stage flow
+
+The steps below assume the normal order: you pin, then the tester installs from the catalogue. **For a
+change with external blast radius that order is inverted**, and you are stage 3 rather than stage 1:
+
+```
+1. the application publishes its artifact, digest-verified.   YOU PUBLISH NOTHING.
+2. the tester injects a LOCAL registry entry, pinned to that digest, and verifies.
+3. on the tester's verdict, YOU pin that same digest in the real catalogue.
+4. the tester re-installs from the catalogue — which is then the test of your entry.
+```
+
+⚠️ **If someone rings you at stage 3 and the tester has not reported, that ring is wrong. Say so.**
+
+### Hand the tester the entry body before it verifies
+
+Otherwise stage 2 tests **the artifact** and says nothing about **your entry** — the tester would be
+verifying a hand-written local entry, not the one you will publish.
+
+```bash
+# stage 2: edit the pin in template-info.yaml, then
+bash scripts/emit-application-entry.sh --app atlas --out /tmp/atlas-handover
+```
+
+That writes two files: the entry alone, and a complete one-entry registry the tester can point
+`REGISTRY_URL_PRIMARY` at as a `file://` URL. Hand over the registry file; **keep the entry file.**
+
+```bash
+# stage 3, immediately before committing
+bash scripts/emit-application-entry.sh --app atlas --check /tmp/atlas-handover.entry.json
+```
+
+`IDENTICAL` means you are publishing the bytes that were verified. `DIFFERS` prints the field that
+moved and you do not publish until it is explained.
+
+**This does not make stage 4 a formality.** The publish is exactly where bytes can change, and stage 4
+is what catches that — the handover makes the second proof *cheap*, not unnecessary.
+
+⚠️ **Between stages 2 and 3 your working tree carries an unpublished pin.** The generator rewrites
+`website/src/data/template-registry.json` when you emit. Do not push until the verdict is in; `git
+status` before every commit on these nights.
+
+---
+
 ## 0. Pre-flight
 
 `/opt/homebrew/bin` is not on `PATH` in a non-interactive shell, and this host has no `node`/`docker`:
