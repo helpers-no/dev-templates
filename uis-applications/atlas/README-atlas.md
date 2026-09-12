@@ -45,13 +45,17 @@ load, so the row count is arithmetic on two measured figures — the combined wa
 measured and is deliberately not stated.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260911-f4bf175`:
+`operational.cadence` in the artifact at pin `v20260911-03a1338`:
 
 | when | what |
 |---|---|
 | Sunday 02:00 | ~37 annual public-sector sources — SSB, FHI, Bufdir |
 | 1st of month, 01:00 | SSB Klass classifications (kommune/fylke) |
+| Daily 04:00 | Brønnøysundregistrene — the day's Enhetsregister changes (~3,000 records, measured median over 30 days), plus a full re-walk of Frivillighetsregisteret (~727 requests; it has no change feed of its own) |
 | Daily 05:00 | dbt transform and publish — no external calls |
+
+The 04:00 feed is deliberately **one hour before** the 05:00 transform, so a day's changes and the
+transform that publishes them reach the API the same morning rather than a day apart.
 
 **The external services Atlas calls** are SSB (Statistics Norway), FHI (Folkehelseinstituttet),
 Bufdir and Brønnøysundregistrene. All are public-sector APIs. The cadence is deliberately
@@ -72,7 +76,7 @@ Enabling the schedules does **not** backfill. Every schedule is `on_cron`, which
 so a Thursday install waits until Sunday 02:00 for raw data, and until the 1st for the monthly
 sources. The API stays empty in the meantime, with nothing to explain why.
 
-To get data immediately, launch these five jobs from the Dagster UI, **serially, in exactly this
+To get data immediately, launch these six jobs from the Dagster UI, **serially, in exactly this
 order**:
 
 | order | job | ~time |
@@ -81,19 +85,37 @@ order**:
 | 2 | `klass_refresh` | 1.0 min |
 | 3 | `seed_sources_refresh` | 0.8 min |
 | 4 | `brreg_bootstrap` | **not yet measured** |
-| 5 | `transform_and_publish` | 2.8 min |
+| 5 | `brreg_change_feed` | **not yet measured** |
+| 6 | `transform_and_publish` | 2.8 min |
 
-**The order is not arbitrary.** `seed_sources_refresh` contains `raw/_migrations` and runs third, so
-the migrations apply after two source jobs have already written. That is safe because they are
-idempotent, but reordering has not been tested.
+**The order is not arbitrary**, for two separate reasons:
+
+- `seed_sources_refresh` contains `raw/_migrations` and runs third, so the migrations apply after two
+  source jobs have already written. That is safe because they are idempotent, but reordering has not
+  been tested.
+- `brreg_change_feed` runs **immediately after** `brreg_bootstrap` because the bootstrap seeds the
+  feed's watermark from the snapshot's own date. The feed has nothing to start from until the
+  bootstrap has run — and run first, it **fails loudly** rather than silently walking history: it
+  refuses to start without a watermark.
 
 Together these produce **~4.1M rows** across 48 `raw` and 64 `marts` tables from ~41 sources — the
 1,173,878-record Enhetsregisteret bulk load on top of `imac`'s measured 2,906,194.
 
-⚠️ **Do not read "~11 minutes" as the total.** That figure is `imac`'s measurement of the first four
-jobs on a clean cluster (10.8 min, 2,906,194 rows, zero failures — urb-agents #507, #520) and
-**predates `brreg_bootstrap`**. The Brreg download alone is 210 MB / 52 s and its database write time
-is not yet measured, so the combined wall time is unknown rather than estimated.
+> ⚠️ **64 marts, and the artifact disagrees with itself about that.** At this pin
+> `operational.first_load` says **60** marts tables while `operational.first_data.takes` says **64**.
+> This page uses **64** because that is the number `imac` counted on a real install (urb-agents #520),
+> not because one field of the artifact was preferred over the other. Unreconciled upstream and
+> flagged rather than picked silently — the row total (~4.1M) is unaffected either way.
+
+⚠️ **Do not read "~11 minutes" as the total.** That figure is `imac`'s measurement of the four jobs
+that existed when it was taken — `annual_sources_refresh`, `klass_refresh`, `seed_sources_refresh`
+and `transform_and_publish` — on a clean cluster (10.8 min, 2,906,194 rows, zero failures; urb-agents
+#507, #520). It **predates both Brreg jobs**. The bootstrap's download alone is 210 MB / 52 s and its
+write time is not measured, and the change feed is not measured at all, so the combined wall time is
+**unknown rather than estimated**.
+
+(Stated by naming the four jobs rather than "the first four", because that phrase silently stopped
+being true when the list grew from four to six.)
 
 ### 🔴 `brreg_bootstrap` is the one most likely to be skipped
 
@@ -107,7 +129,22 @@ nothing self-triggers it. **Run it once, here.**
 It is deliberately *not* in the unscheduled list further down: that list means *cannot* run.
 `brreg_bootstrap` is the opposite — it **must** run once, on day one, and then be left alone.
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260911-f4bf175`.** It is
+### `brreg_change_feed` is different again — run it once here, then leave it to its schedule
+
+Unlike the bootstrap, the change feed **is** scheduled: once automation is on it runs daily at 04:00.
+You launch it by hand exactly once, in the sequence above, because a fresh install has no data for the
+first nightly run to apply a delta to.
+
+So the three kinds of job on this page are not interchangeable:
+
+| | runs by itself? | run by hand on day one? |
+|---|---|---|
+| the four source/transform jobs | yes, on their crons | yes |
+| `brreg_bootstrap` | **never** — no schedule, no automation condition | yes, exactly once |
+| `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
+| `redcross-branches`, `frr` | no — parked, **cannot** run | no |
+
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260911-03a1338`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this

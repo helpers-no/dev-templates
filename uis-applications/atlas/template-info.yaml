@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260911-f4bf175"
+version: "v20260911-03a1338"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -67,21 +67,19 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #715):
-#   release asset  .../releases/download/v20260911-f4bf175/uis-artifact.json
-#   GHCR docker-content-digest for the tag  — agrees
-#   artifact blob pulled AT the digest: hash matches the manifest, and it declares
-#   kind: application, id: atlas, tag: v20260911-f4bf175
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #721):
+#   release asset and GHCR docker-content-digest agree on the digest
+#   blob pulled AT the digest hashes to the manifest
+#   declares kind: application, id: atlas, tag: v20260911-03a1338
+#   operational.first_data.jobs = 6, brreg_change_feed present
 #
-# ⚠️ atlas published TWO artifacts in seven minutes on 2026-09-11. Only this one is
-# the Enhetsregisteret definition:
-#   v20260911-908209f  22:24:57Z  first_data.jobs = 4  — NO brreg_bootstrap, do not pin
-#   v20260911-f4bf175  22:31:45Z  first_data.jobs = 5  — brreg_bootstrap present
-# Selected by decoding both and comparing the job list, not by publish order.
+# atlas published three artifacts after the previous pin — 30bfbd3 (23:12),
+# d930cd6 (23:30) and 03a1338 (23:47). This is the last of them and the one
+# nominated; the other two are intermediates and must not be pinned.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260911-f4bf175
-  digest: "sha256:d25b99d1b0df3c969ae62dc4a870b9be2a685cd679111df4fa4766893494c699"
+  tag: v20260911-03a1338
+  digest: "sha256:0f27556ac29fd40c79fb671f8f131eedb5c9ade9e778a324a121c80dee0420e0"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public
