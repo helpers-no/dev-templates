@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260912-f232efb"
+version: "v20260912-50fded5"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -67,24 +67,22 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #724):
-#   release asset and GHCR docker-content-digest agree on the digest
-#   blob pulled AT the digest hashes to the manifest
-#   declares kind: application, id: atlas, tag: v20260912-f232efb
-#   operational.first_data.jobs = 6, unchanged
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #743):
+#   release asset and GHCR docker-content-digest agree on the ARTIFACT digest
+#   blob pulled AT that digest hashes to the manifest
+#   declares kind: application, id: atlas, tag: v20260912-50fded5
+#   operational: byte-identical to the previous pin — no prose re-derived
 #
-# URGENT FIX. The previous pin v20260911-03a1338 shipped a migration that fails on
-# real Postgres: 053_raw_brreg_change_feed.sql line 114, `comment on index` without
-# the raw. prefix that `create index` above requires. 053 is transactional, so it
-# rolled back whole and the change feed had no tables at all (imac, #723).
-#
-# This artifact's template-info.yaml differs from the previous one by EXACTLY ONE
-# line — its own code-location tag — and its operational: block is byte-identical.
-# Diffed both before pinning; the SQL fix is in the uis/init layer. Nothing bundled.
+# 🔴 THIS DEFINITION CONTAINS TWO DIGESTS. The one below is the ARTIFACT digest —
+# what UIS pulls and what belongs here. The definition also declares
+#   sha256:86c5aed1…  the code-location IMAGE digest (new in atlas PR #250)
+# which is a different thing and must NOT be pinned here. Both are sha256 + 64 hex
+# and both are real; the verifier resolves the artifact digest independently from
+# the release asset and GHCR, and flags the other one as not-the-one.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260912-f232efb
-  digest: "sha256:a43f9a402f9faf89827b22f1585e8cfce112f209d62866329325a2f9022c7193"
+  tag: v20260912-50fded5
+  digest: "sha256:2b4c97f27f5f099f55275ebdebf400c10766eb7381abdf910c6dfa28e1a0b4ee"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public
