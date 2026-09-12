@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260911-03a1338"
+version: "v20260912-f232efb"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -67,19 +67,24 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #721):
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #724):
 #   release asset and GHCR docker-content-digest agree on the digest
 #   blob pulled AT the digest hashes to the manifest
-#   declares kind: application, id: atlas, tag: v20260911-03a1338
-#   operational.first_data.jobs = 6, brreg_change_feed present
+#   declares kind: application, id: atlas, tag: v20260912-f232efb
+#   operational.first_data.jobs = 6, unchanged
 #
-# atlas published three artifacts after the previous pin — 30bfbd3 (23:12),
-# d930cd6 (23:30) and 03a1338 (23:47). This is the last of them and the one
-# nominated; the other two are intermediates and must not be pinned.
+# URGENT FIX. The previous pin v20260911-03a1338 shipped a migration that fails on
+# real Postgres: 053_raw_brreg_change_feed.sql line 114, `comment on index` without
+# the raw. prefix that `create index` above requires. 053 is transactional, so it
+# rolled back whole and the change feed had no tables at all (imac, #723).
+#
+# This artifact's template-info.yaml differs from the previous one by EXACTLY ONE
+# line — its own code-location tag — and its operational: block is byte-identical.
+# Diffed both before pinning; the SQL fix is in the uis/init layer. Nothing bundled.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260911-03a1338
-  digest: "sha256:0f27556ac29fd40c79fb671f8f131eedb5c9ade9e778a324a121c80dee0420e0"
+  tag: v20260912-f232efb
+  digest: "sha256:a43f9a402f9faf89827b22f1585e8cfce112f209d62866329325a2f9022c7193"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public

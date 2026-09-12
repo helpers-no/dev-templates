@@ -9,7 +9,7 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
 <TemplateHeader
   logo="/img/templates/atlas-logo.svg"
   name="Atlas Data"
-  version="v20260911-03a1338"
+  version="v20260912-f232efb"
   description="Norway's civil-society sector as a REST API — municipality-level indicators of humanitarian need, and the NGOs and local chapters that respond to them."
   abstract={"Installs the Atlas data platform as one application: a PostgreSQL database with\nits migrations, a Dagster code location running the ingest and dbt transforms,\nand a PostgREST API over the curated api_v1 views.\n\nThe data is an open semantic layer over Norwegian public sources — SSB\nstatistics, FHI public-health and living-conditions indicators, Bufdir child-poverty\nfigures and the Brønnøysund business register — joined to NGO supply data, so\nthat humanitarian need and the organisations responding to it can be queried\ntogether at kommune level.\n\nThe API is self-describing: meta_sources, meta_endpoints and meta_dimensions let\na consumer discover what is available without out-of-band documentation.\n\nA fresh install serves an empty API until the first pipeline run — the schema and\ngrants exist from install, the data arrives on the ingest schedule. Exports\napi-url for other applications to consume.\n\nInstalling does not start anything: the schedules ship stopped, so no data is\nfetched until an operator turns them on. That is a deliberate go-live decision,\nnot a side effect of installing."}
   install="uis template install atlas"
@@ -79,7 +79,7 @@ load, so the row count is arithmetic on two measured figures — the combined wa
 measured and is deliberately not stated.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260911-03a1338`:
+`operational.cadence` in the artifact at pin `v20260912-f232efb`:
 
 | when | what |
 |---|---|
@@ -178,7 +178,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches`, `frr` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260911-03a1338`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260912-f232efb`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
