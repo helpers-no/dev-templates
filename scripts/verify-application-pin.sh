@@ -27,7 +27,7 @@
 
 set -uo pipefail
 
-APP=""; TAG=""; EXPECT=""; RELEASE_REPO=""; OUT="/tmp/artifact-template-info.yaml"; DRIFT=""
+APP=""; TAG=""; EXPECT=""; RELEASE_REPO=""; OUT="/tmp/artifact-template-info.yaml"; DRIFT=""; AWAIT=""; AWAIT_TIMEOUT=600
 while [ $# -gt 0 ]; do
   case "$1" in
     --app) APP="${2:?}"; shift 2 ;;
@@ -36,13 +36,15 @@ while [ $# -gt 0 ]; do
     --release-repo) RELEASE_REPO="${2:?}"; shift 2 ;;
     --out) OUT="${2:?}"; shift 2 ;;
     --drift) DRIFT=1; shift ;;
+    --await) AWAIT="${2:?}"; shift 2 ;;
+    --await-timeout) AWAIT_TIMEOUT="${2:?}"; shift 2 ;;
     -h|--help)
       printf 'usage: %s --app <id> --tag <tag> [--expect-digest sha256:...] [--release-repo owner/name] [--out path]\n' "$0"; exit 0 ;;
     *) printf 'unknown argument: %s\n' "$1" >&2; exit 2 ;;
   esac
 done
 [ -n "$APP" ] || { printf 'need --app\n' >&2; exit 2; }
-[ -n "$TAG" ] || [ -n "$DRIFT" ] || { printf 'need --tag (or --drift)\n' >&2; exit 2; }
+[ -n "$TAG" ] || [ -n "$DRIFT" ] || [ -n "$AWAIT" ] || { printf 'need --tag (or --drift / --await)\n' >&2; exit 2; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -74,6 +76,60 @@ if [ -z "$RELEASE_REPO" ]; then
   RELEASE_REPO="$(sed -n 's#.*https://github.com/\([A-Za-z0-9_.-]\{1,\}/[A-Za-z0-9_.-]\{1,\}\).*#\1#p' "$INFO" | head -1)"
 fi
 [ -n "$RELEASE_REPO" ] || { printf 'could not determine the release repo; pass --release-repo\n' >&2; exit 2; }
+
+# ── await: wait until the PUBLISHED catalogue actually serves a tag ────────────────
+#
+# raw.githubusercontent.com caches for five minutes (max-age=300), so a push is not
+# visible to UIS immediately. Telling an installer to clear its cache inside that
+# window makes it re-fetch the STALE pin and hold it for an hour.
+#
+# 🔴 Why this is a command and not a one-liner: the obvious loop —
+#     until [ "$(curl -s URL | jq -r .…tag)" = "$TAG" ]; do sleep 15; done
+# is SATISFIED BY A 404. A wrong path and an un-propagated push look identical to it,
+# so it waits forever on a typo. imac hit exactly that (urb-agents #776). This asserts
+# valid JSON containing an entry for the app whose tag matches, and says WHICH of those
+# failed.
+if [ -n "$AWAIT" ]; then
+  RAW_URL="https://raw.githubusercontent.com/helpers-no/dev-templates/main/website/src/data/template-registry.json"
+  printf '\nWaiting for the published catalogue to serve %s (timeout %ss)\n' "$AWAIT" "$AWAIT_TIMEOUT"
+  printf '  %s\n\n' "$RAW_URL"
+  _waited=0
+  while :; do
+    BODY="$(curl -s --max-time 20 -w '\n%{http_code}' "$RAW_URL")"
+    CODE="$(printf '%s' "$BODY" | tail -1)"
+    JSON="$(printf '%s' "$BODY" | sed '$d')"
+    STATE="$(printf '%s' "$JSON" | CODE="$CODE" APP="$APP" WANT="$AWAIT" python3 -c '
+import json,sys,os
+code=os.environ["CODE"]
+if code!="200":
+    print("HTTP "+code); sys.exit()
+try: d=json.load(sys.stdin)
+except Exception as e:
+    print("NOTJSON "+str(e)[:40]); sys.exit()
+ts=[t for t in d.get("templates",[]) if t.get("id")==os.environ["APP"]]
+if not ts: print("NOENTRY"); sys.exit()
+tag=(ts[0].get("source") or {}).get("tag","")
+print("MATCH" if tag==os.environ["WANT"] else "OLDTAG "+tag)')"
+    case "$STATE" in
+      MATCH) ok "catalogue now serves $AWAIT (after ${_waited}s)"; exit 0 ;;
+      "OLDTAG "*) printf '  ...still serving %s (%ss)\n' "${STATE#OLDTAG }" "$_waited" ;;
+      "HTTP "*)
+        bad "the URL returned ${STATE#HTTP } — that is a BROKEN URL, not a slow CDN"
+        note "a 404 and an un-propagated push are indistinguishable if you only watch the tag"
+        exit 1 ;;
+      NOTJSON*)
+        bad "the URL did not return JSON (${STATE#NOTJSON }) — broken URL or a partial response"
+        exit 1 ;;
+      NOENTRY)
+        bad "valid JSON, but it contains no entry with id '$APP'"
+        note "wrong registry, or the entry was dropped — either way not a propagation delay"
+        exit 1 ;;
+    esac
+    _waited=$((_waited + 15))
+    [ "$_waited" -ge "$AWAIT_TIMEOUT" ] && { bad "still not serving $AWAIT after ${_waited}s"; exit 1; }
+    sleep 15
+  done
+fi
 
 # ── drift: is the PUBLISHED catalogue behind what the application has published? ──
 #

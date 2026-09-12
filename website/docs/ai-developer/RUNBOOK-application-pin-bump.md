@@ -300,9 +300,27 @@ and `git log` showed the new commit immediately while the raw endpoint served th
 several more minutes — `cache-control: max-age=300`, with `source-age` counting up to it.
 
 ```bash
-# the deliverable is what the raw URL serves, not what git says
-until [ "$(curl -s "$RAW_URL" | jq -r '.templates[]|select(.id=="atlas")|.source.tag')" = "$TAG" ]; do sleep 15; done
+bash scripts/verify-application-pin.sh --app atlas --await "$TAG"
 ```
+
+🔴 **Do not hand-roll this as an `until` loop.** The obvious form —
+
+```bash
+until [ "$(curl -s "$RAW_URL" | jq -r '…tag')" = "$TAG" ]; do sleep 15; done   # ← DO NOT
+```
+
+— **is satisfied by a 404.** A wrong path and an un-propagated push are indistinguishable to it, so a
+typo waits forever and looks like a slow CDN. `imac` hit exactly that on this rule's first use
+(urb-agents #776). The command asserts **valid JSON containing an entry for the app whose tag
+matches**, and says which of those failed:
+
+| what it sees | what it says |
+|---|---|
+| the tag you asked for | ✓ proceed |
+| a different tag | still serving `<tag>`, keeps waiting |
+| HTTP 404 or other | ✗ **broken URL, not a slow CDN** — stops |
+| not JSON | ✗ broken URL or partial response — stops |
+| JSON with no such entry | ✗ wrong registry, or the entry was dropped — stops |
 
 🔴 **This interacts badly with step 8, and the wrong order makes things worse rather than slower.**
 UIS caches the catalogue for an hour. So if the installer clears its cache *during* the five-minute
