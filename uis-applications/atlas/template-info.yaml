@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260913-eba547e"
+version: "v20260913-e0ef430"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -69,33 +69,34 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #813):
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #827):
 #   release asset and GHCR docker-content-digest agree on the ARTIFACT digest
 #   blob pulled AT that digest hashes to the manifest
-#   declares kind: application, id: atlas, tag: v20260913-eba547e
-#   operational.* enumerated with a parser, not inferred from a diff
+#   declares kind: application, id: atlas, tag: v20260913-e0ef430
+#   operational.* enumerated with a parser: 17 paths, none added or removed vs eba547e,
+#   so the >= 1.6.69 pass condition is unaffected
 #
-# 🔴 THREE DIGESTS ARE IN PLAY ON THIS BUMP. Below is the ARTIFACT digest — the only
-# one that belongs here. The other two are:
-#   sha256:8191aacd…  the code-location IMAGE digest, inside the definition
-#   sha256:519feb0f…  UIS 1.6.69 itself, which is a version gate and not a pin at all
-# All three are sha256 + 64 hex. Pinning the wrong one passes every other check.
+# 🔴 THE NOMINATION GAVE THE WRONG DIGEST AND THE VERIFIER CAUGHT IT.
+#   nominated to pin   sha256:ce6d776b…  <- this is the CODE-LOCATION IMAGE digest
+#   actually pinned    sha256:a3beb267…  <- the ARTIFACT digest, from the release asset
+#                                            and GHCR, which agree with each other
+# The tag was right and stated three times; only the digest was the wrong one of the two
+# the definition carries. Pinning ce6d776b would have passed every fetch-side check and
+# surfaced on a cluster as an unexplained pull failure.
 #
-# Released from a PIN-HOLD whose clearing condition was exactly this: UIS >= 1.6.69,
-# reported as a digest rather than a merge. On 1.6.68 `_warn_unrendered_operational`
-# prints `install.first_load` on this artifact — a correct artifact on an old renderer,
-# not a defect. So the install-time pass condition belongs to the tester, not here.
+# Why THIS tag of three published within 17 minutes: it is the only one carrying both
+# contract fixes. Verified by decoding all three rather than taking the claim —
+#   d78141a  install.first_load 60 marts / first_data.takes 64   still contradicts
+#   f21f099  install.first_load 60 marts / first_data.takes 64   still contradicts
+#   e0ef430  both 61, with the BASE TABLE counting rule stated   <- complete
 #
-# ⚠️ Text-only relative to v20260913-7deb4a2. Its code-location image digest differs
-# (6684ff0c -> 8191aacd) and that is NOT evidence the tree changed — the check is
-# hashing the trees inside the images. Every value this repo's prose mirrors —
-# first_data.{jobs,how}, automation, cadence, manual_only, unscheduled,
-# external_services — compared equal between the two artifacts with a YAML parser,
-# so nothing was re-derived.
+# ⚠️ NOT purely prose. chapter_data_shape is a dbt model description that PostgREST
+# publishes as OpenAPI field docs, so the code-location image digest moving MEANS
+# something here — unlike eba547e, where it moved and meant nothing.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260913-eba547e
-  digest: "sha256:2d837e2ce9b2dfef26eb8ecfc72a32430b055617cf8cf74ef39a4d056bca6a1f"
+  tag: v20260913-e0ef430
+  digest: "sha256:a3beb26715b6e6508d9774a70341692cda66b80109c41d20931cc2d7f304dcba"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public
