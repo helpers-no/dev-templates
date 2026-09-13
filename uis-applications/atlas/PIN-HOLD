@@ -8,6 +8,12 @@
 # reads it may be a fresh session after a restart with none of this context. A held pin
 # that is only held in someone's head gets pinned away by the next person doing the
 # obviously-right thing.
+#
+# 2026-09-13, UPDATED: the original reason was "imac is mid stage-4 install". Stage 4 has
+# since PASSED (urb-agents #807), so that reason expired within hours of being written.
+# The hold stands for a different reason, below. Recording the update rather than editing
+# silently, because a hold whose stated reason has quietly expired is the exact failure
+# this file was built to catch — and it caught its own.
 
 held_tag: v20260913-7deb4a2
 newer_upstream: v20260913-eba547e
@@ -15,14 +21,17 @@ since: 2026-09-13
 refs: urb-agents #803, #804
 
 reason: >-
-  imac is mid stage-4 install on v20260913-7deb4a2. Moving the catalogue under a running
-  verification is the exact thing the four-stage handoff exists to prevent, on a round
-  that has already run four times. atlas published eba547e and explicitly declined to ask
-  for a pin: "I would rather it waited for a reason to move than move for tidiness —
-  pinning is where stage 2 restarts, and nothing in this build changes behaviour."
+  atlas published eba547e and explicitly declined to ask for a pin: "I would rather it
+  waited for a reason to move than move for tidiness — pinning is where stage 2 restarts,
+  and nothing in this build changes behaviour." ops-dev's position after stage 4 passed:
+  it "rides whenever something real next moves". So the hold is no longer about protecting
+  a running verification — that finished — it is that a pin costs a stage-2 round and this
+  build has not earned one.
 
 release_when: >-
-  Stage 4 concludes and eba547e is nominated. Then delete this file and pin normally.
+  When something real next moves — a behaviour change worth a stage-2 round — and eba547e
+  (or its successor) is nominated. NOT on tidiness, and not merely because drift reports
+  behind.
 
 carry_forward: >-
   Two things to apply when eba547e IS pinned, both easy to lose between now and then.
