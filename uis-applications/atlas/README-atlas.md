@@ -150,20 +150,19 @@ nothing self-triggers it. **Run it once, here.**
 It is deliberately *not* in the unscheduled list further down: that list means *cannot* run.
 `brreg_bootstrap` is the opposite — it **must** run once, on day one, and then be left alone.
 
-<!-- DO NOT TRIM AS DUPLICATION (urb-agents #802).
-     The paragraph above restates, in this page's own words, why nothing self-triggers
-     brreg_bootstrap. It reads as redundant with the artifact's first_data.how and that
-     redundancy is the point: atlas is moving that explanation out of `how` to make room
-     for the restored manual_only key, and `first_data.how` does not render at end of
-     install — only `uis template info` shows it. So this may be the only place a reader
-     finds the REASON rather than just the instruction.
 
-     This is the opposite call to the troubleshooting block, which this page deliberately
-     does NOT copy. The difference is rot: a copied remedy goes stale silently when the
-     source changes, while a sentence written in this page's own voice about a property
-     that does not change (a 1.17M bulk load must not self-trigger) stays true whether or
-     not the artifact still says it. Copy nothing that has a current source; keep your own
-     words for what would otherwise have none. -->
+> **Maintainer note — do not trim the paragraph above as duplication.** It restates, in this page's
+> own words, *why* nothing self-triggers `brreg_bootstrap`. That looks redundant with the artifact's
+> `first_data.how`, and the redundancy is deliberate: `first_data.how` does **not** render at the end
+> of an install — only `uis template info` shows it — so an operator about to run the chain may see
+> this page's reason and nowhere else's (urb-agents #802).
+>
+> This is the opposite call to the troubleshooting block, which this page deliberately does **not**
+> copy, and the difference is rot. A copied *remedy* goes stale silently when its source changes; a
+> sentence in this page's own voice about a property that does not change — a 1.17M-record bulk load
+> must not self-trigger — stays true whether or not the artifact still says it. **Copy nothing that
+> has a current source; keep your own words for what would otherwise have none.**
+
 
 ### `brreg_change_feed` is different again — run it once here, then leave it to its schedule
 
