@@ -211,10 +211,29 @@ printf '  artifact     %s\n  release repo %s\n\n' "$ARTIFACT" "$RELEASE_REPO"
 # ── 1. the release asset ──────────────────────────────────────────────────────────
 ASSET_URL="https://github.com/$RELEASE_REPO/releases/download/$TAG/uis-artifact.json"
 ASSET_JSON="$(curl -sL --max-time 30 "$ASSET_URL")"
-ASSET_DIGEST="$(printf '%s' "$ASSET_JSON" | python3 -c '
+# From 2026-09-13 the asset carries `artifact_digest` and `image_digest` explicitly,
+# alongside the original `digest` (atlas kept that name and value deliberately, because
+# this consumer reads it -- urb-agents #836). Prefer the explicit field, fall back to the
+# legacy one for artifacts published before it existed, and FAIL if both exist and
+# disagree: that would be a producer inconsistency, and agreement between producers is
+# exactly what failed to catch ce6d776b.
+ASSET_PARSE="$(printf '%s' "$ASSET_JSON" | python3 -c '
 import json,sys
-try: print(json.load(sys.stdin).get("digest",""))
-except Exception: print("")' 2>/dev/null)"
+try: d=json.load(sys.stdin)
+except Exception: print("|||"); sys.exit()
+a=d.get("artifact_digest",""); g=d.get("digest",""); i=d.get("image_digest","")
+print("%s|%s|%s" % (a,g,i))' 2>/dev/null)"
+ASSET_ARTIFACT_DIGEST="$(printf '%s' "$ASSET_PARSE" | cut -d'|' -f1)"
+ASSET_LEGACY_DIGEST="$(printf '%s' "$ASSET_PARSE" | cut -d'|' -f2)"
+ASSET_IMAGE_DIGEST="$(printf '%s' "$ASSET_PARSE" | cut -d'|' -f3)"
+if [ -n "$ASSET_ARTIFACT_DIGEST" ] && [ -n "$ASSET_LEGACY_DIGEST" ] \
+   && [ "$ASSET_ARTIFACT_DIGEST" != "$ASSET_LEGACY_DIGEST" ]; then
+  bad "the release asset's artifact_digest and digest DISAGREE"
+  note "artifact_digest $ASSET_ARTIFACT_DIGEST"
+  note "digest          $ASSET_LEGACY_DIGEST"
+  note "do not pin either until the producer explains which is correct."
+fi
+ASSET_DIGEST="${ASSET_ARTIFACT_DIGEST:-$ASSET_LEGACY_DIGEST}"
 
 if [ -z "$ASSET_DIGEST" ]; then
   # A missing asset is "not adoptable yet", not a corrupt pin -- artifacts published
@@ -223,7 +242,21 @@ if [ -z "$ASSET_DIGEST" ]; then
   note "if this artifact predates the release asset, it is NOT ADOPTABLE by this check;"
   note "verify by hand per the runbook and say so on the bus."
 else
-  ok "release asset names $ASSET_DIGEST"
+  if [ -n "$ASSET_ARTIFACT_DIGEST" ]; then
+    ok "release asset names artifact_digest $ASSET_DIGEST"
+  else
+    ok "release asset names $ASSET_DIGEST (legacy \`digest\`; no artifact_digest on this artifact)"
+  fi
+  # The asset's own image_digest is a second, independent statement of the value that must
+  # NOT be pinned. Assert it differs from what we are about to pin -- cheap, and it is the
+  # exact confusion that produced ce6d776b.
+  if [ -n "$ASSET_IMAGE_DIGEST" ]; then
+    if [ "$ASSET_IMAGE_DIGEST" = "$ASSET_DIGEST" ]; then
+      bad "the asset's image_digest EQUALS its artifact digest — one of them is wrong"
+    else
+      ok "asset distinguishes image_digest ${ASSET_IMAGE_DIGEST:0:19}… from the artifact digest"
+    fi
+  fi
   ASSET_TAG="$(printf '%s' "$ASSET_JSON" | python3 -c 'import json,sys;print(json.load(sys.stdin).get("tag",""))')"
   [ "$ASSET_TAG" = "$TAG" ] && ok "asset tag matches" || bad "asset tag is '$ASSET_TAG', expected '$TAG'"
 fi
@@ -260,8 +293,18 @@ DIGEST="${ASSET_DIGEST:-$GHCR_DIGEST}"
 
 # ── 3. what you are about to commit ───────────────────────────────────────────────
 if [ -n "$EXPECT" ]; then
-  [ "$EXPECT" = "$DIGEST" ] && ok "--expect-digest matches" \
-    || { bad "--expect-digest does NOT match"; note "given    $EXPECT"; note "resolved $DIGEST"; }
+  if [ "$EXPECT" = "$DIGEST" ]; then
+    ok "--expect-digest matches"
+  else
+    bad "--expect-digest does NOT match"
+    note "given    $EXPECT"
+    note "resolved $DIGEST"
+    # Name the mistake when we can, instead of leaving it as two hex strings.
+    if [ -n "$ASSET_IMAGE_DIGEST" ] && [ "$EXPECT" = "$ASSET_IMAGE_DIGEST" ]; then
+      note "the value given is this artifact's IMAGE digest, not its artifact digest."
+      note "that is the ce6d776b mistake (urb-agents #827). Pin the resolved value above."
+    fi
+  fi
 fi
 
 # ── 4 + 5. pull the artifact AT the digest and decode it ──────────────────────────

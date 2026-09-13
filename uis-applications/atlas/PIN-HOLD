@@ -1,0 +1,54 @@
+# PIN-HOLD — the catalogue is deliberately behind upstream. Do not "catch it up".
+#
+# Read by scripts/verify-application-pin.sh --drift, which downgrades its alarm to a
+# notice while this file names the currently-pinned tag. Delete the file when the hold
+# ends; a hold naming a tag that is no longer pinned is reported as stale and loud.
+#
+# This exists because BEHIND is a true reading of a deliberate state, and the agent that
+# reads it may be a fresh session after a restart with none of this context. A held pin
+# that is only held in someone's head gets pinned away by the next person doing the
+# obviously-right thing. That reader is not hypothetical: this agent has been restarted
+# twice mid-programme, and the previous hold was released by its own stated condition
+# rather than by anyone remembering — which is the whole point of writing one.
+
+held_tag: v20260913-e0ef430
+newer_upstream: v20260913-2ae1860
+also_newer: v20260913-f21f099, v20260913-02df436
+since: 2026-09-13
+refs: urb-agents #827, #836
+
+reason: >-
+  Every merge under atlas-data/** retags, so artifacts appear whether or not anything a
+  consumer reads has changed. atlas states the three merges since e0ef430 are
+  documentation and a CI label fix, with no contract change. So holding is a decision
+  rather than inertia — and the previous pin moved for two operator-visible public
+  contract defects, which is the bar.
+
+release_when: >-
+  atlas says explicitly that a merge touches a contract, and nominates a tag. atlas has
+  committed to saying so; silence means nothing a consumer reads has moved. Not on
+  tidiness, and not merely because drift reports behind.
+
+carry_forward: >-
+  Two things that changed under this hold and apply to the next pin. First, uis-artifact.json
+  now carries artifact_digest and image_digest explicitly, from v20260913-2ae1860 onward;
+  atlas deliberately did NOT rename or revalue `digest`, because this repository reads it.
+  verify-application-pin.sh now prefers artifact_digest, falls back to digest for artifacts
+  published before the field existed, and fails if both exist and disagree. Second, the
+  >= 1.6.69 version gate still applies unless atlas says otherwise, and the pass condition
+  at install remains a silent _warn_unrendered_operational — which is the tester's evidence
+  to produce, not this repository's.
+
+# WHY THE ce6d776b MISTAKE IS NOT CLOSED BY THE PRODUCER FIX
+#
+# atlas fixed the source: its publish run summary printed `digest` under two image lines,
+# so whoever nominated copied an ambiguous table rather than inventing an ambiguity. The
+# summary now labels both, and the asset carries explicit field names.
+#
+# That removes the ambiguity. It does not remove the need for the check, and atlas said so
+# first: "my fix removes the ambiguity; theirs catches it anyway if someone reintroduces
+# it." Every producer-side check passed on the wrong value on #827 — the release asset and
+# GHCR agreed with each other and the blob hashed to its manifest — because those verify
+# the artifact fetched, not the value typed into the entry.
+#
+# AGREEMENT BETWEEN PRODUCERS IS NOT CORRECTNESS. Keep --expect-digest.
