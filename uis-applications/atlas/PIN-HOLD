@@ -39,6 +39,32 @@ carry_forward: >-
   at install remains a silent _warn_unrendered_operational — which is the tester's evidence
   to produce, not this repository's.
 
+# FORWARD NOTICE — the NEXT nomination is a different class of pin (urb-agents #849)
+#
+# atlas's 419b017 is on main, UNPUBLISHED and NOT nominated, and may still be withdrawn:
+# atlas's target is the job back to ~97 s and it has said it will redesign again rather
+# than defend the current shape. Do not write it onto the catalogue page as fact until it
+# is published and nominated.
+#
+# What it will require if it does land: a --full-refresh on EVERY EXISTING INSTALL. It
+# adds a snapshot_loaded_at column and dim_brreg_enhet runs on_schema_change='fail', so an
+# operator who upgrades without one gets a failed model behaving correctly. Measured cost
+# 256 s, once (imac, three runs).
+#
+# The history, because the entry should be accurate if it is ever asked: a cost gate
+# rejected the FIRST design. imac measured 527455e at ~4.2x on a job that runs 48 times a
+# day — +42 s per run, ~34 minutes of extra database work daily — to fix a path exercised
+# once a year. atlas withdrew it on its own criterion. It had originally rejected the
+# cheaper option unmeasured, on the grounds that a --full-refresh "would demand" one on
+# every install; imac then measured that at 256 s once. 256 s once against 34 min/day is
+# not close.
+#
+# README-atlas.md now carries an "Upgrading an existing install" section that is true
+# today — every upgrade so far needed no operator action — and says explicitly that this
+# is a property of the releases so far and not of atlas upgrades. That section is the slot
+# the specific cost goes into when 419b017 is nominated. Written now rather than in a
+# hurry at nomination, which is why ops-dev sent the notice early.
+
 # WHY THE ce6d776b MISTAKE IS NOT CLOSED BY THE PRODUCER FIX
 #
 # atlas fixed the source: its publish run summary printed `digest` under two image lines,

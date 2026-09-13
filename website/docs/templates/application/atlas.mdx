@@ -255,6 +255,31 @@ uis template install atlas --param app_name=atlas-t
 `app_name` isolates everything — database, secret prefix, url prefix and code location —
 so an existing tenant is untouched. Verified by `imac` on urb-agents #481.
 
+### Upgrading an existing install
+
+An upgrade happens when this catalogue entry's pin moves and you re-install. **What that costs you
+depends on the release, and it is not always nothing.**
+
+**Every atlas upgrade so far has required no operator action.** The pins through 2026-09-13 were
+text-only or additive: you re-install and the data is untouched.
+
+⚠️ **Do not read that as a property of atlas upgrades.** It is a property of the releases so far, and
+it is the more dangerous half of this page precisely because three silent upgrades in a row teach an
+expectation. A release that changes the shape of an incrementally-materialised model **requires a
+`--full-refresh` on an existing install**, and `dim_brreg_enhet` runs with `on_schema_change='fail'`
+— so an operator who upgrades without one gets a failed model doing exactly what it is configured to
+do, not a bug.
+
+**Two surfaces answer two different questions, and this is the earlier one:**
+
+| you are asking | read |
+|---|---|
+| *should I take this upgrade, and what will it cost?* | **this page**, before you re-install |
+| *a run just failed — what now?* | `uis template info atlas`, which renders the artifact's `troubleshooting` block, and the install output itself |
+
+**When a release needs operator action, this section will say so and name the cost**, because by the
+time the install output tells you, you have already committed to it.
+
 ## What this directory is, and is not
 
 **This directory is a catalogue pointer, not the application.** There is no atlas source
