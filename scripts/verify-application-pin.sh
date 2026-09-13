@@ -162,12 +162,42 @@ print(best[0] if best else "")' "$RELEASE_REPO")"
   printf '\nDrift check for %s\n' "$APP"
   printf '  published catalogue pins  %s\n' "${LIVE_TAG:-<unreadable>}"
   printf '  newest published artifact %s\n\n' "${NEWEST:-<unreadable>}"
+  HOLD_FILE="$REPO_ROOT/uis-applications/$APP/PIN-HOLD"
+  HELD_TAG=""
+  [ -f "$HOLD_FILE" ] && HELD_TAG="$(sed -n 's/^held_tag:[[:space:]]*//p' "$HOLD_FILE" | head -1)"
+
   if [ -z "$LIVE_TAG" ] || [ -z "$NEWEST" ]; then
     bad "could not read both sides; drift is UNKNOWN, not clean"
     exit 1
   elif [ "$LIVE_TAG" = "$NEWEST" ]; then
+    if [ -n "$HELD_TAG" ]; then
+      bad "a PIN-HOLD exists but the catalogue is already current — the hold is STALE"
+      note "delete $HOLD_FILE"
+      exit 1
+    fi
     ok "catalogue is current"
     exit 0
+  elif [ -n "$HELD_TAG" ] && [ "$HELD_TAG" = "$LIVE_TAG" ]; then
+    # BEHIND is a true reading of a deliberate state. Say so rather than alarming,
+    # because the agent reading this may be a fresh session with none of the context.
+    printf '  \033[0;33m⏸\033[0m  behind on purpose — a PIN-HOLD names this exact tag\n'
+    printf '     %s\n\n' "$HOLD_FILE"
+    python3 - "$HOLD_FILE" <<'PYHOLD'
+import sys,re
+d=open(sys.argv[1]).read()
+m=re.search(r'^reason: >-\n((?:[ \t]+\S.*\n|\n)*)', d, re.M)
+if m:
+    body=" ".join(l.strip() for l in m.group(1).splitlines() if l.strip())
+    import textwrap
+    for line in textwrap.wrap(body, 88):
+        print("     "+line)
+PYHOLD
+    printf '\n     DO NOT pin %s away. Read the file before acting.\n\n' "$NEWEST"
+    exit 0
+  elif [ -n "$HELD_TAG" ]; then
+    bad "a PIN-HOLD names '$HELD_TAG' but the catalogue pins '$LIVE_TAG' — the hold is STALE"
+    note "the hold no longer describes reality; delete or update $HOLD_FILE"
+    exit 1
   else
     bad "CATALOGUE IS BEHIND — a nomination may never have reached this agent"
     note "pin it: scripts/verify-application-pin.sh --app $APP --tag $NEWEST"
