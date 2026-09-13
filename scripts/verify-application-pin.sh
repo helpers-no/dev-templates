@@ -329,6 +329,39 @@ sys.exit(1 if fails else 0)
 PY
     rc=$?
     [ $rc -eq 0 ] && ok "artifact decodes and identifies itself correctly" || bad "artifact self-identification failed (see FAIL lines above)"
+
+    # Enumerate operational.* with a REAL PARSER, never from a diff.
+    #
+    # On 2026-09-13 this repo reported that eba547e "moves first_load inside first_data".
+    # It does not -- it is operational.install.first_load, and there are two distinct
+    # `takes` keys on different rendering paths. The claim came from reading a unified
+    # diff of a structured file and inferring nesting from nearby context. Two other
+    # agents had to enumerate the artifact to correct it (urb-agents #810).
+    #
+    # A diff shows you that a block moved. It does not show you where it landed.
+    if command -v ruby >/dev/null 2>&1; then
+      printf '  operational key paths (parsed, not inferred):\n'
+      ruby -ryaml -e '
+        d = YAML.load_file(ARGV[0]) rescue nil
+        op = d && d["operational"]
+        unless op.is_a?(Hash)
+          puts "     (no operational: block)"; exit
+        end
+        walk = lambda do |h, pre|
+          h.each do |k, v|
+            path = pre.empty? ? k : "#{pre}.#{k}"
+            case v
+            when Hash  then puts "     #{path}"; walk.call(v, path)
+            when Array then puts "     #{path}  (list #{v.length})"
+            else            puts "     #{path}"
+            end
+          end
+        end
+        walk.call(op, "operational")' "$OUT"
+    else
+      printf '  \033[0;33m!\033[0m  no ruby: operational key paths NOT enumerated.\n'
+      printf '     Do not describe this artifact\x27s structure from a diff — parse it.\n'
+    fi
   fi
 fi
 
