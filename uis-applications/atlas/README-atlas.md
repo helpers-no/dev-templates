@@ -48,20 +48,30 @@ load, so the row count is arithmetic on two measured figures — the combined wa
 measured and is deliberately not stated.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260912-5b46a8a`:
+`operational.cadence` in the artifact at pin `v20260913-7deb4a2`:
 
-| when | what |
-|---|---|
-| Sunday 02:00 | ~37 annual public-sector sources — SSB, FHI, Bufdir |
-| 1st of month, 01:00 | SSB Klass classifications (kommune/fylke) |
-| **Every 30 min** (:00, :30) | Brønnøysundregistrene **change feed** — only what moved, ~114 records per cycle at the measured 3.8 changes a minute. Half-hourly because the register is a live subscription, not a daily table |
-| **Every 30 min** (:10, :40) | Brreg **reconciliation into marts** — one incremental model, ten minutes behind each poll |
-| Daily 04:00 | **Frivillighetsregisteret** — a full re-walk of ~72,800 organisations (~727 requests) |
-| Daily 05:00 | dbt transform and publish — no external calls |
+**Every row names the job that owns it**, and that is not decoration — see the warning below the
+table.
+
+| when | job | what |
+|---|---|---|
+| Sunday 02:00 | `annual_sources_refresh` | ~37 annual public-sector sources — SSB, FHI, Bufdir |
+| 1st of month, 01:00 | `klass_refresh` | SSB Klass classifications (kommune/fylke) |
+| **Every 30 min** (:00, :30) | `brreg_change_feed` | Brønnøysundregistrene **change feed** — only what moved, ~114 records per cycle at the measured 3.8 changes a minute. **Appends to raw only; rebuilds nothing and cannot affect the public API** |
+| **Every 30 min** (:10, :40) | `brreg_transform` | Brreg **reconciliation into marts** — ONE incremental model, ten minutes behind each poll. Rows are inserted and deleted, never the table replaced, so **no `api_v1` view is disturbed** |
+| Daily 04:00 | `brreg_change_feed` | **Frivillighetsregisteret** — a full re-walk of ~72,800 organisations (~727 requests) |
+| Daily 05:00 | `transform_and_publish` | dbt transform and publish — no external calls. ⚠️ **The only scheduled job that rebuilds marts**, and therefore the only one during which `api_v1` views are recreated — each restored immediately after its own mart, so the gap is milliseconds per view |
+
+🔴 **Two rows, one job — and reading them as one *thing* has already cost real time.** The 04:00
+Frivillighetsregisteret row and the half-hourly feed row are **the same job**, `brreg_change_feed`,
+with different sources and different automation conditions. Two agents independently read the Brreg
+rows as a single job that both polled every half hour *and* rebuilt marts, and one of them costed a
+public-API outage at 48× its real rate and nearly weighed a cadence rollback against it (urb-agents
+#780, #786).
 
 **The ten-minute offset is deliberate.** The reconciliation runs at `:10`/`:40` rather than alongside
-the feed at `:00`/`:30` because firing on the same tick would reconcile data the feed had not yet
-written, leaving the dimension permanently one cycle behind.
+the feed because firing on the same tick would reconcile data the feed had not yet written, leaving
+the dimension permanently one cycle behind.
 
 ⚠️ **Frivillighetsregisteret is daily and did *not* move to the feed's cadence.** It has no change
 feed, so every refresh is the whole register — ~727 requests. At half-hourly that would be ~35,000
@@ -155,12 +165,28 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches`, `frr` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260912-5b46a8a`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260913-7deb4a2`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
 > section from the artifact at authoring time is the intended fix; see
 > `PLAN-application-catalogue.md`.
+
+### If a run fails, the artifact tells you what to do
+
+The install definition carries a **`troubleshooting`** block, and **UIS renders it at install** as of
+1.6.67 — so the remedy reaches the operator rather than living only on this page. It covers the two
+failure modes that have actually happened:
+
+- a transform failing with a **dbt schema error naming `dim_brreg_enhet`**, after an upgrade adds a
+  column to an incrementally-materialised model, and
+- the **public API returning 404 even after the database has been repaired** and the view confirmed to
+  exist with rows and grants.
+
+**The authoritative text is the artifact's, not this page's.** It is deliberately not copied here: it
+is long, it is precise about which database user must run the rebuild and about the ordering that
+people miss, and a stale copy of a 02:00 remedy is worse than a pointer to a current one. Read it from
+`uis template info atlas`, or from the definition at the pinned digest.
 
 ### Installing alongside an atlas that is already running
 

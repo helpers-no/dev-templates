@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260912-5b46a8a"
+version: "v20260913-7deb4a2"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -69,24 +69,31 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #773):
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #795):
 #   release asset and GHCR docker-content-digest agree on the ARTIFACT digest
 #   blob pulled AT that digest hashes to the manifest
-#   declares kind: application, id: atlas, tag: v20260912-5b46a8a
-#   --drift named this tag independently, before the nomination was read
+#   declares kind: application, id: atlas, tag: v20260913-7deb4a2
 #
 # 🔴 TWO DIGESTS. Below is the ARTIFACT digest. The definition also declares
-# sha256:6e622784… — the code-location IMAGE digest — which must NOT be pinned here.
+# sha256:6684ff0c… — the code-location IMAGE digest — which must NOT be pinned here.
 #
-# Checked before pushing, because ops-dev asked for it by name (#773): the cadence
-# block has SIX crons and Frivillighetsregisteret is still `0 4 * * *`, daily. It did
-# NOT move to the feed's half-hourly cadence — it has no change feed, so every refresh
-# is a ~727-request full re-walk, and half-hourly would be ~35,000 requests a day
-# against a public-sector API.
+# 🔴 THE REGISTER PUBLISH: api_v1.brreg_enhet, ~1.17M organisations including
+# ~462,000 sole proprietors who are natural persons. Largest public surface Atlas
+# has added, on Terje's instruction.
+#
+# Stage 3 of the four-stage flow. imac's verdict was read directly on #794 —
+# "Advance to stage 3." — rather than taken from the relay, because this repo is
+# instructed to refuse a stage-3 ring without it. Three builds died at stage 2
+# before this one (2616c9c, 576f2be, cfd2ca7).
+#
+# ⚠️ imac hashed the trees inside the cfd2ca7 and 7deb4a2 images and found them
+# IDENTICAL (e07a4e04…) while the image digests differ. Two artifacts can carry
+# byte-identical code under different image digests, so a changed code-location
+# digest is not by itself evidence of a code change.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260912-5b46a8a
-  digest: "sha256:4893844e3b72950bf7c1fabf044f40fd111b01a8dae28bda61daf59169583daa"
+  tag: v20260913-7deb4a2
+  digest: "sha256:d2af25f28d0f77c63f820d98cc7c95301f8a0368d2d0c894d27ae704424f645f"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public
