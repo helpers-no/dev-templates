@@ -52,7 +52,7 @@ because two figures in the artifact used to disagree with each other *and* with 
 counting method was written down anywhere.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260913-e0ef430`:
+`operational.cadence` in the artifact at pin `v20260914-72999a4`:
 
 **Every row names the job that owns it**, and that is not decoration — see the warning below the
 table.
@@ -185,7 +185,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches`, `frr` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260913-e0ef430`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260914-72999a4`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
@@ -195,11 +195,15 @@ So the three kinds of job on this page are not interchangeable:
 ### If a run fails, the artifact tells you what to do
 
 The install definition carries a **`troubleshooting`** block, and **UIS renders it at install** as of
-1.6.67 — so the remedy reaches the operator rather than living only on this page. It covers the two
+1.6.67 — so the remedy reaches the operator rather than living only on this page. It covers **four**
 failure modes that have actually happened:
 
+- **`brreg_bootstrap` reporting success while writing nothing** — re-run to repair the register, it
+  and the transform both report success and the API still serves the old data;
+- **the bootstrap terminating part-way through the download**, and retrying getting *less* far each
+  time rather than more;
 - a transform failing with a **dbt schema error naming `dim_brreg_enhet`**, after an upgrade adds a
-  column to an incrementally-materialised model, and
+  column to an incrementally-materialised model; and
 - the **public API returning 404 even after the database has been repaired** and the view confirmed to
   exist with rows and grants.
 
@@ -226,15 +230,39 @@ so an existing tenant is untouched. Verified by `imac` on urb-agents #481.
 An upgrade happens when this catalogue entry's pin moves and you re-install. **What that costs you
 depends on the release, and it is not always nothing.**
 
-**Every atlas upgrade so far has required no operator action.** The pins through 2026-09-13 were
-text-only or additive: you re-install and the data is untouched.
+### 🔴 The current pin is such a release. Upgrading to it needs TWO operations.
 
-⚠️ **Do not read that as a property of atlas upgrades.** It is a property of the releases so far, and
-it is the more dangerous half of this page precisely because three silent upgrades in a row teach an
-expectation. A release that changes the shape of an incrementally-materialised model **requires a
-`--full-refresh` on an existing install**, and `dim_brreg_enhet` runs with `on_schema_change='fail'`
-— so an operator who upgrades without one gets a failed model doing exactly what it is configured to
-do, not a bug.
+The pins through 2026-09-13 were text-only or additive — you re-installed and the data was untouched.
+**This one is not.** It adds a column to an incrementally-materialised model, and `dim_brreg_enhet`
+runs with `on_schema_change='fail'`.
+
+**1. A full refresh.** Without it the transform fails with
+
+> *"The source and target schemas on this incremental model are out of sync!"*
+
+which is the model doing exactly what it is configured to do, **not a broken release**.
+
+```bash
+dbt build --full-refresh --select +dim_brreg_enhet
+```
+
+⚠️ **Run it as the `atlas` database user, not as a superuser.** A full refresh drops and recreates, so
+the tables take the running user's ownership — and a superuser leaves the *next* run with "permission
+denied". **Measured cost: 256 seconds, once** (`imac`, three runs).
+
+**2. A publish — and it is a different operation, not part of the refresh.** This release changes
+`COMMENT`s, and comments live **in the database, not in the image**. Materialise the `api_v1` asset,
+or run `transform_and_publish`. Without it the served OpenAPI field documentation stays as it was
+while the build that produced it has moved on.
+
+**Both. A refresh is not a publish.**
+
+### Why the earlier releases being silent is the hazard
+
+**Every atlas upgrade before this one required no operator action.** ⚠️ **That is a property of those
+releases, not of atlas upgrades** — and it is the more dangerous half of this page, because three
+silent upgrades in a row teach an expectation that the fourth violates. An operator who meets the
+schema error without warning reads it as a broken release.
 
 **Two surfaces answer two different questions, and this is the earlier one:**
 
