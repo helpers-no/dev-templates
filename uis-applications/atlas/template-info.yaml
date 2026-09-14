@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260914-9509ea5"
+version: "v20260914-1fa7961"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -69,38 +69,45 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #970):
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #980):
 #   asset artifact_digest and GHCR docker-content-digest agree; image_digest
-#   (sha256:69e0de8a…) distinguished and asserted NOT to be this value
-#   blob hashes to the manifest; kind/id/tag self-consistent; 30707 bytes read via the
-#   raw-UTF-8 path, because the layer still declares .tar and is not one
+#   (sha256:00812e2f…) distinguished and asserted NOT to be this value
+#   blob hashes to the manifest; 31611 bytes via the raw-UTF-8 path
 #
-# 🔴 A BETTER ERROR MESSAGE, NOT A FIX. The declaration is unchanged, so nothing about
-# the defect changes: env_from_exports is still declared, api-url is still host-facing
-# loopback, and the address delivered into the pod is still wrong. The real remedy is
-# env_from_services (UIS 1.6.84); no atlas artifact uses it yet. A pin landing on the day
-# of a long argument reads as the argument landing — it did not.
+# 🟢 THIS IS THE LOOPBACK FIX, and the first pin installed and measured in a pod BEFORE
+# being nominated. before: ATLAS_POSTGREST_URL=http://api-atlas.localhost -> exit 2,
+# CANNOT, because .localhost is loopback (RFC 6761) and the pod dialled itself. after:
+# http://atlas-postgrest.postgrest.svc.cluster.local:3000 -> exit 0, check healthy.
+# Port 3000 is the data API; 3001 is the admin server and 404s a table read.
 #
-# ⚠️ PRECISION ON THE "BYTE-IDENTICAL" PREMISE, which is the nomination's one inference:
-# the published template-info.yaml files are NOT byte-identical. They differ in exactly
-# four lines — code_location.tag and code_location.digest, both substituted at publish:
-#     tag     v20260914-123cdc8  ->  v20260914-9509ea5
-#     digest  sha256:6dd4056b…   ->  sha256:69e0de8a…
-# What IS identical is the authored source and, decisively, all EIGHT code_location keys:
-#   digest env_from_exports env_secrets image module name tag why
-# tor-agent's 1.6.84 result was a key-whitelist and validator pass, so it transfers on key
-# identity — which holds. The conclusion stands; the premise as stated was stronger than
-# the evidence, and "byte-identical" would license a wrong inference if a third field ever
-# moved. Verified here with shasum, cmp and a key enumeration.
+# Key list enumerated from the PULLED artifact, not a source diff — the method this repo
+# corrected into place on pin A, now adopted by the nominator:
+#   9509ea5   env_from_exports  {ATLAS_POSTGREST_URL: api-url}
+#   1fa7961   env_from_services {ATLAS_POSTGREST_URL: postgrest}   <- a SERVICE id
+#   eight keys either side, one swapped. env_from_exports is absent at the DATA level in
+#   1fa7961; its two remaining occurrences in the file are comments.
+#   exports.api-url untouched and still host-facing, correctly — it is for hosts.
 #
-# ⚠️ NOT INSTALLED BY ANYONE. imac confirmed the digests; the quoted diagnostic is atlas
-# driving its own code on its own machine. Accepted for a message-only change with an
-# unchanged declaration — and it would not be acceptable for anything touching models or
-# the schema.
+# ⚠️ THE UIS FLOOR RISES TO 1.6.84. env_from_services needs 1.6.84 to be read, and the
+# fallback key is gone, so a host on 1.6.83 or below now gets NO value rather than a wrong
+# one: CANNOT, naming the variable. "Wrong value, explained" becomes "no value, explained"
+# — both CANNOT, neither a health regression. That is why pin A was worth taking.
+# The registry is fetched unauthenticated and lists atlas, so there are hosts nobody can
+# make upgrade.
+#
+# ⚠️ --full-refresh from v20260914-72999a4 STILL REQUIRED, unchanged. No dbt models, no
+# migrations in this delta.
+#
+# ⚠️ NOT OBSERVED: a run pod's rendered env from inside a run pod; and a plain install on
+# a host that took THIS catalogue's word — impossible before this pin existed, because
+# `uis template install <id>` takes an id only with no --tag or --digest, so a nominee
+# cannot reach the supported surface until it is pinned. The verification behind this pin
+# repointed a LOCAL registry cache: the install was real, the catalogue read was not, and
+# that was disclosed rather than glossed. Scope: one application, one cluster.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260914-9509ea5
-  digest: "sha256:13f3925c665f8065fe6624ddc4d9b8a7c9d314df0e63082bdc59b485fe41d2d8"
+  tag: v20260914-1fa7961
+  digest: "sha256:b7de79f13ced31005d27fa7024fbb48427954c61658f39958b4d0425b0b712de"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public
