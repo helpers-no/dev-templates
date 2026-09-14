@@ -52,7 +52,7 @@ because two figures in the artifact used to disagree with each other *and* with 
 counting method was written down anywhere.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260914-72999a4`:
+`operational.cadence` in the artifact at pin `v20260914-123cdc8`:
 
 **Every row names the job that owns it**, and that is not decoration — see the warning below the
 table.
@@ -185,7 +185,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches`, `frr` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260914-72999a4`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260914-123cdc8`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
@@ -238,7 +238,12 @@ so an existing tenant is untouched. Verified by `imac` on urb-agents #481.
 An upgrade happens when this catalogue entry's pin moves and you re-install. **What that costs you
 depends on the release, and it is not always nothing.**
 
-### 🔴 The current pin is such a release. Upgrading to it needs TWO operations.
+### 🔴 Upgrading still needs TWO operations — unchanged by the current pin
+
+⚠️ **The `--full-refresh` requirement below arrived with `v20260914-72999a4` and still applies.** The
+current pin adds a declaration and a render gate, not a schema change — so it introduces nothing new
+of this kind, **and it does not retire it.** An operator who has not yet taken `72999a4` still needs
+everything in this section.
 
 The pins through 2026-09-13 were text-only or additive — you re-installed and the data was untouched.
 **This one is not.** It adds a column to an incrementally-materialised model, and `dim_brreg_enhet`
@@ -283,6 +288,32 @@ options and neither is the one-liner you might expect:
 - **materialise the `api_v1` asset in the Dagster UI**, which is the narrow operation.
 
 **Both. A refresh is not a publish.**
+
+### ⚠️ A UIS version floor on the *outcome*, not on the install
+
+The current pin declares `env_from_exports`, which hands another application Atlas's API url as an
+environment variable rather than a copied literal.
+
+**Older UIS ignores the key rather than rejecting it, so taking this pin breaks nothing on any host.**
+But the benefit has a floor:
+
+| UIS | what happens |
+|---|---|
+| 1.6.80 | ignores the key, variable absent → reports **UNHEALTHY** — wrong, and the original defect |
+| 1.6.81 | ignores the key, variable absent → reports **could not be asked** — honest |
+| **1.6.82** | reads the key, variable present → **healthy** |
+
+⚠️ **A host below 1.6.82 gets no benefit and no way to know why.** `latest` is 1.6.82, so a single
+`./uis pull` moves a host the whole distance.
+
+🔴 **That tolerance is correct by accident, not by design.** `env_from_exports` sits inside
+`code_location`, which UIS iterates by known keys rather than validates — so unknown keys are skipped.
+**One level up and this pin would have rejected the install outright on every host not yet on 1.6.82.**
+Worth knowing before assuming a future declaration will be equally harmless.
+
+⚠️ **Not yet observed end to end.** The writer has been verified standalone; nobody has yet seen
+`ATLAS_POSTGREST_URL` inside a running pod. Until someone has, treat the variable as declared rather
+than as proven.
 
 ### Why the earlier releases being silent is the hazard
 

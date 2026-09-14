@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260914-72999a4"
+version: "v20260914-123cdc8"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -69,36 +69,38 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #944):
-#   release asset `artifact_digest` and GHCR docker-content-digest agree
-#   asset's `image_digest` distinguished and asserted NOT to be this value
-#   blob pulled AT the digest hashes to the manifest
-#   declares kind: application, id: atlas, tag: v20260914-72999a4
-#   operational.* enumerated with a parser: 17 paths, none added or removed vs e0ef430,
-#   so the >= 1.6.69 pass condition is unaffected
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #956):
+#   asset artifact_digest and GHCR docker-content-digest agree; image_digest
+#   (sha256:6dd4056b…) distinguished and asserted NOT to be this value
+#   blob pulled AT the digest hashes to the manifest; kind/id/tag self-consistent
 #
-# 🔴 TWO DIGESTS. Below is the ARTIFACT digest. The code-location IMAGE digest is
-# sha256:f98df123… and must NOT be pinned here. The nomination labelled each to its image
-# this time — the format atlas fixed at source after ce6d776b cost a refused pin.
+# ⚠️ THE template-info.yaml LAYER LIES ABOUT ITS OWN mediaType. It declares
+# application/vnd.oci.image.layer.v1.tar and is RAW UTF-8 YAML — tarfile.open raises.
+# A verifier that trusts the declared type reads NOTHING, and an empty read is
+# indistinguishable from an absent field, which is usually the thing being checked. The
+# verifier now names which path it used and refuses an empty read outright.
 #
-# 🔴 THIS IS THE FIRST ATLAS UPGRADE THAT REQUIRES OPERATOR ACTION, and it requires TWO
-# operations, not one:
-#   1. dbt build --full-refresh --select +dim_brreg_enhet   as the atlas DB user, not a
-#      superuser (a refresh drops and recreates; a superuser leaves the next run with
-#      "permission denied"). Measured 256 s once, by imac, three runs.
-#   2. a PUBLISH — materialise the api_v1 asset — because this release changes COMMENTs
-#      and comments live in the DATABASE, not the image. A refresh is not a publish.
-# Both are on the catalogue page under "Upgrading an existing install", which existed
-# before this nomination precisely so it would not be written in a hurry (#849, 10361ea).
+# Reproduced tor-agent's known-NEGATIVE control rather than only the positive:
+#   123cdc8   env_from_exports 1   api-url 4
+#   72999a4   env_from_exports 0   api-url 1   <- proves the read works on that blob,
+#                                                 so the 0 is a real absence
 #
-# Ongoing cost, stated by atlas as a miss rather than dressed as a pass: the half-hourly
-# transform goes ~107.6 s -> ~139 s, ~1.6x at the model, against a ~97 s target atlas set
-# itself. ~6.7 min/day, accepted against a bootstrap that otherwise reported success and
-# wrote zero rows.
+# ⚠️ The --full-refresh requirement from v20260914-72999a4 is UNCHANGED and still applies.
+# This delta is a declaration plus a render gate, not a schema change.
+#
+# 🔴 UIS >= 1.6.82 is a floor on the OUTCOME, not on the install: older UIS ignores
+# env_from_exports rather than rejecting it, so pinning breaks nothing — but below 1.6.82
+# a host gets no benefit and no signal. tor-agent's caveat, worth keeping: the tolerance is
+# correct BY ACCIDENT. env_from_exports sits inside code_location, which UIS iterates by
+# known keys rather than validates. One level up and this pin would have REJECTED the
+# install on every host not on 1.6.82.
+#
+# ⚠️ NOT VERIFIED END TO END: nobody has seen ATLAS_POSTGREST_URL inside a running pod.
+# The writer was verified standalone. Do not let this pin imply the wiring works.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260914-72999a4
-  digest: "sha256:90c9afb97f649c9930410943ed3c16abdbde52b5e315ed430d5f2b9d4c60c598"
+  tag: v20260914-123cdc8
+  digest: "sha256:ae08a38ee9f34f2a8689a5b99f50cbe8b8e4d69ea0a60a30838910bb7298a126"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public

@@ -330,11 +330,21 @@ raw=open('/tmp/_pin_blob.tar','rb').read()
 actual="sha256:"+hashlib.sha256(raw).hexdigest()
 fails=[]
 if actual!=blob: fails.append(f"blob hash {actual} != manifest layer digest {blob}")
+# The template-info.yaml layer declares mediaType .tar but is RAW UTF-8 YAML, so
+# tarfile.open raises. Falling back is not enough on its own: a verifier that trusts
+# the declared type reads NOTHING, and "read nothing" is indistinguishable from "the
+# field is absent" -- which is usually the thing being checked (tor-agent, #956).
+# So say which path was taken, and refuse to continue on an empty read.
+how=""
 try:
     t=tarfile.open('/tmp/_pin_blob.tar')
     data=t.extractfile(t.getnames()[0]).read().decode()
+    how="tar"
 except Exception:
     data=raw.decode('utf8','replace')
+    how="raw UTF-8 (the layer declares .tar but is not one)"
+if not data.strip():
+    fails.append("decoded content is EMPTY -- an empty read looks exactly like an absent field")
 open(out,'w').write(data)
 def top(key):
     m=re.search(rf'^{key}:[ \t]*(.+?)[ \t]*$', data, re.M)
@@ -356,6 +366,7 @@ jobs = re.search(r'^\s*jobs:\s*\[(.*?)\]', data, re.M|re.S)
 for f in fails: print("FAIL "+f)
 print("INFO blob hash matches manifest" if actual==blob else "")
 print(f"INFO kind={kind} id={aid} tag={atag}")
+print(f"INFO decoded {len(data)} bytes via {how}")
 print(f"INFO operational block present: {has_op}")
 if cl_digest:
     print(f"NOTE the definition also carries a code-location IMAGE digest: {cl_digest.group(1)[:26]}…")
