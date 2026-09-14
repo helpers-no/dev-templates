@@ -370,6 +370,39 @@ It reports both at once when both are true, labelled differently, so a real faul
 routine pending work. The question has no clock in it, so it cannot drift when the `:10`/`:40` offset
 is tuned — and that offset is deliberate and therefore tunable.
 
+> ### 🔴 A healthy verdict does not mean anything is running
+>
+> **The table above assumes automation is on. The check does not verify that.** It reports on **data
+> only** — so until you have run
+>
+> ```bash
+> uis dagster automation --start
+> ```
+>
+> a healthy result tells you the data is consistent, **not that anything is processing it**. With the
+> pipeline entirely switched off the check has reported **healthy, exit 0**, and said *"awaiting the
+> next transform"* **when no transform was scheduled** — the reassuring half of the table printed for
+> the one reason it cannot cover.
+>
+> **UIS 1.6.97 fixes the total case:** with 0 of 5 instigators running it now retracts every
+> future-tense sentence and exits 2.
+>
+> ⚠️ **The partial case is not fixed.** **One stopped instigator among five still reports healthy** —
+> reproduced with 57 pending changes and 5 unpropagated deletions sitting behind it. So a green check
+> is not evidence that all five are running, on any current version.
+>
+> **Check the instigators yourself** until that lands: `uis dagster automation` lists them and their
+> state.
+>
+> 🔵 **Interim, with a retirement condition:** atlas's real fix is written, tested and green, awaiting
+> a human merge (PR #309). **When a pin lands carrying it, delete this box** — it is here to cover the
+> window, not to outlive it.
+>
+> ⚠️ **The `Installing on UIS` guide linked from this page is stale on this point.** Its step 4
+> predates `uis dagster automation --start`, which shipped in UIS 1.6.90 and has been run repeatedly
+> on a real cluster, and still describes enabling automation through the web UI. **The flag is real;
+> the guide has not caught up.** Prefer the flag.
+
 > ⚠️ **If you installed pin `v20260914-1fa7961` and the check said "reported a problem", that was
 > probably not your install.** That pin's check counted pending deletions without asking whether they
 > had been applied, so a correct system reported **UNHEALTHY for roughly 11 minutes in every 30** —
