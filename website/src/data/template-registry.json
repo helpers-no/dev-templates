@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-14T07:43:34.887Z",
+  "generated": "2026-09-14T08:46:18.777Z",
   "dctDocsBase": "https://dct.sovereignsky.no",
   "uisDocsBase": "https://uis.sovereignsky.no",
   "categories": [
@@ -948,12 +948,12 @@
     {
       "id": "atlas",
       "folder": "uis-applications/atlas",
-      "version": "v20260914-15dc497",
+      "version": "v20260914-b7e513f",
       "name": "Atlas Data",
       "description": "Norway's civil-society sector as a REST API — municipality-level indicators of humanitarian need, and the NGOs and local chapters that respond to them.",
       "category": "APPLICATION",
       "install_type": "application",
-      "abstract": "Installs the Atlas data platform as one application: a PostgreSQL database with\nits migrations, a Dagster code location running the ingest and dbt transforms,\nand a PostgREST API over the curated api_v1 views.\n\nThe data is an open semantic layer over Norwegian public sources — SSB\nstatistics, FHI public-health and living-conditions indicators, Bufdir child-poverty\nfigures and the Brønnøysund business register — joined to NGO supply data, so\nthat humanitarian need and the organisations responding to it can be queried\ntogether at kommune level.\n\nThe API is self-describing: meta_sources, meta_endpoints and meta_dimensions let\na consumer discover what is available without out-of-band documentation.\n\nA fresh install serves an empty API until the first pipeline run — the schema and\ngrants exist from install, the data arrives on the ingest schedule. Exports\napi-url for other applications to consume.\n\nInstalling does not start anything: the schedules and sensors ship stopped, so\nno data is fetched until an operator turns them on. That is a deliberate go-live\ndecision, not a side effect of installing — and enabling them starts the NEXT\nscheduled run rather than backfilling, so a fresh install stays empty until the\nfirst-data jobs are launched by hand.",
+      "abstract": "Installs the Atlas data platform as one application: a PostgreSQL database with\nits migrations, a Dagster code location running the ingest and dbt transforms,\nand a PostgREST API over the curated api_v1 views.\n\nThe data is an open semantic layer over Norwegian public sources — SSB\nstatistics, FHI public-health and living-conditions indicators, Bufdir child-poverty\nfigures and the Brønnøysund business register — joined to NGO supply data, so\nthat humanitarian need and the organisations responding to it can be queried\ntogether at kommune level.\n\nThe API is self-describing: meta_sources, meta_endpoints and meta_dimensions let\na consumer discover what is available without out-of-band documentation.\n\nA fresh install serves an empty API until the first pipeline run — the schema and\ngrants exist from install, the data arrives on the ingest schedule. Exports\napi-url for other applications to consume.\n\nInstalling does not start anything: the schedules and sensors ship stopped, so\nno data is fetched until an operator turns them on. That is a deliberate go-live\ndecision, not a side effect of installing. Nothing is ever backfilled — but the\ntiming differs between the two halves and only one of them waits: the schedules\nwait for their next scheduled time, while the automation sensor that drives the\n~40 ingest sources can begin fetching within about a minute of being enabled.\nLaunch the first-data jobs BEFORE enabling automation.",
       "tools": "",
       "readme": "README-atlas.md",
       "tags": [
@@ -995,8 +995,8 @@
       "context": "uis",
       "source": {
         "artifact": "ghcr.io/terchris/atlas-data/uis",
-        "tag": "v20260914-15dc497",
-        "digest": "sha256:058e7bba6257d388acdbf308544fd0f098119b47361d35f6e374296a1428fd9f"
+        "tag": "v20260914-b7e513f",
+        "digest": "sha256:aa52587c7480c0a458f07fb1e1056096f63faa83844a1d692fb520708760b2b6"
       },
       "visibility": "public",
       "configureCommand": "uis template install atlas",

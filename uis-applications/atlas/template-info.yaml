@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260914-15dc497"
+version: "v20260914-b7e513f"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -35,9 +35,11 @@ abstract: |-
 
   Installing does not start anything: the schedules and sensors ship stopped, so
   no data is fetched until an operator turns them on. That is a deliberate go-live
-  decision, not a side effect of installing — and enabling them starts the NEXT
-  scheduled run rather than backfilling, so a fresh install stays empty until the
-  first-data jobs are launched by hand.
+  decision, not a side effect of installing. Nothing is ever backfilled — but the
+  timing differs between the two halves and only one of them waits: the schedules
+  wait for their next scheduled time, while the automation sensor that drives the
+  ~40 ingest sources can begin fetching within about a minute of being enabled.
+  Launch the first-data jobs BEFORE enabling automation.
 tools: ""
 readme: README-atlas.md
 tags:
@@ -69,50 +71,43 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #993):
-#   asset artifact_digest and GHCR docker-content-digest agree; image_digest
-#   (sha256:2e52e074…) distinguished and asserted NOT to be this value
-#   blob hashes to the manifest; 31611 bytes via the raw-UTF-8 path
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #1007).
 #
-# 🔴 SUPERSEDES v20260914-1fa7961, which this repository advertised for about an hour and
-# which cries wolf: its check counted PENDING deletions without asking whether they had
-# been APPLIED, so a healthy system reported UNHEALTHY for ~11 minutes in every 30 and
-# rendered identically to the real incident the check exists to catch. The fix asks the
-# deletion's own oppdateringsid against the dimension watermark — no clock, so it cannot
-# drift when the :10/:40 offset is tuned.
+# ⚠️ THIS PIN'S DIGESTS WERE NOT CONFIRMED BY imac — the nominator said so plainly and
+# relied on this repository's read as the independent one, because imac had two jobs that
+# outranked a docs pin. So the read was done with BOTH controls in the same session:
+#   v20260914-b7e513f   HTTP 200   asset artifact_digest == GHCR docker-content-digest
+#   v20260914-15dc497   HTTP 200   good control
+#   nosuchtag-control   HTTP 404   bad control — the instrument discriminates
+# image_digest (sha256:e78eedf1…) distinguished and asserted NOT to be this value.
 #
-# Verified BOTH directions on a real cluster by imac, one commit apart on identical rows:
-#   1fa7961  pending 47, applied 25191244, deletion still served -> exit 1
-#   15dc497  the same rows                                       -> exit 0
-# and the RED case was CONSTRUCTED, not reasoned about: an already-applied deletion's
-# organisation was re-inserted into marts.dim_brreg_enhet so the API served it while its
-# deletion was applied -> UNHEALTHY at ZERO age. It reported both conditions at once,
-# labelled differently. The alarm was not silenced, it was made specific. Fixture reverted
-# and the revert verified.
+# Documentation only. Key list from the PULLED artifact: the eight code_location keys are
+# identical to 15dc497's, env_from_services unchanged, env_from_exports absent. No models,
+# no migrations, no schema keys. UIS floor unchanged at 1.6.84+. --full-refresh from
+# 72999a4 unchanged.
 #
-# Declaration identity, stated precisely per this repo's correction on pin A: NOT
-# byte-identical — the two publish-time substitutions differ (code_location.tag and
-# .digest). All EIGHT code_location keys are identical and env_from_services is unchanged
-# at {ATLAS_POSTGREST_URL: postgrest}. Key list from the PULLED artifact, not a source
-# diff.
+# 🔴 WHAT IT CORRECTS, and this repository was repeating the error: the previous artifact
+# said "Enabling them starts the NEXT scheduled run". True of the two schedules, WRONG for
+# the automation sensor that drives all ~40 ingest sources — on_cron means "tick passed
+# AND deps updated since that tick", both trivially true on a fresh install, so it can
+# begin fetching within about a minute. Enabling at 16:55 on a Friday starts work at
+# 16:55.
 #
-# ✅ Installed through the SUPPORTED surface with no fabricated step, using UIS 1.6.88's
-# new --version flag:
-#   ./uis template install atlas --version v20260914-15dc497@sha256:058e7bba…   exit 0
-# That closes the circular dependency this repo flagged on #980 — a nominee could not
-# reach the supported surface until it was already pinned, and the catalogue was the
-# circle.
+# That sentence was in this entry's abstract and on the catalogue page, because this repo
+# mirrored it from the artifact on #764. Both corrected here.
 #
-# UIS floor unchanged at 1.6.84+. --full-refresh from 72999a4 unchanged. No models, no
-# migrations, no schema keys.
+# UIS 1.6.90 shipped `uis dagster automation --start` an hour before this nomination, so
+# enabling went from opening a web UI to one command — which is why a wrong timing
+# sentence stopped being academic.
 #
-# ⚠️ NOT VERIFIED: an applied deletion served for HOURS (zero age was produced; the claim
-# is any age), and the pending/applied split under a bulk reload where the watermark jumps.
-# Scope: one cluster.
+# ⚠️ ORDERING, new on the page: launch the first-data jobs BEFORE enabling automation.
+# Enable first and the sensor decides the order — brreg_change_feed starts, finds no
+# watermark and fails loudly until brreg_bootstrap has run. By design, not a fault, and
+# avoidable.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260914-15dc497
-  digest: "sha256:058e7bba6257d388acdbf308544fd0f098119b47361d35f6e374296a1428fd9f"
+  tag: v20260914-b7e513f
+  digest: "sha256:aa52587c7480c0a458f07fb1e1056096f63faa83844a1d692fb520708760b2b6"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public

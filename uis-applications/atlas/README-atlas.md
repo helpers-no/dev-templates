@@ -39,8 +39,26 @@ consumer discover what is available without any out-of-band documentation.
 fetched, and no external service is contacted, until an operator turns them on. Turning them on is the
 go-live decision.
 
-⚠️ **Turning them on does not backfill.** It starts the *next* scheduled run, so a fresh install stays
-empty until the first-data jobs below are launched by hand.
+⚠️ **Turning them on never backfills — no history is replayed, ever.** But the *timing* differs
+between the two halves, and **only one of them waits**:
+
+| what you enable | when it starts |
+|---|---|
+| the **schedules** — `transform_and_publish` at 05:00, `brreg_transform` at `:10`/`:40` | at their next scheduled time |
+| the **automation sensor**, which drives all ~40 ingest sources | **within about a minute** |
+
+**The sensor does not wait for a cron.** It evaluates on its own tick: an asset becomes eligible when
+its cron tick has passed *and* its dependencies updated since that tick — and on a fresh install every
+tick is already in the past and nothing has run, so both are trivially true. **Enabling at 16:55 on a
+Friday starts work at 16:55.**
+
+Concurrency is bounded by `ATLAS_MAX_CONCURRENT_INGESTS`, so it is a bounded start rather than 40
+simultaneous writers.
+
+🔴 **Launch the first-data jobs BEFORE enabling automation.** Enable first and the *sensor* decides the
+order: `brreg_change_feed` will start, find no watermark, and **fail loudly** until `brreg_bootstrap`
+has run. That is by design rather than a fault — but it is noise nobody needs, and it is avoidable by
+doing the two in the right order.
 
 **First ingest loads roughly 4.1 million rows** across **52 `raw` BASE TABLEs and 61 `marts` BASE
 TABLEs (plus 5 `marts` views)**, from about 41 sources. That is `imac`'s measured 2,906,194 plus the
@@ -52,7 +70,7 @@ because two figures in the artifact used to disagree with each other *and* with 
 counting method was written down anywhere.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260914-15dc497`:
+`operational.cadence` in the artifact at pin `v20260914-b7e513f`:
 
 **Every row names the job that owns it**, and that is not decoration — see the warning below the
 table.
@@ -185,7 +203,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches`, `frr` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260914-15dc497`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260914-b7e513f`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
