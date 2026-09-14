@@ -207,7 +207,15 @@ failure modes that have actually happened:
 - the **public API returning 404 even after the database has been repaired** and the view confirmed to
   exist with rows and grants.
 
-**The authoritative text is the artifact's, not this page's.** It is deliberately not copied here: it
+⚠️ **One place where this page and the artifact currently disagree, and this page is the correct one.**
+Both described the schema-change failure as *"the source and target schemas on this incremental model
+are out of sync"*. `imac` ran the upgrade and the model's own watermark subquery hits the missing
+column **before** dbt's schema-change handling runs, so dbt never emits that message. This page now
+quotes what is actually printed; the artifact — and therefore what `uis template info` renders — still
+carries the older wording until atlas corrects it. **If the product shows you the other sentence, the
+remedy is the same one.**
+
+**Otherwise the authoritative text is the artifact's, not this page's.** It is deliberately not copied here: it
 is long, it is precise about which database user must run the rebuild and about the ordering that
 people miss, and a stale copy of a 02:00 remedy is worse than a pointer to a current one. Read it from
 `uis template info atlas`, or from the definition at the pinned digest.
@@ -238,22 +246,41 @@ runs with `on_schema_change='fail'`.
 
 **1. A full refresh.** Without it the transform fails with
 
-> *"The source and target schemas on this incremental model are out of sync!"*
+```
+Database Error in model dim_brreg_enhet
+  column "snapshot_loaded_at" does not exist
+  LINE 209: select coalesce(max(snapshot_loaded_at), '-infinity'…
+```
 
 which is the model doing exactly what it is configured to do, **not a broken release**.
 
 ```bash
-dbt build --full-refresh --select +dim_brreg_enhet
+dbt build --full-refresh --select dim_brreg_enhet+
 ```
+
+⚠️ **Note the trailing `+`: descendants, not ancestors.** `dim_brreg_enhet+` rebuilds what depends on
+the changed table, which is what you need. `+dim_brreg_enhet` is the opposite selector and does not.
 
 ⚠️ **Run it as the `atlas` database user, not as a superuser.** A full refresh drops and recreates, so
 the tables take the running user's ownership — and a superuser leaves the *next* run with "permission
-denied". **Measured cost: 256 seconds, once** (`imac`, three runs).
+denied".
+
+**Measured cost for this selector: 528 s dbt-reported, 536 s wall** (`imac`, on a real upgrade;
+PASS=30 WARN=1 ERROR=0). ⚠️ **A figure of ~256 s or "about four minutes" refers to the model *alone*.**
+`dim_brreg_enhet+` additionally runs 29 data tests and a view model, so it is roughly twice that. The
+number and the selector have to travel together.
 
 **2. A publish — and it is a different operation, not part of the refresh.** This release changes
-`COMMENT`s, and comments live **in the database, not in the image**. Materialise the `api_v1` asset,
-or run `transform_and_publish`. Without it the served OpenAPI field documentation stays as it was
-while the build that produced it has moved on.
+`COMMENT`s, and comments live **in the database, not in the image**. Without a publish the served
+OpenAPI field documentation stays as it was while the build that produced it has moved on.
+
+🔴 **There is no CLI affordance for materialising a single asset.** `uis dagster run` takes **jobs**,
+not assets, so `uis dagster run api_v1` answers *"No job named 'api_v1'"*. From the host you have two
+options and neither is the one-liner you might expect:
+
+- **`uis dagster run transform_and_publish`** — works, and rebuilds every mart rather than just
+  publishing, so it costs more than the operation needs; or
+- **materialise the `api_v1` asset in the Dagster UI**, which is the narrow operation.
 
 **Both. A refresh is not a publish.**
 
