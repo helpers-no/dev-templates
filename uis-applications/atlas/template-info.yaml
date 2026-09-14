@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260914-123cdc8"
+version: "v20260914-9509ea5"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -69,38 +69,38 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #956):
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #970):
 #   asset artifact_digest and GHCR docker-content-digest agree; image_digest
-#   (sha256:6dd4056b…) distinguished and asserted NOT to be this value
-#   blob pulled AT the digest hashes to the manifest; kind/id/tag self-consistent
+#   (sha256:69e0de8a…) distinguished and asserted NOT to be this value
+#   blob hashes to the manifest; kind/id/tag self-consistent; 30707 bytes read via the
+#   raw-UTF-8 path, because the layer still declares .tar and is not one
 #
-# ⚠️ THE template-info.yaml LAYER LIES ABOUT ITS OWN mediaType. It declares
-# application/vnd.oci.image.layer.v1.tar and is RAW UTF-8 YAML — tarfile.open raises.
-# A verifier that trusts the declared type reads NOTHING, and an empty read is
-# indistinguishable from an absent field, which is usually the thing being checked. The
-# verifier now names which path it used and refuses an empty read outright.
+# 🔴 A BETTER ERROR MESSAGE, NOT A FIX. The declaration is unchanged, so nothing about
+# the defect changes: env_from_exports is still declared, api-url is still host-facing
+# loopback, and the address delivered into the pod is still wrong. The real remedy is
+# env_from_services (UIS 1.6.84); no atlas artifact uses it yet. A pin landing on the day
+# of a long argument reads as the argument landing — it did not.
 #
-# Reproduced tor-agent's known-NEGATIVE control rather than only the positive:
-#   123cdc8   env_from_exports 1   api-url 4
-#   72999a4   env_from_exports 0   api-url 1   <- proves the read works on that blob,
-#                                                 so the 0 is a real absence
+# ⚠️ PRECISION ON THE "BYTE-IDENTICAL" PREMISE, which is the nomination's one inference:
+# the published template-info.yaml files are NOT byte-identical. They differ in exactly
+# four lines — code_location.tag and code_location.digest, both substituted at publish:
+#     tag     v20260914-123cdc8  ->  v20260914-9509ea5
+#     digest  sha256:6dd4056b…   ->  sha256:69e0de8a…
+# What IS identical is the authored source and, decisively, all EIGHT code_location keys:
+#   digest env_from_exports env_secrets image module name tag why
+# tor-agent's 1.6.84 result was a key-whitelist and validator pass, so it transfers on key
+# identity — which holds. The conclusion stands; the premise as stated was stronger than
+# the evidence, and "byte-identical" would license a wrong inference if a third field ever
+# moved. Verified here with shasum, cmp and a key enumeration.
 #
-# ⚠️ The --full-refresh requirement from v20260914-72999a4 is UNCHANGED and still applies.
-# This delta is a declaration plus a render gate, not a schema change.
-#
-# 🔴 UIS >= 1.6.82 is a floor on the OUTCOME, not on the install: older UIS ignores
-# env_from_exports rather than rejecting it, so pinning breaks nothing — but below 1.6.82
-# a host gets no benefit and no signal. tor-agent's caveat, worth keeping: the tolerance is
-# correct BY ACCIDENT. env_from_exports sits inside code_location, which UIS iterates by
-# known keys rather than validates. One level up and this pin would have REJECTED the
-# install on every host not on 1.6.82.
-#
-# ⚠️ NOT VERIFIED END TO END: nobody has seen ATLAS_POSTGREST_URL inside a running pod.
-# The writer was verified standalone. Do not let this pin imply the wiring works.
+# ⚠️ NOT INSTALLED BY ANYONE. imac confirmed the digests; the quoted diagnostic is atlas
+# driving its own code on its own machine. Accepted for a message-only change with an
+# unchanged declaration — and it would not be acceptable for anything touching models or
+# the schema.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260914-123cdc8
-  digest: "sha256:ae08a38ee9f34f2a8689a5b99f50cbe8b8e4d69ea0a60a30838910bb7298a126"
+  tag: v20260914-9509ea5
+  digest: "sha256:13f3925c665f8065fe6624ddc4d9b8a7c9d314df0e63082bdc59b485fe41d2d8"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public

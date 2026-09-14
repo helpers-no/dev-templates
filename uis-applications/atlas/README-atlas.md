@@ -52,7 +52,7 @@ because two figures in the artifact used to disagree with each other *and* with 
 counting method was written down anywhere.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260914-123cdc8`:
+`operational.cadence` in the artifact at pin `v20260914-9509ea5`:
 
 **Every row names the job that owns it**, and that is not decoration — see the warning below the
 table.
@@ -185,7 +185,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches`, `frr` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260914-123cdc8`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260914-9509ea5`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
@@ -311,9 +311,46 @@ But the benefit has a floor:
 **One level up and this pin would have rejected the install outright on every host not yet on 1.6.82.**
 Worth knowing before assuming a future declaration will be equally harmless.
 
-⚠️ **Not yet observed end to end.** The writer has been verified standalone; nobody has yet seen
-`ATLAS_POSTGREST_URL` inside a running pod. Until someone has, treat the variable as declared rather
-than as proven.
+### 🔴 The variable is delivered, and the address in it is wrong
+
+This is stronger than "unproven", which is what this page said before anyone looked inside a pod.
+
+`api-url` is **host-facing**. `.localhost` is loopback by specification (RFC 6761), so a pod that dials
+it reaches **itself**, not the API. The variable arrives; the address it carries does not work from
+where it is used.
+
+```
+env_from_exports: ATLAS_POSTGREST_URL: api-url   still declared
+api-url                                          still loopback, host-facing
+the address delivered into the pod               still wrong
+```
+
+**The current pin does not fix this.** It adds a diagnostic that explains it:
+
+```
+⚠️ API unreachable: <urlopen error [Errno 61] Connection refused>
+⚠️ that address is HOST-facing and this is running in a pod. `.localhost` is
+   loopback (RFC 6761), so the request went to this pod, not to the API.
+   Not a missing ingress — an in-cluster address is needed here.
+```
+
+⚠️ **Search for the sentence, not the errno.** 61 on macOS, 111 on Linux — the number is
+platform-dependent and the explanation is not.
+
+**A better error message is not a fix.** The real remedy is `env_from_services`, shipped in UIS 1.6.84,
+and **no atlas artifact uses it yet**. When one does, this section changes.
+
+### ⚠️ The diagnostic is never proactive — it answers, it does not warn
+
+| how you reach it | does it run? |
+|---|---|
+| `uis template check atlas` | **yes**, immediately |
+| a shell in the pod | **yes** |
+| anything on a schedule — Dagster, a log, a sweep | **no** |
+
+**The only invoker is the check command.** Nothing runs it on a clock, so this is never "a log nobody
+reads" — and it is also never something that tells you first. **Do not read "better diagnostics" as
+"I will be told."** It reaches a human exactly when a human asks.
 
 ### Why the earlier releases being silent is the hazard
 
