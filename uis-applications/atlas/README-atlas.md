@@ -52,7 +52,7 @@ because two figures in the artifact used to disagree with each other *and* with 
 counting method was written down anywhere.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260914-1fa7961`:
+`operational.cadence` in the artifact at pin `v20260914-15dc497`:
 
 **Every row names the job that owns it**, and that is not decoration — see the warning below the
 table.
@@ -185,7 +185,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches`, `frr` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260914-1fa7961`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260914-15dc497`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
@@ -337,6 +337,27 @@ atlas today; nobody can make those hosts upgrade. `./uis pull` moves a host to `
   verification behind this pin used a locally repointed registry cache — **the install was real, the
   catalogue read was not** — and that was disclosed rather than glossed.
 - **Scope.** One application, one cluster: k3s v1.25.16 on Rancher Desktop, zero IngressRoutes.
+
+### What `uis template check atlas` actually reports
+
+The check asks whether a deletion Brreg has published has been **applied** by the transform, not
+whether one is merely **outstanding**:
+
+| situation | verdict |
+|---|---|
+| deletions pending, awaiting the next transform at `:10`/`:40` | **OK** — *"not a fault"* |
+| a deletion **applied** and the organisation **still served** by the API | **WARN** — a real fault, **at any age** |
+
+It reports both at once when both are true, labelled differently, so a real fault is not hidden by
+routine pending work. The question has no clock in it, so it cannot drift when the `:10`/`:40` offset
+is tuned — and that offset is deliberate and therefore tunable.
+
+> ⚠️ **If you installed pin `v20260914-1fa7961` and the check said "reported a problem", that was
+> probably not your install.** That pin's check counted pending deletions without asking whether they
+> had been applied, so a correct system reported **UNHEALTHY for roughly 11 minutes in every 30** —
+> and it rendered identically to the real incident it exists to catch. The current pin distinguishes
+> them. **This catalogue advertised `1fa7961` for about an hour; if you took it in that window and
+> saw a problem on a fresh install, re-check on the current pin before investigating anything.**
 
 ### ⚠️ The check is never proactive — it answers, it does not warn
 

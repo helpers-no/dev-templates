@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260914-1fa7961"
+version: "v20260914-15dc497"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -69,45 +69,50 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #980):
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #993):
 #   asset artifact_digest and GHCR docker-content-digest agree; image_digest
-#   (sha256:00812e2f…) distinguished and asserted NOT to be this value
+#   (sha256:2e52e074…) distinguished and asserted NOT to be this value
 #   blob hashes to the manifest; 31611 bytes via the raw-UTF-8 path
 #
-# 🟢 THIS IS THE LOOPBACK FIX, and the first pin installed and measured in a pod BEFORE
-# being nominated. before: ATLAS_POSTGREST_URL=http://api-atlas.localhost -> exit 2,
-# CANNOT, because .localhost is loopback (RFC 6761) and the pod dialled itself. after:
-# http://atlas-postgrest.postgrest.svc.cluster.local:3000 -> exit 0, check healthy.
-# Port 3000 is the data API; 3001 is the admin server and 404s a table read.
+# 🔴 SUPERSEDES v20260914-1fa7961, which this repository advertised for about an hour and
+# which cries wolf: its check counted PENDING deletions without asking whether they had
+# been APPLIED, so a healthy system reported UNHEALTHY for ~11 minutes in every 30 and
+# rendered identically to the real incident the check exists to catch. The fix asks the
+# deletion's own oppdateringsid against the dimension watermark — no clock, so it cannot
+# drift when the :10/:40 offset is tuned.
 #
-# Key list enumerated from the PULLED artifact, not a source diff — the method this repo
-# corrected into place on pin A, now adopted by the nominator:
-#   9509ea5   env_from_exports  {ATLAS_POSTGREST_URL: api-url}
-#   1fa7961   env_from_services {ATLAS_POSTGREST_URL: postgrest}   <- a SERVICE id
-#   eight keys either side, one swapped. env_from_exports is absent at the DATA level in
-#   1fa7961; its two remaining occurrences in the file are comments.
-#   exports.api-url untouched and still host-facing, correctly — it is for hosts.
+# Verified BOTH directions on a real cluster by imac, one commit apart on identical rows:
+#   1fa7961  pending 47, applied 25191244, deletion still served -> exit 1
+#   15dc497  the same rows                                       -> exit 0
+# and the RED case was CONSTRUCTED, not reasoned about: an already-applied deletion's
+# organisation was re-inserted into marts.dim_brreg_enhet so the API served it while its
+# deletion was applied -> UNHEALTHY at ZERO age. It reported both conditions at once,
+# labelled differently. The alarm was not silenced, it was made specific. Fixture reverted
+# and the revert verified.
 #
-# ⚠️ THE UIS FLOOR RISES TO 1.6.84. env_from_services needs 1.6.84 to be read, and the
-# fallback key is gone, so a host on 1.6.83 or below now gets NO value rather than a wrong
-# one: CANNOT, naming the variable. "Wrong value, explained" becomes "no value, explained"
-# — both CANNOT, neither a health regression. That is why pin A was worth taking.
-# The registry is fetched unauthenticated and lists atlas, so there are hosts nobody can
-# make upgrade.
+# Declaration identity, stated precisely per this repo's correction on pin A: NOT
+# byte-identical — the two publish-time substitutions differ (code_location.tag and
+# .digest). All EIGHT code_location keys are identical and env_from_services is unchanged
+# at {ATLAS_POSTGREST_URL: postgrest}. Key list from the PULLED artifact, not a source
+# diff.
 #
-# ⚠️ --full-refresh from v20260914-72999a4 STILL REQUIRED, unchanged. No dbt models, no
-# migrations in this delta.
+# ✅ Installed through the SUPPORTED surface with no fabricated step, using UIS 1.6.88's
+# new --version flag:
+#   ./uis template install atlas --version v20260914-15dc497@sha256:058e7bba…   exit 0
+# That closes the circular dependency this repo flagged on #980 — a nominee could not
+# reach the supported surface until it was already pinned, and the catalogue was the
+# circle.
 #
-# ⚠️ NOT OBSERVED: a run pod's rendered env from inside a run pod; and a plain install on
-# a host that took THIS catalogue's word — impossible before this pin existed, because
-# `uis template install <id>` takes an id only with no --tag or --digest, so a nominee
-# cannot reach the supported surface until it is pinned. The verification behind this pin
-# repointed a LOCAL registry cache: the install was real, the catalogue read was not, and
-# that was disclosed rather than glossed. Scope: one application, one cluster.
+# UIS floor unchanged at 1.6.84+. --full-refresh from 72999a4 unchanged. No models, no
+# migrations, no schema keys.
+#
+# ⚠️ NOT VERIFIED: an applied deletion served for HOURS (zero age was produced; the claim
+# is any age), and the pending/applied split under a bulk reload where the watermark jumps.
+# Scope: one cluster.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260914-1fa7961
-  digest: "sha256:b7de79f13ced31005d27fa7024fbb48427954c61658f39958b4d0425b0b712de"
+  tag: v20260914-15dc497
+  digest: "sha256:058e7bba6257d388acdbf308544fd0f098119b47361d35f6e374296a1428fd9f"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public
