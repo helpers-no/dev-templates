@@ -60,27 +60,36 @@ simultaneous writers.
 > Finishing the first-data sequence means the data is in. **It does not mean the data has been
 > checked.** Run the checks before treating the install as good.
 >
-> 🔵 **This page is currently the only place that sentence reaches you.** The artifact says it too —
-> `operational.first_data.how` carries it verbatim — but the field is **2300 characters** and UIS
-> renders about **1114**. The sentence begins at character **1159**, so it is **45 characters past the
-> cut**, and it appears in no install output, no `--dry-run`, no progress and no check.
+> 🔵 **This page is currently the only place that sentence reaches you.** The artifact carries it too,
+> in `operational.first_data.how` — but **`how` is not rendered by the installer at all**, so at
+> install time it emits **zero characters**, not a shortened version. It appears in no install output,
+> no `--dry-run`, no progress and no check. `uis template info` does render it in full.
 >
-> ⚠️ **The cut is a character budget, not a paragraph break** — and the difference matters if you are
-> tempted to fix it by rewriting the field. Measured on the pinned artifact: the newlines sit at
-> **336, 650, 1114, 1681**, and UIS rendered **1114**, which is the *third* of them. A
-> first-paragraph-break rule would have rendered 336. What fits the evidence is a budget somewhere in
-> **(1114, 1681]** with a cut-back to the last line boundary that fits.
->
-> 🔴 **So "keep the field to one paragraph" is the wrong fix and would make it worse.** A single
-> unbroken 2300-character paragraph offers no boundary to cut back to, so a boundary rule loses more
-> than it does now, not less. **Shorter, or split so an early boundary carries the important sentence
-> — not flatter.**
->
-> **Retire this box when UIS renders the whole field** — not when the artifact next changes, because
-> the artifact already says it.
->
-> **Retire this box when UIS renders the whole field** — not when the artifact next changes, because
-> the artifact already says it.
+> **Retire this box when the installer renders the version this host installed.** Not when the
+> artifact changes — the artifact already says it.
+
+### 🔴 On an off-catalogue host, `uis template info` describes the wrong software
+
+**`info` renders the definition the *catalogue* pins, not the one your host installed.** If you
+installed a specific version — `uis template install atlas --version …@sha256:…` — then `info` prints
+a complete, well-formed, authoritative description of **a different build**.
+
+It even says so and does not connect the two: the off-catalogue warning prints, and **the operational
+block on the very next line comes from the other version, silently.** Everything in it is affected —
+`deploys`, `automation`, the first-data list, the cadence table.
+
+⚠️ **This page has the same limitation, for the same reason.** It mirrors the artifact **at the pinned
+tag**. If you are running something else, this page describes the catalogue's build, not yours. **Read
+your own definition** — pull the artifact at the digest you installed.
+
+🔵 **Why this bites the person it bites:** anyone installing off-catalogue is by definition *ahead of*
+the pin, which is exactly when they most need the description to be of what they installed.
+
+> ⚠️ **And it disappears when you fix the pin.** Once the catalogue points at what the host is running,
+> installed and catalogue agree and the symptom is gone — so re-running the test afterwards shows
+> correct output and invites the conclusion that something merged fixed it. **A defect that vanishes
+> when the thing it affects is corrected gets closed as fixed every time anyone looks.** It was caught
+> here only because a blob had been pulled and kept while the two disagreed.
 
 🔴 **Launch the first-data jobs BEFORE enabling automation.** Enable first and the *sensor* decides the
 order: `brreg_change_feed` will start, find no watermark, and **fail loudly** until `brreg_bootstrap`

@@ -38,7 +38,18 @@ carry_forward: >-
   scopes that item to the pinned build and says it retires with the next pin, so when the
   pin moves, delete it rather than rewriting it. The publish_api_v1 caveat is unaffected.
 
-  Still live and NOT retired by a pin move: the "LOADED but NOT VALIDATED" box, whose
-  condition is UIS rendering the whole first_data.how field — atlas PR #314's text is
-  already in the artifact and reaches nobody, so the artifact changing does not clear it.
-  Tracked with tor-agent as #1152.
+  Still live and NOT retired by a pin move: the "LOADED but NOT VALIDATED" box. Its
+  condition was reworded on urb-agents #1156 and the old wording must not come back: it
+  said "UIS renders the whole field", which was ALREADY TRUE — `uis template info` renders
+  all 2300 characters — so it was a condition phrased as a future event that could never
+  fire. It now reads "the installer renders the version this host installed", because
+  `first_data.how` is not in the installer's whitelist at all and emits ZERO characters
+  there. Tracked with tor-agent as #1152.
+
+  THERE WAS NEVER A TRUNCATION, and this page said there was for several hours. The 1114
+  characters everyone measured is where b7e513f's version of the field ENDED — it is a
+  byte-exact prefix of e439668's 2300, verified here against both blobs. The catalogue
+  pinned b7e513f during imac's test and imac had installed e439668 off-catalogue, so
+  `uis template info` rendered the catalogue's definition completely and correctly, about
+  software imac was not running. Every number was real; the object being measured was the
+  wrong version of the file.
