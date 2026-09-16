@@ -1,0 +1,39 @@
+# PIN-HOLD — the catalogue is deliberately behind upstream. Do not "catch it up".
+#
+# Read by scripts/verify-application-pin.sh --drift, which downgrades its alarm to a
+# notice while this file names the currently-pinned tag. Delete the file when the hold
+# ends; a hold naming a tag that is no longer pinned is reported as stale and loud.
+#
+# This exists because BEHIND is a true reading of a deliberate state, and the agent that
+# reads it may be a fresh session after a restart with none of this context. That reader
+# is not hypothetical — this agent has now been restarted three times mid-programme, and
+# --drift prints a ready-made pin command next to the alarm.
+
+held_tag: v20260914-b7e513f
+newer_upstream: v20260914-40c69b9
+since: 2026-09-16
+refs: urb-agents #1142, #1143
+
+reason: >-
+  PINNED AND VALIDATED MUST BE THE SAME TAG, and today they are. b7e513f is what imac
+  installed and validated end to end. 40c69b9 is newest and equals main HEAD, and nobody
+  has ever installed it. The four commits between them are comment and template-info text
+  with no behaviour change — but every commit under atlas-data/** retags and republishes,
+  so newer here does not mean different software. Moving the pin would buy nothing and
+  would make the thing operators install a thing no one has validated. ops-dev's framing,
+  which is the point: "I would rather tell Terje pinned at X, validated at Y and have
+  those be the same letter than discover later they were not."
+
+release_when: >-
+  40c69b9 or a successor has been validated end to end by imac AND is nominated, or a
+  behaviour change lands that is worth a round. Not on tidiness, not because newer exists,
+  and NOT because --drift reports behind.
+
+carry_forward: >-
+  Terje has refocused on getting atlas deployed, so the question being asked of this
+  catalogue right now is "what will an operator get", not "is it current". Those pull in
+  opposite directions while an unvalidated artifact sits on top: the honest answer to the
+  first is served by holding. Also still live: the interim box in README-atlas.md about a
+  healthy check not meaning anything is running, which retires when a pin lands carrying
+  atlas PR #309 — do not delete that box just because a pin moved, check the pin carries
+  the fix.
