@@ -68,6 +68,38 @@ simultaneous writers.
 > **Retire this box when the installer renders the version this host installed.** Not when the
 > artifact changes — the artifact already says it.
 
+> ### 🔴 …and the pinned build tells you that you cannot run them. You can.
+>
+> The box above says to run the checks. **The definition currently pinned contradicts it**, in these
+> words:
+>
+> > *"The other 675 cannot be launched this way yet: the call does not return within 300 s, exceeds
+> > the client's 60 s budget, and leaves an unsubmitted run behind, so do not retry it"*
+>
+> **Four details in that sentence are wrong**, and they were measured against a build and a UIS
+> version that have both moved:
+>
+> | the pinned text says | actually |
+> |---|---|
+> | the checks **cannot be launched** | **they launch.** They are *slow*, not broken |
+> | leaves an **unsubmitted run** behind | **duplicate runs** — the opposite hazard |
+> | a **60 s** client budget | replaced by **900 s** in UIS 1.6.104 |
+> | **679** checks, **675** from dbt | this build defines **685** — 681 dbt plus 4 on `api_v1` |
+>
+> ✅ **"Do not retry it" is still the right action** — but for the opposite reason. It is not that a
+> retry leaves nothing behind; it is that **a run which looks hung is usually still going, and
+> retrying gives you duplicates.** Wait it out.
+>
+> ⚠️ **An operator who checks that reason and finds it false has no way to know the advice is still
+> sound.** That is why this note exists rather than a correction upstream: atlas has fixes ready, but
+> `uis template install` fetches the **pin**, so they reach nobody until the pin moves.
+>
+> 🔵 **Worth knowing how a sentence like that survives:** it cites its source — *(imac, #1064)* — and
+> the citation is honest. It was measured, by the named party, and has since been superseded. **A
+> correctly attributed measurement is not a current one.**
+>
+> **Retire this box when the pin moves off `v20260916-e439668`.**
+
 ### 🔴 On an off-catalogue host, `uis template info` describes the wrong software
 
 **`info` renders the definition the *catalogue* pins, not the one your host installed.** If you

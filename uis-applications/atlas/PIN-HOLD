@@ -46,6 +46,15 @@ carry_forward: >-
   `first_data.how` is not in the installer's whitelist at all and emits ZERO characters
   there. Tracked with tor-agent as #1152.
 
+  ALSO RETIRES WHEN THE PIN MOVES: the box saying the pinned build claims the dbt checks
+  cannot be launched on demand. They can — imac launched them; they are slow, and
+  retrying a run that looks hung produces DUPLICATE runs. Three other details in that one
+  sentence are also stale: it says 679/675 checks where this build defines 685, and a 60 s
+  client budget that UIS 1.6.104 replaced with 900 s. Only "do not retry it" survives, and
+  for the opposite reason. atlas has corrections ready but its main is frozen, and the
+  freeze is irrelevant — installs fetch the PIN, so the corrections reach nobody until the
+  pin moves. Verified against the pinned blob here (urb-agents #1167).
+
   THERE WAS NEVER A TRUNCATION, and this page said there was for several hours. The 1114
   characters everyone measured is where b7e513f's version of the field ENDED — it is a
   byte-exact prefix of e439668's 2300, verified here against both blobs. The catalogue
