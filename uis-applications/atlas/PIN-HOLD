@@ -1,0 +1,44 @@
+# PIN-HOLD — the catalogue is deliberately behind upstream. Do not "catch it up".
+#
+# Read by scripts/verify-application-pin.sh --drift, which downgrades its alarm to a
+# notice while this file names the currently-pinned tag. Delete the file when the hold
+# ends; a hold naming a tag that is no longer pinned is reported as stale and loud.
+#
+# ⚠️ THIS IS THE READER THE FILE EXISTS FOR. `--drift` reports BEHIND and prints a
+# ready-made pin command on the next line. This agent has been restarted three times
+# mid-programme. A fresh session with no memory runs drift, sees a correct alarm and a
+# correct-looking command, and executes it — pinning something nobody has installed. The
+# tool is right, the alarm is right, the command is right, and the outcome is wrong.
+
+held_tag: v20260916-e439668
+newer_upstream: v20260916-f848593
+since: 2026-09-16
+refs: urb-agents #1143, #1148, #1153
+
+reason: >-
+  PINNED AND VALIDATED MUST BE THE SAME TAG. e439668 is what imac installed and validated
+  end to end, as an upgrade over a loaded install. f848593 is newer, merged and published,
+  and NOBODY HAS INSTALLED IT. atlas said so about its own build before anyone asked:
+  "This is NEWER than the nominated e439668 and nobody has installed it. Do not let
+  f848593 inherit a nomination it has not earned." Terje is focused on getting atlas
+  deployed, so the question being asked of this catalogue is "what will an operator get",
+  and the honest answer to that is served by holding.
+
+release_when: >-
+  imac has installed f848593 or a successor AND it is nominated. Not on tidiness, not
+  because newer exists, and NOT because --drift reports behind. A nomination is not
+  inherited by whatever happens to be newest when the previous one was validated.
+
+carry_forward: >-
+  f848593 fixes something this page currently documents, so the next pin has prose work
+  attached rather than being a digest swap. The "uis template check returns exit 2,
+  NOTHING WAS CHECKED, until one transform has run" caveat is TRUE of e439668 and FIXED
+  from f848593 on: it separates WARN (marts built before, view missing — an upgrade
+  waiting on a transform, self-heals) from CANNOT (marts never built). The page already
+  scopes that item to the pinned build and says it retires with the next pin, so when the
+  pin moves, delete it rather than rewriting it. The publish_api_v1 caveat is unaffected.
+
+  Still live and NOT retired by a pin move: the "LOADED but NOT VALIDATED" box, whose
+  condition is UIS rendering the whole first_data.how field — atlas PR #314's text is
+  already in the artifact and reaches nobody, so the artifact changing does not clear it.
+  Tracked with tor-agent as #1152.

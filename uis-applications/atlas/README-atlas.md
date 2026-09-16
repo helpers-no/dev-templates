@@ -61,10 +61,23 @@ simultaneous writers.
 > checked.** Run the checks before treating the install as good.
 >
 > 🔵 **This page is currently the only place that sentence reaches you.** The artifact says it too —
-> `operational.first_data.how` carries it verbatim — but that field parses to **2300 characters** and
-> UIS renders about **1114**, cutting at the first paragraph break. The sentence begins at character
-> **1159**, so it is **45 characters past the cut** and appears in no install output, no `--dry-run`,
-> no progress and no check. Verified here by parsing the pinned artifact, not taken on report.
+> `operational.first_data.how` carries it verbatim — but the field is **2300 characters** and UIS
+> renders about **1114**. The sentence begins at character **1159**, so it is **45 characters past the
+> cut**, and it appears in no install output, no `--dry-run`, no progress and no check.
+>
+> ⚠️ **The cut is a character budget, not a paragraph break** — and the difference matters if you are
+> tempted to fix it by rewriting the field. Measured on the pinned artifact: the newlines sit at
+> **336, 650, 1114, 1681**, and UIS rendered **1114**, which is the *third* of them. A
+> first-paragraph-break rule would have rendered 336. What fits the evidence is a budget somewhere in
+> **(1114, 1681]** with a cut-back to the last line boundary that fits.
+>
+> 🔴 **So "keep the field to one paragraph" is the wrong fix and would make it worse.** A single
+> unbroken 2300-character paragraph offers no boundary to cut back to, so a boundary rule loses more
+> than it does now, not less. **Shorter, or split so an early boundary carries the important sentence
+> — not flatter.**
+>
+> **Retire this box when UIS renders the whole field** — not when the artifact next changes, because
+> the artifact already says it.
 >
 > **Retire this box when UIS renders the whole field** — not when the artifact next changes, because
 > the artifact already says it.
@@ -285,13 +298,21 @@ uis dagster run publish_api_v1      # ~67 s
 
 After that, **4 of 4 succeeded**.
 
-**2. `uis template check atlas` returns exit 2 — "NOTHING WAS CHECKED" — until one transform has
-run.** `marts.mart_source_freshness` does not exist yet, so there is nothing to check. The same
-command returned exit 0 on the previous pin and exit 2 straight after this install.
+**2. On the currently pinned build only — `uis template check atlas` returns exit 2, "NOTHING WAS
+CHECKED", until one transform has run.** `marts.mart_source_freshness` does not exist yet, so there is
+nothing to check. The same command returned exit 0 on the previous pin and exit 2 straight after this
+install.
 
 ⚠️ **That is exit 2 in exactly the window where an operator is checking whether their upgrade
 worked.** Let one `transform_and_publish` run (~376 s) and it returns exit 0 — measured at 29 bounded
 sources, 29 within cadence.
+
+✅ **Already fixed upstream, and this note retires with the next pin.** A later atlas build separates
+the two cases — **WARN** for marts built before but the view missing (an upgrade waiting on a
+transform, which self-heals) and **CANNOT** for marts never built (nothing has run here). The old
+behaviour rested on an assertion that a missing view *"means no transform has ever run here"*, which
+is false on every upgrade. **So treat this item as true of the pinned build and not as permanent
+advice.**
 
 🔵 **Neither cause was inferred; both were established by intervention.**
 
