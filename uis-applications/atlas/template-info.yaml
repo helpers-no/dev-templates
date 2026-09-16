@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260914-b7e513f"
+version: "v20260916-e439668"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -71,43 +71,52 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #1007).
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #1148):
+#   asset artifact_digest and GHCR docker-content-digest agree; image_digest
+#   (sha256:4f8072bf…) distinguished and asserted NOT to be this value
+#   blob hashes to the manifest; 36575 bytes via the raw-UTF-8 path
+#   bad control in the same session: v20260916-nosuchtag -> 404
 #
-# ⚠️ THIS PIN'S DIGESTS WERE NOT CONFIRMED BY imac — the nominator said so plainly and
-# relied on this repository's read as the independent one, because imac had two jobs that
-# outranked a docs pin. So the read was done with BOTH controls in the same session:
-#   v20260914-b7e513f   HTTP 200   asset artifact_digest == GHCR docker-content-digest
-#   v20260914-15dc497   HTTP 200   good control
-#   nosuchtag-control   HTTP 404   bad control — the instrument discriminates
-# image_digest (sha256:e78eedf1…) distinguished and asserted NOT to be this value.
+# 🟢 VALIDATED END TO END BY imac BEFORE nomination, which is what the PIN-HOLD this pin
+# released required in those words. Installed as an UPGRADE over a loaded b7e513f install
+# rather than a cold one: check exit 0, 14/14 public endpoints 200, automation 5 RUNNING,
+# register current with 0 pending.
 #
-# Documentation only. Key list from the PULLED artifact: the eight code_location keys are
-# identical to 15dc497's, env_from_services unchanged, env_from_exports absent. No models,
-# no migrations, no schema keys. UIS floor unchanged at 1.6.84+. --full-refresh from
-# 72999a4 unchanged.
+# 🔴 THE INTERIM BOX IS RETIRED BY THIS PIN, and only by this one. atlas PR #309 is in
+# e439668, and imac verified its BEHAVIOUR in both cases — all five instigators stopped,
+# and the PARTIAL case where one is stopped and four run, which is the case that had no
+# fix at all before and that a whole-fleet check would miss.
 #
-# 🔴 WHAT IT CORRECTS, and this repository was repeating the error: the previous artifact
-# said "Enabling them starts the NEXT scheduled run". True of the two schedules, WRONG for
-# the automation sensor that drives all ~40 ingest sources — on_cron means "tick passed
-# AND deps updated since that tick", both trivially true on a fresh install, so it can
-# begin fetching within about a minute. Enabling at 16:55 on a Friday starts work at
-# 16:55.
+# ⚠️ TWO THINGS LOOK BROKEN AFTER UPGRADING AND ARE NOT. Both on the page, both measured
+# by intervention rather than inferred:
+#   1. api_v1 checks 2 pass / 2 fail until `uis dagster run publish_api_v1` (~67 s) -> 4/4.
+#      COMMENTs live in the database, so served docs track the last build that PUBLISHED.
+#   2. `uis template check atlas` returns exit 2 "NOTHING WAS CHECKED" until one transform
+#      has run, because marts.mart_source_freshness does not exist yet. After one
+#      transform_and_publish (~376 s) it is exit 0. That is exit 2 in exactly the window
+#      where an operator is checking whether the upgrade worked.
 #
-# That sentence was in this entry's abstract and on the catalogue page, because this repo
-# mirrored it from the artifact on #764. Both corrected here.
+# 🔴 atlas PR #314 is NOT DELIVERED, and this repository is now the only surface carrying
+# its sentence. Confirmed here by parsing the pinned artifact rather than on report:
+# operational.first_data.how is 2300 characters, UIS renders ~1114, and "WHEN THESE SIX
+# HAVE FINISHED THE INSTALL IS LOADED BUT NOT VALIDATED" starts at character 1159 — 45
+# past the cut. It appears in no install output, no --dry-run, no progress, no check. The
+# page says it in its own words and says to retire that box when UIS renders the whole
+# field, NOT when the artifact next changes, because the artifact already says it.
 #
-# UIS 1.6.90 shipped `uis dagster automation --start` an hour before this nomination, so
-# enabling went from opening a web UI to one command — which is why a wrong timing
-# sentence stopped being academic.
+# ⚠️ Not fully verified, per imac and worth not recording as done: #314's positive case
+# cannot be demonstrated on that machine (all 685 checks have now run there, so a correct
+# implementation stays silent) — a genuinely fresh install is still owed; #317 was a
+# threshold-scaled reproduction, disclosed unasked, tested both directions; and
+# transform_checks still cannot be launched on demand, which is platform-side.
 #
-# ⚠️ ORDERING, new on the page: launch the first-data jobs BEFORE enabling automation.
-# Enable first and the sensor decides the order — brreg_change_feed starts, finds no
-# watermark and fails loudly until brreg_bootstrap has run. By design, not a fault, and
-# avoidable.
+# 🔵 A transform_checks SUCCESS can carry 18 failed checks. Diffed against the overnight
+# b7e513f run in the same database: 0 new, 0 fixed, pre-existing kommune_nr / fylke_nr
+# referential integrity. Do not read the exit code as the check count.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260914-b7e513f
-  digest: "sha256:aa52587c7480c0a458f07fb1e1056096f63faa83844a1d692fb520708760b2b6"
+  tag: v20260916-e439668
+  digest: "sha256:ba5305f065d81ae78da95e35d4efa007dd005e6a346ea3f6a33f1cdb875613cc"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public

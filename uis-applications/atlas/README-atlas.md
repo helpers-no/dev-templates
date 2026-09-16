@@ -55,6 +55,20 @@ Friday starts work at 16:55.**
 Concurrency is bounded by `ATLAS_MAX_CONCURRENT_INGESTS`, so it is a bounded start rather than 40
 simultaneous writers.
 
+> ### ⚠️ When those six jobs finish, the install is LOADED but NOT VALIDATED
+>
+> Finishing the first-data sequence means the data is in. **It does not mean the data has been
+> checked.** Run the checks before treating the install as good.
+>
+> 🔵 **This page is currently the only place that sentence reaches you.** The artifact says it too —
+> `operational.first_data.how` carries it verbatim — but that field parses to **2300 characters** and
+> UIS renders about **1114**, cutting at the first paragraph break. The sentence begins at character
+> **1159**, so it is **45 characters past the cut** and appears in no install output, no `--dry-run`,
+> no progress and no check. Verified here by parsing the pinned artifact, not taken on report.
+>
+> **Retire this box when UIS renders the whole field** — not when the artifact next changes, because
+> the artifact already says it.
+
 🔴 **Launch the first-data jobs BEFORE enabling automation.** Enable first and the *sensor* decides the
 order: `brreg_change_feed` will start, find no watermark, and **fail loudly** until `brreg_bootstrap`
 has run. That is by design rather than a fault — but it is noise nobody needs, and it is avoidable by
@@ -70,7 +84,7 @@ because two figures in the artifact used to disagree with each other *and* with 
 counting method was written down anywhere.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260914-b7e513f`:
+`operational.cadence` in the artifact at pin `v20260916-e439668`:
 
 **Every row names the job that owns it**, and that is not decoration — see the warning below the
 table.
@@ -203,7 +217,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches`, `frr` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260914-b7e513f`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260916-e439668`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
@@ -255,6 +269,31 @@ so an existing tenant is untouched. Verified by `imac` on urb-agents #481.
 
 An upgrade happens when this catalogue entry's pin moves and you re-install. **What that costs you
 depends on the release, and it is not always nothing.**
+
+### 🔴 After upgrading to this pin, two things look broken and are not
+
+Both self-heal, both are documented, and an upgrader who does not know them will think the upgrade
+failed. **Measured on a real upgrade over a loaded install, not a cold one.**
+
+**1. The served documentation lags until you publish.** `COMMENT`s live in the database, so the
+OpenAPI field docs track the last build that *published*. Immediately after installing, the `api_v1`
+checks measured **2 pass / 2 fail**:
+
+```bash
+uis dagster run publish_api_v1      # ~67 s
+```
+
+After that, **4 of 4 succeeded**.
+
+**2. `uis template check atlas` returns exit 2 — "NOTHING WAS CHECKED" — until one transform has
+run.** `marts.mart_source_freshness` does not exist yet, so there is nothing to check. The same
+command returned exit 0 on the previous pin and exit 2 straight after this install.
+
+⚠️ **That is exit 2 in exactly the window where an operator is checking whether their upgrade
+worked.** Let one `transform_and_publish` run (~376 s) and it returns exit 0 — measured at 29 bounded
+sources, 29 within cadence.
+
+🔵 **Neither cause was inferred; both were established by intervention.**
 
 ### 🔴 Upgrading still needs TWO operations — unchanged by the current pin
 
@@ -370,45 +409,24 @@ It reports both at once when both are true, labelled differently, so a real faul
 routine pending work. The question has no clock in it, so it cannot drift when the `:10`/`:40` offset
 is tuned — and that offset is deliberate and therefore tunable.
 
-> ### 🔴 A healthy verdict does not mean anything is running
+> ### ✅ The check now tells you when nothing is running
 >
-> **The table above assumes automation is on. The check does not verify that.** It reports on **data
-> only** — so until you have run
+> **This used to be a false all-clear.** With the pipeline switched off, the check reported healthy,
+> exit 0, and said *"awaiting the next transform"* when no transform was scheduled — the reassuring
+> half of the table above printed for the one reason it could not cover. **Fixed as of this pin**, and
+> verified in both the total and the partial case:
 >
-> ```bash
-> uis dagster automation --start
-> ```
+> | state | what it says |
+> |---|---|
+> | all five instigators stopped | names them, `other instigators running 0`, **"Nothing is scheduled to reconcile the register"** |
+> | **one** stopped, four running | *"…not yet applied — `brreg_transform_half_hourly` is STOPPED, nothing will apply them"*, `other instigators running 4` |
 >
-> a healthy result tells you the data is consistent, **not that anything is processing it**. With the
-> pipeline entirely switched off the check has reported **healthy, exit 0**, and said *"awaiting the
-> next transform"* **when no transform was scheduled** — the reassuring half of the table printed for
-> the one reason it cannot cover.
+> ⚠️ **The partial case is the one a whole-fleet check would have missed** — it names the single
+> stopped instigator while four others still run. That is the case that had no fix at all on the
+> previous pin.
 >
-> **UIS 1.6.97 fixes the total case:** with 0 of 5 instigators running it now retracts every
-> future-tense sentence and exits 2.
->
-> ⚠️ **The partial case is not fixed.** **One stopped instigator among five still reports healthy** —
-> reproduced with 57 pending changes and 5 unpropagated deletions sitting behind it. So a green check
-> is not evidence that all five are running, on any current version.
->
-> **Check the instigators yourself** until that lands: `uis dagster automation` lists them and their
-> state.
->
-> 🔵 **Interim, with a retirement condition:** atlas's real fix is written, tested and green, awaiting
-> a human merge (PR #309). **When a pin lands carrying it, delete this box** — it is here to cover the
-> window, not to outlive it.
->
-> ⚠️ **The `Installing on UIS` guide linked from this page is stale on this point.** Its step 4
-> predates `uis dagster automation --start`, which shipped in UIS 1.6.90 and has been run repeatedly
-> on a real cluster, and still describes enabling automation through the web UI. **The flag is real;
-> the guide has not caught up.** Prefer the flag.
-
-> ⚠️ **If you installed pin `v20260914-1fa7961` and the check said "reported a problem", that was
-> probably not your install.** That pin's check counted pending deletions without asking whether they
-> had been applied, so a correct system reported **UNHEALTHY for roughly 11 minutes in every 30** —
-> and it rendered identically to the real incident it exists to catch. The current pin distinguishes
-> them. **This catalogue advertised `1fa7961` for about an hour; if you took it in that window and
-> saw a problem on a fresh install, re-check on the current pin before investigating anything.**
+> Enable automation with `uis dagster automation --start`. `uis dagster automation` lists the
+> instigators and their state.
 
 ### ⚠️ The check is never proactive — it answers, it does not warn
 
