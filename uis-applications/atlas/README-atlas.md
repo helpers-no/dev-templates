@@ -60,45 +60,26 @@ simultaneous writers.
 > Finishing the first-data sequence means the data is in. **It does not mean the data has been
 > checked.** Run the checks before treating the install as good.
 >
-> 🔵 **This page is currently the only place that sentence reaches you.** The artifact carries it too,
-> in `operational.first_data.how` — but **`how` is not rendered by the installer at all**, so at
-> install time it emits **zero characters**, not a shortened version. It appears in no install output,
-> no `--dry-run`, no progress and no check. `uis template info` does render it in full.
+> ✅ **The installer now says this too, and that condition is met.** As of the pinned build the
+> sentence appears in the install summary itself — between the endpoints block and the load-data
+> instructions, no scrolling, no `template info` needed. It took four mechanisms and three premature
+> declarations of "delivered" to get one sentence onto a screen, including a truncation this page
+> once described that did not exist.
 >
-> **Retire this box when the installer renders the version this host installed.** Not when the
-> artifact changes — the artifact already says it.
+> 🔵 **Kept anyway, as corroboration rather than as the only source.** One operator has seen that line
+> on one host. **This box costs a reader nothing and stops costing the moment a second person confirms
+> it** — so it stands until then, not because the condition failed.
 
-> ### 🔴 …and the pinned build tells you that you cannot run them. You can.
+> **Running them costs 6–15 minutes and looks like a hang.** All 685 can be run on demand;
+> `uis dagster run transform_checks` works, but measured launches took **364 s and 885 s just to
+> start**. The run sits `NOT_STARTED` for that whole time and then runs.
 >
-> The box above says to run the checks. **The definition currently pinned contradicts it**, in these
-> words:
+> 🔴 **That is slow, not stuck — and re-launching because it looks hung is how you get duplicate
+> runs.** Wait it out.
 >
-> > *"The other 675 cannot be launched this way yet: the call does not return within 300 s, exceeds
-> > the client's 60 s budget, and leaves an unsubmitted run behind, so do not retry it"*
->
-> **Four details in that sentence are wrong**, and they were measured against a build and a UIS
-> version that have both moved:
->
-> | the pinned text says | actually |
-> |---|---|
-> | the checks **cannot be launched** | **they launch.** They are *slow*, not broken |
-> | leaves an **unsubmitted run** behind | **duplicate runs** — the opposite hazard |
-> | a **60 s** client budget | replaced by **900 s** in UIS 1.6.104 |
-> | **679** checks, **675** from dbt | this build defines **685** — 681 dbt plus 4 on `api_v1` |
->
-> ✅ **"Do not retry it" is still the right action** — but for the opposite reason. It is not that a
-> retry leaves nothing behind; it is that **a run which looks hung is usually still going, and
-> retrying gives you duplicates.** Wait it out.
->
-> ⚠️ **An operator who checks that reason and finds it false has no way to know the advice is still
-> sound.** That is why this note exists rather than a correction upstream: atlas has fixes ready, but
-> `uis template install` fetches the **pin**, so they reach nobody until the pin moves.
->
-> 🔵 **Worth knowing how a sentence like that survives:** it cites its source — *(imac, #1064)* — and
-> the citation is honest. It was measured, by the named party, and has since been superseded. **A
-> correctly attributed measurement is not a current one.**
->
-> **Retire this box when the pin moves off `v20260916-e439668`.**
+> ⚠️ **On a busy cluster it can genuinely time out**, and it will not look like a timeout: the 885 s
+> measurement sits against a 900 s ceiling, so a slower start presents as an **image-pull or
+> scheduling failure** rather than as what it is. A later UIS raises the ceiling.
 
 ### 🔴 On an off-catalogue host, `uis template info` describes the wrong software
 
@@ -138,7 +119,7 @@ because two figures in the artifact used to disagree with each other *and* with 
 counting method was written down anywhere.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260916-e439668`:
+`operational.cadence` in the artifact at pin `v20260916-1709934`:
 
 **Every row names the job that owns it**, and that is not decoration — see the warning below the
 table.
@@ -271,7 +252,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches`, `frr` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260916-e439668`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260916-1709934`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
@@ -489,6 +470,20 @@ is tuned — and that offset is deliberate and therefore tunable.
 >
 > Enable automation with `uis dagster automation --start`. `uis dagster automation` lists the
 > instigators and their state.
+
+### ⚠️ If you gate on the check's exit code, it changed in this build
+
+**A "dark" Automation block — where the check cannot reach Dagster to ask — now returns `exit 0`.**
+On the previous pin the same condition returned `exit 2`.
+
+That is deliberate: **an exit code reporting the tool's own wiring is not a health gate.** But it is a
+contract change, and anything of yours that treats non-zero as "unhealthy" will now pass where it
+previously failed.
+
+✅ **The build says so when it happens** — the printed output names the condition at the moment it
+occurs, and the `EXIT CODES` docstring names the supported way to tighten it if you need the old
+behaviour. **Check the printed phrase on the raw stream if you grep for it**; colour sequences can
+break a naive match.
 
 ### ⚠️ The check is never proactive — it answers, it does not warn
 

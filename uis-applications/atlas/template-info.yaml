@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260916-e439668"
+version: "v20260916-1709934"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -71,52 +71,57 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #1148):
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #1172):
 #   asset artifact_digest and GHCR docker-content-digest agree; image_digest
-#   (sha256:4f8072bf…) distinguished and asserted NOT to be this value
-#   blob hashes to the manifest; 36575 bytes via the raw-UTF-8 path
-#   bad control in the same session: v20260916-nosuchtag -> 404
+#   (sha256:efdfb102…) distinguished and asserted NOT to be this value
+#   blob hashes to the manifest; 45082 bytes via the raw-UTF-8 path
+#   bad control in the same session: nosuchtag -> 404
 #
-# 🟢 VALIDATED END TO END BY imac BEFORE nomination, which is what the PIN-HOLD this pin
-# released required in those words. Installed as an UPGRADE over a loaded b7e513f install
-# rather than a cold one: check exit 0, 14/14 public endpoints 200, automation 5 RUNNING,
-# register current with 0 pending.
+# 🟢 Validated end to end by imac (#1171) and nominated; atlas's main is frozen at this
+# tag. Installed by digest, INSTALL_EXIT 0, and the check reports "this output came from
+# 1709934" — a build-identity line, so the output names the build that produced it.
 #
-# 🔴 THE INTERIM BOX IS RETIRED BY THIS PIN, and only by this one. atlas PR #309 is in
-# e439668, and imac verified its BEHAVIOUR in both cases — all five instigators stopped,
-# and the PARTIAL case where one is stopped and four run, which is the case that had no
-# fix at all before and that a whole-fleet check would miss.
+# ⚠️ "cannot be launched" STILL appears in this artifact and it is NOT the old false
+# claim. Checked rather than assumed: it occurs only inside the artifact's own retraction
+# of what it said until 2026-09-16. The live text now reads "All 685 can be run on demand"
+# with measured launches of 364 s and 885 s to start, and names the real hazard —
+# re-launching a run that looks hung produces DUPLICATE runs.
 #
-# ⚠️ TWO THINGS LOOK BROKEN AFTER UPGRADING AND ARE NOT. Both on the page, both measured
-# by intervention rather than inferred:
-#   1. api_v1 checks 2 pass / 2 fail until `uis dagster run publish_api_v1` (~67 s) -> 4/4.
-#      COMMENTs live in the database, so served docs track the last build that PUBLISHED.
-#   2. `uis template check atlas` returns exit 2 "NOTHING WAS CHECKED" until one transform
-#      has run, because marts.mart_source_freshness does not exist yet. After one
-#      transform_and_publish (~376 s) it is exit 0. That is exit 2 in exactly the window
-#      where an operator is checking whether the upgrade worked.
+# 🔴 EXIT-CODE CONTRACT CHANGE, on the page where a gating caller meets it: a dark
+# Automation block returns exit 0 on this build and returned exit 2 on e439668. Deliberate
+# — an exit code reporting the tool's own wiring is not a health gate — and the build says
+# so when it happens, naming the supported way to tighten it.
 #
-# 🔴 atlas PR #314 is NOT DELIVERED, and this repository is now the only surface carrying
-# its sentence. Confirmed here by parsing the pinned artifact rather than on report:
-# operational.first_data.how is 2300 characters, UIS renders ~1114, and "WHEN THESE SIX
-# HAVE FINISHED THE INSTALL IS LOADED BUT NOT VALIDATED" starts at character 1159 — 45
-# past the cut. It appears in no install output, no --dry-run, no progress, no check. The
-# page says it in its own words and says to retire that box when UIS renders the whole
-# field, NOT when the artifact next changes, because the artifact already says it.
+# ✅ Retired by this pin, exactly as its condition said: the transform_checks note added at
+# 18:00 against e439668's false launch text. The condition was "the pin moves off
+# e439668", and it fired.
 #
-# ⚠️ Not fully verified, per imac and worth not recording as done: #314's positive case
-# cannot be demonstrated on that machine (all 685 checks have now run there, so a correct
-# implementation stays silent) — a genuinely fresh install is still owed; #317 was a
-# threshold-scaled reproduction, disclosed unasked, tested both directions; and
-# transform_checks still cannot be launched on demand, which is platform-side.
+# ⚠️ KEPT, deliberately: the LOADED-but-NOT-VALIDATED box. Its condition — the installer
+# rendering the version this host installed — IS now satisfied, and the sentence appears in
+# the install summary. It stands as corroboration because one operator has seen it on one
+# host, and it costs a reader nothing until a second confirms.
 #
-# 🔵 A transform_checks SUCCESS can carry 18 failed checks. Diffed against the overnight
-# b7e513f run in the same database: 0 new, 0 fixed, pre-existing kommune_nr / fylke_nr
-# referential integrity. Do not read the exit code as the check count.
+# 🔴 DAGSTER_DATABASE_URL is now read NOWHERE. Both previously-dark blocks answer through a
+# plain `uis template check atlas` with no credential exported. This entry never documented
+# that remedy, so nothing here needed unwinding — worth noting because the fix removed the
+# requirement rather than documenting it.
+#
+# ⚠️ NOT verified by imac, volunteered rather than found: #311 half 1 and #309's
+# deletion-propagation line both need a Brreg deletion in flight and Brreg published none
+# in the window — imac tried to fabricate one, hit a foreign key, and STOPPED rather than
+# route around it, because a synthetic row proves the check works on synthetic rows. Also
+# unshown: an HTTP 400 rejection path, and multi-location disambiguation on a
+# single-location install. #317 was again a threshold-scaled reproduction.
+#
+# 🔵 Not part of this build's account: a Dagster QueuePool timeout on a large asset-check
+# query, and a transform_checks launch measured at 885 s against a 900 s ceiling — fifteen
+# seconds of margin. No timeout occurred in imac's pass, but on a busy cluster it would
+# present as an image-pull or scheduling failure rather than as a timeout. That is on the
+# page.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260916-e439668
-  digest: "sha256:ba5305f065d81ae78da95e35d4efa007dd005e6a346ea3f6a33f1cdb875613cc"
+  tag: v20260916-1709934
+  digest: "sha256:245f2ef0fc1ceb37a8cf715b29b6f897e4976d89520073168513b08362615d3c"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public
