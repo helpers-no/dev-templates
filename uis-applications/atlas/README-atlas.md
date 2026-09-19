@@ -119,7 +119,7 @@ because two figures in the artifact used to disagree with each other *and* with 
 counting method was written down anywhere.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260916-1709934`:
+`operational.cadence` in the artifact at pin `v20260919-6e10058`:
 
 **Every row names the job that owns it**, and that is not decoration — see the warning below the
 table.
@@ -173,12 +173,27 @@ order**:
 
 | order | job | ~time |
 |---|---|---|
-| 1 | `annual_sources_refresh` | 6.3 min |
+| 1 | `annual_sources_refresh` | 474 s (7.9 min) |
 | 2 | `klass_refresh` | 1.0 min |
 | 3 | `seed_sources_refresh` | 0.8 min |
-| 4 | `brreg_bootstrap` | **not yet measured** |
-| 5 | `brreg_change_feed` | **not yet measured** |
-| 6 | `transform_and_publish` | 2.8 min |
+| 4 | `brreg_bootstrap` | 501 s (8.4 min) |
+| 5 | `brreg_change_feed` | not stated |
+| 6 | `transform_and_publish` | 484 s (8.1 min) |
+
+**A cold install is ~30 minutes — 1772 s wall, measured end to end on a factory-reset cluster**
+(urb-agents #1027). `brreg_bootstrap` is **no longer the unmeasured part**.
+
+⚠️ **Rows 1, 4 and 6 are from that cold-install measurement; rows 2, 3 and 5 are carried from the
+earlier four-job run and the artifact does not restate them.** They are left as they were rather
+than rescaled, because a number invented to make a table look consistent is worse than a number
+from a different run that says so. **The three measured jobs do not sum to the total** — the jobs
+vary far more than the total suggests, which is the point of stating the total separately.
+
+> ⚠️ **An earlier figure of ~11 minutes is still in circulation and understates a cold install by
+> nearly 3x.** It was the measurement of the *first four* jobs (#507: 11.1 min, 2,906,194 rows) and
+> it predates `brreg_bootstrap` entirely. A run that looks stalled at 8 minutes may be normal —
+> run the check command rather than waiting, since it reports what has been pulled against what
+> has been applied.
 
 **The order is not arbitrary**, for two separate reasons:
 
@@ -193,6 +208,14 @@ order**:
 Together these produce **~4.1M rows** across **52 `raw` and 61 `marts` BASE TABLEs (plus 5 `marts`
 views)** from ~41 sources — the 1,173,878-record Enhetsregisteret bulk load on top of `imac`'s
 measured 2,906,194.
+
+> ⚠️ **The views count disagrees with itself inside `v20260919-6e10058`, and this page keeps 5.**
+> `install.first_load` opens with *"61 marts BASE TABLEs (plus 6 marts views)"* and its own counting
+> rule then says *"five of those models are materialised as views instead"*. **6 and 5, in one
+> field.** This page keeps **5**, because the counting rule shows its method and the summary line
+> does not — but that is a tie-break, not a verification, and only atlas can settle it. Raised on
+> urb-agents#1261 rather than resolved here. It is the same failure the note below describes as
+> fixed, recurring in the adjacent number.
 
 > ✅ **The two figures in the artifact now agree, and this page no longer has to choose between them.**
 > Earlier pins had `install.first_load` saying 60 marts while `first_data.takes` said 64, and this
@@ -252,7 +275,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches`, `frr` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260916-1709934`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260919-6e10058`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
