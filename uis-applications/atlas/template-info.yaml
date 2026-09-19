@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260916-1709934"
+version: "v20260919-6e10058"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -71,15 +71,29 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #1172):
-#   asset artifact_digest and GHCR docker-content-digest agree; image_digest
-#   (sha256:efdfb102…) distinguished and asserted NOT to be this value
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #1172),
+# PASS on 2026-09-19 for v20260919-6e10058:
+#   release asset artifact_digest == GHCR docker-content-digest == --expect-digest
+#   image_digest (sha256:98026678…) distinguished and asserted NOT to be this value
 #   blob hashes to the manifest; 45082 bytes via the raw-UTF-8 path
-#   bad control in the same session: nosuchtag -> 404
+#   artifact self-identifies kind=application id=atlas tag=v20260919-6e10058
+#   the digest is independently pullable BY DIGEST (HTTP 200), not only by tag
 #
-# 🟢 Validated end to end by imac (#1171) and nominated; atlas's main is frozen at this
-# tag. Installed by digest, INSTALL_EXIT 0, and the check reports "this output came from
-# 1709934" — a build-identity line, so the output names the build that produced it.
+# 🟢 Nominated by atlas and validated against the LIVE API by ops-dev (#1261), not
+# reported: barn_i_lavinntekt sums 124,669 over 357 kommuner for 2024 — atlas predicted
+# 124,670 if correct and ~1,097,107 if the operands were inverted, so the child-poverty
+# column this whole day started from is right. dim_kommune published at 1,158 rows (357
+# active plus history, as predicted). indicator_summary carries upstream_title, publisher,
+# eu_theme and tags. The ANALYZE post-hook is proven to have EXECUTED by re-measuring the
+# consumer's own finding: ngo_index estimated 11 / exact 11 and meta_sources 44 / 44, where
+# both were wildly out before.
+#
+# ⚠️ ONE THING NOT CONFIRMED, and it is deliberately named rather than omitted:
+# transform_checks reporting the relationships test green is UNCONFIRMED. atlas shipped a
+# relationships TEST rather than a foreign-key constraint, on purpose, because an enforced
+# FK fails the nightly transform instead of a test. That test being green is a precondition
+# for ADDING the constraint later — it is not evidence about whether this build is correct,
+# and the embed returning 400 is expected rather than a regression.
 #
 # ⚠️ "cannot be launched" STILL appears in this artifact and it is NOT the old false
 # claim. Checked rather than assumed: it occurs only inside the artifact's own retraction
@@ -120,8 +134,8 @@ links:
 # page.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260916-1709934
-  digest: "sha256:245f2ef0fc1ceb37a8cf715b29b6f897e4976d89520073168513b08362615d3c"
+  tag: v20260919-6e10058
+  digest: "sha256:1875211c2826c931ea12f125719a1dc83f9465933d5716daa413ae1dca76f5d1"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public
