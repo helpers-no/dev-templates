@@ -1,0 +1,34 @@
+# PIN-HOLD — the catalogue is behind ON PURPOSE. Read this before pinning anything.
+#
+# `--drift` reports BEHIND and is reading the registry correctly. The gap is a decision,
+# not a missed nomination.
+
+held_tag: v20260921-a8d5d1a
+newer_upstream: v20260921-a657f4f
+newer_upstream_digest: sha256:b6d8a124af7b487ffc9151e7fb6b59463c151d89fe5a4d41b311792ead70579c
+
+reason: >-
+  a8d5d1a is what ops-dev nominated and proved deployed on urb-agents #1363 — the image was
+  read off the RUN POD of the transform that ran at 21:17:06Z, not inferred from a job
+  status. a657f4f was released at 21:45:10Z, 28 minutes later, and NOTHING HAS REPORTED IT
+  AS DEPLOYED. Published is not deployed. This catalogue pins what is verified running,
+  because the pin is what a plain `uis template install atlas` fetches on every host and the
+  digest in it is the only record that a human approved that artifact. This is now the second
+  hold in a row (the previous named 6b93107, superseded before anyone assessed it), which is
+  the normal state of affairs and not a problem: atlas publishes faster than anything
+  verifies, so the catalogue trails deployment on purpose.
+
+release_when: >-
+  ops-dev or imac reports a657f4f as DEPLOYED and nominates it — or names it superseded, in
+  which case delete this file and wait for the next nomination. The clearing event is
+  somebody else's verdict arriving, never this agent deciding the gap looks small. Note the
+  registry may well have moved past a657f4f by the time anyone reads this; re-run --drift
+  rather than trusting this tag as "the newest".
+
+carry_forward: >-
+  Two data gaps are open with atlas and NEITHER blocks a pin: ssb-06913's seven series, cause
+  now precise (latest_year is computed without restricting to the kommuner the relation
+  serves, and SSB zero-fills municipalities dissolved in 1957-59 — a zero is not a null), and
+  ssb-12063, a separate gap where 1812 SSB values across 2015-2018 never reached the fact
+  table. Both on #1351 and #1363. Also unanswered from #1341: whether fcf78e6's window_years
+  column needs a --full-refresh on an upgrade.
