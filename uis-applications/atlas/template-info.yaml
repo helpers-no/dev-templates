@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260921-2d88589"
+version: "v20260921-fcf78e6"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -71,38 +71,33 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #1323):
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #1341):
 #   asset artifact_digest and GHCR docker-content-digest agree; image_digest
-#   (sha256:9014518d…) distinguished and asserted NOT to be this value
+#   (sha256:f0cd2d0a…) distinguished and asserted NOT to be this value
 #   blob hashes to the manifest; kind/id/tag self-consistent
+#   --drift independently agreed the catalogue was behind at 2d88589
 #
-# 🔴 THIS PIN EXPOSED A DEFECT IN THIS REPO'S OWN DRIFT CHECK. ghcr's tags/list
-# SILENTLY TRUNCATES: with no ?n it returned exactly 100 tags for a repository holding
-# 118, and the 18 it dropped included this very tag. --drift therefore computed "newest
-# published artifact" from a subset and named v20260921-de9d4ae. With ?n=1000 it names
-# 2d88589, which is correct. A truncated list is indistinguishable from a complete one —
-# the same failure family as a mislabelled mediaType and a case-sensitive grep returning
-# zero. Fixed, and it now fails loudly if it hits the ceiling.
+# This bump is a PURE PIN MOVE for this page. The artifact's `data:` and `operational:`
+# blocks were diffed against v20260921-2d88589 and are UNCHANGED — all five data:
+# subsections equal, operational: identical. So no prose was re-derived, and the absence
+# of page changes here is a measured result rather than an omission.
 #
-# ⚠️ ALSO: this session's working tree was ONE COMMIT BEHIND origin/main. The catalogue
-# had been pinned to v20260919-6e10058 by PR #86 while this agent was stopped. Editing
-# from the stale tree and pushing would have silently reverted that pin. `git fetch`
-# before trusting a local entry after any gap.
+# What the release itself carries (atlas's account, not verified here): window-year
+# descriptions, a `window_years` column, an ssb_08764 UNION arity fix, a verifier
+# User-Agent fix, and a new root document.
 #
-# NEW: a `data:` block — 44 sources, 5 publishers, 19 public relations, NLOD for 42 of 44.
-# The counts are generated with a CI check that fails on drift, so they cannot rot against
-# the repo. The page carries them AND says the live endpoints are the authority.
+# ⚠️ A PIN DOES NOT LAND THE DATA. atlas reports the data behind these descriptions is
+# already live; this entry catching up to it is a separate fact from the rows existing.
+# Pin and run are two actions and this catalogue performs only the first.
 #
-# ⚠️ At pin time public_relations said 19 and the live API served 16 — three relations
-# 404ing during an unrelated transform_and_publish, not caused by this tag. Recorded on
-# the page as "ask the endpoints", which is what the block's own discover: line says.
-#
-# ⚠️ A PIN DOES NOT LAND THE DATA. The image carries the new FHI models; their rows arrive
-# on a separate transform_and_publish. Pin and run are two actions and this is the first.
+# Procedural lessons from the previous bump (tags/list truncation, and a stale working
+# tree nearly reverting PR #86) now live in RUNBOOK-application-pin-bump.md, under
+# "Two ways this check has been wrong" — not here, because this block is rewritten
+# every bump and a lesson stored in it is a lesson scheduled for deletion.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260921-2d88589
-  digest: "sha256:35972b5264e08e736b5532452e46cb3054e04adb5052d31ac85b379ed7270368"
+  tag: v20260921-fcf78e6
+  digest: "sha256:d68d04c607feec7abc5cc64e46b03241aeb3e6cf81b60206152387df8079065f"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public

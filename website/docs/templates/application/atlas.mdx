@@ -9,7 +9,7 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
 <TemplateHeader
   logo="/img/templates/atlas-logo.svg"
   name="Atlas Data"
-  version="v20260921-2d88589"
+  version="v20260921-fcf78e6"
   description="Norway's civil-society sector as a REST API — municipality-level indicators of humanitarian need, and the NGOs and local chapters that respond to them."
   abstract={"Installs the Atlas data platform as one application: a PostgreSQL database with\nits migrations, a Dagster code location running the ingest and dbt transforms,\nand a PostgREST API over the curated api_v1 views.\n\nThe data is an open semantic layer over Norwegian public sources — SSB\nstatistics, FHI public-health and living-conditions indicators, Bufdir child-poverty\nfigures and the Brønnøysund business register — joined to NGO supply data, so\nthat humanitarian need and the organisations responding to it can be queried\ntogether at kommune level.\n\nThe API is self-describing: meta_sources, meta_endpoints and meta_dimensions let\na consumer discover what is available without out-of-band documentation.\n\nA fresh install serves an empty API until the first pipeline run — the schema and\ngrants exist from install, the data arrives on the ingest schedule. Exports\napi-url for other applications to consume.\n\nInstalling does not start anything: the schedules and sensors ship stopped, so\nno data is fetched until an operator turns them on. That is a deliberate go-live\ndecision, not a side effect of installing. Nothing is ever backfilled — but the\ntiming differs between the two halves and only one of them waits: the schedules\nwait for their next scheduled time, while the automation sensor that drives the\n~40 ingest sources can begin fetching within about a minute of being enabled.\nLaunch the first-data jobs BEFORE enabling automation."}
   install="uis template install atlas"
@@ -73,9 +73,12 @@ GET /meta_sources       every upstream, with its freshness
 GET /indicator_summary  every published series
 ```
 
-⚠️ **At the time of pinning, `public_relations: 19` and the live API served 16** — three relations were
-returning 404 during an unrelated `transform_and_publish`. **Ask the endpoints above rather than
-trusting the number here.**
+⚠️ **A count here has exceeded what was actually served.** On **2026-09-21**, at pin
+`v20260921-2d88589`, the block said `public_relations: 19` while the live API was reported serving
+**16** — three relations 404ing during an unrelated `transform_and_publish`, not caused by that tag.
+Whether that is still true is **not something this page can know**: it is rendered from a published
+artifact, not from a running install, and this repository cannot reach the API to check.
+**Ask the endpoints above.**
 
 ### 🔴 Pinning is not deploying
 
@@ -187,7 +190,7 @@ because two figures in the artifact used to disagree with each other *and* with 
 counting method was written down anywhere.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260921-2d88589`:
+`operational.cadence` in the artifact at pin `v20260921-fcf78e6`:
 
 **Every row names the job that owns it**, and that is not decoration — see the warning below the
 table.
@@ -277,7 +280,8 @@ Together these produce **~4.1M rows** across **52 `raw` and 61 `marts` BASE TABL
 views)** from ~41 sources — the 1,173,878-record Enhetsregisteret bulk load on top of `imac`'s
 measured 2,906,194.
 
-> ⚠️ **The views count disagrees with itself inside `v20260921-2d88589`, and this page keeps 5.**
+> ⚠️ **The views count disagrees with itself in the artifact at pin `v20260921-fcf78e6`, and this
+> page keeps 5.**
 > `install.first_load` opens with *"61 marts BASE TABLEs (plus 6 marts views)"* and its own counting
 > rule then says *"five of those models are materialised as views instead"*. **6 and 5, in one
 > field.** This page keeps **5**, because the counting rule shows its method and the summary line
@@ -343,7 +347,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches`, `frr` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260921-2d88589`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260921-fcf78e6`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
@@ -402,7 +406,10 @@ Both self-heal, both are documented, and an upgrader who does not know them will
 failed. **Measured on a real upgrade over a loaded install, not a cold one.**
 
 **1. The served documentation lags until you publish.** `COMMENT`s live in the database, so the
-OpenAPI field docs track the last build that *published*. Immediately after installing, the `api_v1`
+OpenAPI field docs track the last build that *published*. 🔴 **This pin is largely a descriptions
+release, so this item is the whole point of taking it**: install `v20260921-fcf78e6` without running
+the publish and you get the new build serving the OLD window-year text, with every signal green,
+until the 05:00 publish — up to 24 hours. Immediately after installing, the `api_v1`
 checks measured **2 pass / 2 fail**:
 
 ```bash
@@ -420,21 +427,36 @@ install.
 worked.** Let one `transform_and_publish` run (~376 s) and it returns exit 0 — measured at 29 bounded
 sources, 29 within cadence.
 
-✅ **Already fixed upstream, and this note retires with the next pin.** A later atlas build separates
-the two cases — **WARN** for marts built before but the view missing (an upgrade waiting on a
-transform, which self-heals) and **CANNOT** for marts never built (nothing has run here). The old
-behaviour rested on an assertion that a missing view *"means no transform has ever run here"*, which
-is false on every upgrade. **So treat this item as true of the pinned build and not as permanent
-advice.**
+⚠️ **This note previously said it would retire "with the next pin". That pin has now happened and
+the note is still here.** The promised fix separates the two cases — **WARN** for marts built before
+but the view missing (an upgrade waiting on a transform, which self-heals) and **CANNOT** for marts
+never built (nothing has run here). At `v20260921-fcf78e6` the artifact's own operator text is
+**byte-identical to the previous pin** and still documents only `CANNOT (exit 2)`, with no WARN case.
+That is not proof the fix is absent — the check's code lives in the image, which this repository
+cannot inspect — but it is no evidence that it landed, and **a retirement condition shaped like a
+date retires on the date whether or not the thing was fixed.** The condition is therefore restated
+as a measurement: **this note retires when an operator reports `uis template check atlas` returning
+WARN, or exit 0, on an install whose transform has not yet run.** Until then, treat the item as true
+of the pinned build. The old behaviour rested on an assertion that a missing view *"means no
+transform has ever run here"*, which is false on every upgrade.
 
 🔵 **Neither cause was inferred; both were established by intervention.**
 
 ### 🔴 Upgrading still needs TWO operations — unchanged by the current pin
 
-⚠️ **The `--full-refresh` requirement below arrived with `v20260914-72999a4` and still applies.** The
-current pin adds a declaration and a render gate, not a schema change — so it introduces nothing new
-of this kind, **and it does not retire it.** An operator who has not yet taken `72999a4` still needs
-everything in this section.
+⚠️ **The `--full-refresh` requirement below arrived with `v20260914-72999a4` and still applies.**
+An operator who has not yet taken `72999a4` still needs everything in this section — **this pin does
+not retire it.**
+
+⚠️ **Whether this pin ADDS a case of the same kind is an open question, and the honest answer is
+that this page does not know.** atlas describes `v20260921-fcf78e6` as adding window-year
+descriptions and a **`window_years` column**, and a column added to an incrementally-materialised
+model with `on_schema_change='fail'` is precisely the failure documented below. But the artifact's
+`operational:` block is **byte-identical** to the previous pin and says nothing about
+`window_years` — and *"atlas shipped no new upgrade instruction"* and *"no new instruction is
+needed"* look exactly the same from here. Raised on urb-agents#1341 rather than guessed at. **If you
+are upgrading a loaded install, assume a full refresh may be needed and read the failure signature
+below before concluding the release is broken.**
 
 The pins through 2026-09-13 were text-only or additive — you re-installed and the data was untouched.
 **This one is not.** It adds a column to an incrementally-materialised model, and `dim_brreg_enhet`
@@ -611,9 +633,13 @@ time the install output tells you, you have already committed to it.
 code here. The install definition is the OCI artifact named in `template-info.yaml`:
 
 ```
-ghcr.io/terchris/atlas-data/uis:v20260909-853c696
-sha256:def7b9d2839180258f962555bd30ed5ca037fc42c52ebe0dd75f75c83d3a6c54
+ghcr.io/terchris/atlas-data/uis:<tag>@<digest>
 ```
+
+**The tag and digest are deliberately not repeated here.** They live in `source:` in
+`template-info.yaml` and nowhere else on this page, because a second hand-maintained copy of a
+digest is a second thing to forget: this block sat on `v20260909-853c696` for twelve days and
+several releases, reading like the current pin to anyone who trusted it.
 
 UIS pulls the **digest**. The tag is shown to people and never pulled by, because a tag can
 be re-pointed at a registry and a digest cannot. Bumping atlas therefore means editing

@@ -80,6 +80,30 @@ after any gap.
 ⚠️ If either side is unreadable it reports **UNKNOWN, not clean**, and still exits non-zero. A drift
 check that goes quiet when it cannot see is the failure it exists to prevent.
 
+### Two ways this check has been wrong — both fixed, both worth knowing
+
+**It read a truncated tag list and named the wrong "newest" (2026-09-21).** ghcr's `tags/list`
+silently truncates: asked with no `?n`, it returned exactly **100** tags for a repository holding
+**118**, and the 18 it dropped included the tag then being nominated. `--drift` computed "newest
+published artifact" from that subset and confidently named `v20260921-de9d4ae`; with `?n=1000` it
+named `v20260921-2d88589`, which was correct. **A truncated list is indistinguishable from a
+complete one** — the same failure family as a mislabelled `mediaType`, or a case-sensitive `grep`
+returning zero. The check now asks for far more than it expects and **fails loudly if it hits the
+ceiling** rather than answering from whatever arrived.
+
+**The local tree was a commit behind, so "what we pin" was read from a stale file (2026-09-21).**
+The catalogue had been moved to `v20260919-6e10058` by PR #86 while this agent was stopped. Editing
+from that tree and pushing would have **silently reverted someone else's pin** — no conflict, no
+warning, because the revert looks like an ordinary edit. `--drift` reads the *published* entry and
+was right; the tree was wrong.
+
+```bash
+git fetch origin && git status -sb    # expect "behind 0" before you trust any local entry
+```
+
+**Run this after any gap in which you were stopped.** Both of these were caught by a check
+disagreeing with an assumption — neither was caught by reading more carefully.
+
 ---
 
 ## 0. Pre-flight
@@ -245,7 +269,20 @@ bun test scripts/test/
 cd website && bun run build && cd ..
 ```
 
-⚠️ Check each exit code **without a pipe** — `$?` after `| tail` reports `tail`.
+⚠️ Check each exit code **without a pipe** — `$?` after `| tail` reports `tail`. And `PIPESTATUS`
+is a **bash** array: in this host's zsh `${PIPESTATUS[0]}` expands to nothing, so a guard written on
+it reads "empty" and fails a stage that passed.
+
+🔴 **Run all seven. A green build does NOT mean the page is current.** On 2026-09-21 four of these
+were run — the two `generate-*` stages were skipped — and `bun run build` still exited **0** while
+rendering `atlas.mdx` from the *previous* pin: the rendered page carried the old tag four times and
+the new one zero times. The page under `website/docs/templates/` is **generated and committed**, so a
+skipped generator looks exactly like a page that did not need changing. Verify against the rendered
+HTML, not against the build's exit code:
+
+```bash
+grep -c "$NEW_TAG" website/build/docs/templates/application/atlas/index.html   # expect > 0
+```
 
 ⚠️ `validate-docs.sh` passing is **not** sufficient. It has twice reported "All internal links valid"
 for links the build then rejected. And **nothing checks external links at all** — verify any new
