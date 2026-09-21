@@ -15,6 +15,40 @@ Installing it with UIS brings up the whole application under one name:
 - a **PostgREST** API over the resulting `api_v1` views,
 - and an exported **`api-url`** other applications can consume.
 
+## What Atlas holds
+
+The catalogue used to describe how Atlas refreshes and **not one word about what it refreshes.** The
+pinned definition now carries a `data:` block:
+
+| | |
+|---|---|
+| sources | **44** |
+| publishers | **5** — Folkehelseinstituttet (21), Statistisk sentralbyrå (17), Brønnøysundregistrene (3), Norges Røde Kors (2), Bufdir |
+| public relations | **19** |
+| licence | NLOD for 42 of 44 |
+
+**Norwegian public data at kommune level, joined into one semantic layer.**
+
+🔵 **The live API is the authority, not these counts.** They are regenerated from the repository with
+a CI check that fails on drift, so they cannot silently rot against the code — but they describe the
+build, and what is *served* is a separate question:
+
+```
+GET /meta_endpoints     what is queryable
+GET /meta_sources       every upstream, with its freshness
+GET /indicator_summary  every published series
+```
+
+⚠️ **At the time of pinning, `public_relations: 19` and the live API served 16** — three relations were
+returning 404 during an unrelated `transform_and_publish`. **Ask the endpoints above rather than
+trusting the number here.**
+
+### 🔴 Pinning is not deploying
+
+**A pin moves what an install would fetch. It does not move data.** The image carries the dbt models
+for the newest sources; **their rows arrive on a separate `transform_and_publish`.** Pin and run are
+two actions, and this catalogue only performs the first.
+
 ## Install
 
 ```bash
@@ -119,7 +153,7 @@ because two figures in the artifact used to disagree with each other *and* with 
 counting method was written down anywhere.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260919-6e10058`:
+`operational.cadence` in the artifact at pin `v20260921-2d88589`:
 
 **Every row names the job that owns it**, and that is not decoration — see the warning below the
 table.
@@ -209,7 +243,7 @@ Together these produce **~4.1M rows** across **52 `raw` and 61 `marts` BASE TABL
 views)** from ~41 sources — the 1,173,878-record Enhetsregisteret bulk load on top of `imac`'s
 measured 2,906,194.
 
-> ⚠️ **The views count disagrees with itself inside `v20260919-6e10058`, and this page keeps 5.**
+> ⚠️ **The views count disagrees with itself inside `v20260921-2d88589`, and this page keeps 5.**
 > `install.first_load` opens with *"61 marts BASE TABLEs (plus 6 marts views)"* and its own counting
 > rule then says *"five of those models are materialised as views instead"*. **6 and 5, in one
 > field.** This page keeps **5**, because the counting rule shows its method and the summary line
@@ -275,7 +309,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches`, `frr` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260919-6e10058`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260921-2d88589`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this

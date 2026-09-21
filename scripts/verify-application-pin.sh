@@ -145,10 +145,18 @@ try:
     print([t for t in d["templates"] if t["id"]==sys.argv[1]][0]["source"]["tag"])
 except Exception: print("")' "$APP")"
   TOKD="$(tok_for_early "$REPO_PATH")"
-  NEWEST="$(curl -s -H "Authorization: Bearer $TOKD" "https://ghcr.io/v2/$REPO_PATH/tags/list" \
+  # ⚠️ tags/list SILENTLY TRUNCATES. Without ?n it returned exactly 100 tags for a
+  # repository holding 118, and the 18 it dropped included the tag being nominated
+  # (urb-agents #1323). A truncated list is indistinguishable from a complete one, so
+  # "newest" was computed from a subset and could name the wrong tag — or miss a newer
+  # one entirely and report the catalogue as current when it is behind.
+  # Ask for more than we expect, and say so loudly if we hit the ceiling anyway.
+  NEWEST="$(curl -s -H "Authorization: Bearer $TOKD" "https://ghcr.io/v2/$REPO_PATH/tags/list?n=1000" \
     | python3 -c '
 import json,sys,subprocess
 tags=json.load(sys.stdin).get("tags",[])
+if len(tags) >= 1000:
+    sys.stderr.write("TRUNCATED\n")
 best=None
 for t in tags:
     try:
@@ -158,7 +166,13 @@ for t in tags:
         d=json.loads(out); p=d.get("published_at")
         if p and (best is None or p>best[1]): best=(t,p)
     except Exception: pass
-print(best[0] if best else "")' "$RELEASE_REPO")"
+print(best[0] if best else "")' "$RELEASE_REPO" 2>/tmp/_drift_trunc)"
+  if grep -q TRUNCATED /tmp/_drift_trunc 2>/dev/null; then
+    bad "the registry returned 1000 tags — the list may be TRUNCATED and 'newest' unreliable"
+    note "raise ?n or page the listing before trusting this answer"
+    rm -f /tmp/_drift_trunc; exit 1
+  fi
+  rm -f /tmp/_drift_trunc
   printf '\nDrift check for %s\n' "$APP"
   printf '  published catalogue pins  %s\n' "${LIVE_TAG:-<unreadable>}"
   printf '  newest published artifact %s\n\n' "${NEWEST:-<unreadable>}"

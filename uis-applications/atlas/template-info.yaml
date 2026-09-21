@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260919-6e10058"
+version: "v20260921-2d88589"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -71,71 +71,38 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #1172),
-# PASS on 2026-09-19 for v20260919-6e10058:
-#   release asset artifact_digest == GHCR docker-content-digest == --expect-digest
-#   image_digest (sha256:98026678…) distinguished and asserted NOT to be this value
-#   blob hashes to the manifest; 45082 bytes via the raw-UTF-8 path
-#   artifact self-identifies kind=application id=atlas tag=v20260919-6e10058
-#   the digest is independently pullable BY DIGEST (HTTP 200), not only by tag
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #1323):
+#   asset artifact_digest and GHCR docker-content-digest agree; image_digest
+#   (sha256:9014518d…) distinguished and asserted NOT to be this value
+#   blob hashes to the manifest; kind/id/tag self-consistent
 #
-# 🟢 Nominated by atlas and validated against the LIVE API by ops-dev (#1261), not
-# reported: barn_i_lavinntekt sums 124,669 over 357 kommuner for 2024 — atlas predicted
-# 124,670 if correct and ~1,097,107 if the operands were inverted, so the child-poverty
-# column this whole day started from is right. dim_kommune published at 1,158 rows (357
-# active plus history, as predicted). indicator_summary carries upstream_title, publisher,
-# eu_theme and tags. The ANALYZE post-hook is proven to have EXECUTED by re-measuring the
-# consumer's own finding: ngo_index estimated 11 / exact 11 and meta_sources 44 / 44, where
-# both were wildly out before.
+# 🔴 THIS PIN EXPOSED A DEFECT IN THIS REPO'S OWN DRIFT CHECK. ghcr's tags/list
+# SILENTLY TRUNCATES: with no ?n it returned exactly 100 tags for a repository holding
+# 118, and the 18 it dropped included this very tag. --drift therefore computed "newest
+# published artifact" from a subset and named v20260921-de9d4ae. With ?n=1000 it names
+# 2d88589, which is correct. A truncated list is indistinguishable from a complete one —
+# the same failure family as a mislabelled mediaType and a case-sensitive grep returning
+# zero. Fixed, and it now fails loudly if it hits the ceiling.
 #
-# ⚠️ ONE THING NOT CONFIRMED, and it is deliberately named rather than omitted:
-# transform_checks reporting the relationships test green is UNCONFIRMED. atlas shipped a
-# relationships TEST rather than a foreign-key constraint, on purpose, because an enforced
-# FK fails the nightly transform instead of a test. That test being green is a precondition
-# for ADDING the constraint later — it is not evidence about whether this build is correct,
-# and the embed returning 400 is expected rather than a regression.
+# ⚠️ ALSO: this session's working tree was ONE COMMIT BEHIND origin/main. The catalogue
+# had been pinned to v20260919-6e10058 by PR #86 while this agent was stopped. Editing
+# from the stale tree and pushing would have silently reverted that pin. `git fetch`
+# before trusting a local entry after any gap.
 #
-# ⚠️ "cannot be launched" STILL appears in this artifact and it is NOT the old false
-# claim. Checked rather than assumed: it occurs only inside the artifact's own retraction
-# of what it said until 2026-09-16. The live text now reads "All 685 can be run on demand"
-# with measured launches of 364 s and 885 s to start, and names the real hazard —
-# re-launching a run that looks hung produces DUPLICATE runs.
+# NEW: a `data:` block — 44 sources, 5 publishers, 19 public relations, NLOD for 42 of 44.
+# The counts are generated with a CI check that fails on drift, so they cannot rot against
+# the repo. The page carries them AND says the live endpoints are the authority.
 #
-# 🔴 EXIT-CODE CONTRACT CHANGE, on the page where a gating caller meets it: a dark
-# Automation block returns exit 0 on this build and returned exit 2 on e439668. Deliberate
-# — an exit code reporting the tool's own wiring is not a health gate — and the build says
-# so when it happens, naming the supported way to tighten it.
+# ⚠️ At pin time public_relations said 19 and the live API served 16 — three relations
+# 404ing during an unrelated transform_and_publish, not caused by this tag. Recorded on
+# the page as "ask the endpoints", which is what the block's own discover: line says.
 #
-# ✅ Retired by this pin, exactly as its condition said: the transform_checks note added at
-# 18:00 against e439668's false launch text. The condition was "the pin moves off
-# e439668", and it fired.
-#
-# ⚠️ KEPT, deliberately: the LOADED-but-NOT-VALIDATED box. Its condition — the installer
-# rendering the version this host installed — IS now satisfied, and the sentence appears in
-# the install summary. It stands as corroboration because one operator has seen it on one
-# host, and it costs a reader nothing until a second confirms.
-#
-# 🔴 DAGSTER_DATABASE_URL is now read NOWHERE. Both previously-dark blocks answer through a
-# plain `uis template check atlas` with no credential exported. This entry never documented
-# that remedy, so nothing here needed unwinding — worth noting because the fix removed the
-# requirement rather than documenting it.
-#
-# ⚠️ NOT verified by imac, volunteered rather than found: #311 half 1 and #309's
-# deletion-propagation line both need a Brreg deletion in flight and Brreg published none
-# in the window — imac tried to fabricate one, hit a foreign key, and STOPPED rather than
-# route around it, because a synthetic row proves the check works on synthetic rows. Also
-# unshown: an HTTP 400 rejection path, and multi-location disambiguation on a
-# single-location install. #317 was again a threshold-scaled reproduction.
-#
-# 🔵 Not part of this build's account: a Dagster QueuePool timeout on a large asset-check
-# query, and a transform_checks launch measured at 885 s against a 900 s ceiling — fifteen
-# seconds of margin. No timeout occurred in imac's pass, but on a busy cluster it would
-# present as an image-pull or scheduling failure rather than as a timeout. That is on the
-# page.
+# ⚠️ A PIN DOES NOT LAND THE DATA. The image carries the new FHI models; their rows arrive
+# on a separate transform_and_publish. Pin and run are two actions and this is the first.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260919-6e10058
-  digest: "sha256:1875211c2826c931ea12f125719a1dc83f9465933d5716daa413ae1dca76f5d1"
+  tag: v20260921-2d88589
+  digest: "sha256:35972b5264e08e736b5532452e46cb3054e04adb5052d31ac85b379ed7270368"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public
