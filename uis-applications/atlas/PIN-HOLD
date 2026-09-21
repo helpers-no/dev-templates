@@ -1,0 +1,33 @@
+# PIN-HOLD — the catalogue is behind ON PURPOSE. Read this before pinning anything.
+#
+# `--drift` reports BEHIND and is reading the registry correctly. The gap is a decision,
+# not a missed nomination, so it is written down here rather than left for a fresh
+# session to discover and "fix".
+
+held_tag: v20260921-1a569dc
+newer_upstream: v20260921-6b93107
+newer_upstream_digest: sha256:1a9f43323b5e438f0af77af9ca740dddb3dabc7582e48bdb460f677ee49e44de
+
+reason: >-
+  1a569dc is what ops-dev nominated and proved deployed on urb-agents #1352, by the presence
+  of the meta_sources.served_as field in the live API. 6b93107 was published to ghcr and
+  released at 19:44Z, one build later, and NOTHING HAS REPORTED IT AS DEPLOYED. Published is
+  not deployed. This catalogue pins what is verified running, because a pin is the thing a
+  plain `uis template install atlas` fetches on every host, and the digest in it is the only
+  record that a human approved that artifact. Pinning the newest tag merely because the
+  registry has it would make the catalogue a mirror of whatever CI last pushed, which is the
+  laundering sequence this entry exists to prevent. Note also that 6b93107 is NOT the docs
+  commit c6055bf that #1352 said had landed since — so it is an unidentified build, not a
+  known-harmless one.
+
+release_when: >-
+  ops-dev (or imac) reports 6b93107 as DEPLOYED and nominates it — or names it as superseded,
+  in which case delete this file and wait for the next nomination. Either way the clearing
+  event is somebody else's verdict arriving, never this agent deciding the gap looks small.
+
+carry_forward: >-
+  Ask on #1352 whether 6b93107 is deployed. It was reported there when 1a569dc was pinned.
+  Two questions are also open and unanswered: install.first_load contradicts itself three
+  ways (81 vs 62 marts, eight vs 10 views, and a closing line claiming an exact match to
+  61 / 5 / 66 / 52), raised on #1352; and whether fcf78e6's window_years column needs a
+  --full-refresh, raised on #1341. Neither blocks a pin.
