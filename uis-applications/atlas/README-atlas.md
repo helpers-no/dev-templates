@@ -35,7 +35,11 @@ build, and what is *served* is a separate question:
 
 ```
 GET /meta_endpoints     what is queryable
-GET /meta_sources       every upstream, with its freshness
+GET /meta_sources       every upstream, its freshness, and served_as — the
+                        relations it actually reaches (empty = nothing
+                        published depends on it)
+GET /meta_dimensions    what each coded column MEANS — read it before
+                        interpreting a code
 GET /indicator_summary  every published series
 ```
 
@@ -157,7 +161,7 @@ because two figures in the artifact used to disagree with each other *and* with 
 counting method was written down anywhere.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260921-1a569dc`:
+`operational.cadence` in the artifact at pin `v20260921-a8d5d1a`:
 
 **Every row names the job that owns it**, and that is not decoration — see the warning below the
 table.
@@ -247,22 +251,22 @@ Together these produce **~4.1M rows** across **52 `raw` and 81 `marts` BASE TABL
 views)** from ~41 sources — the 1,173,878-record Enhetsregisteret bulk load on top of `imac`'s
 measured 2,906,194.
 
-> ⚠️ **`install.first_load` in the artifact at pin `v20260921-1a569dc` contradicts itself three
-> ways, and this page uses the headline figures.**
-> It opens with *"52 raw BASE TABLEs and 81 marts BASE TABLEs (plus 10 marts views)"*, and
-> `first_data.takes` says the same — **the two fields agree with each other.** Three other figure
-> sets inside that one field do not:
->
-> | it says | where | disagrees with |
-> |---|---|---|
-> | 46 + 16 = **62** marts | its counting rule | the headline **81** |
-> | *"**eight** models land in marts as views instead and are the 10 marts views above"* | its counting rule | the **10** in its own sentence |
-> | *"match `imac`'s live measurement exactly (**61 / 5** / 66 / 52)"* | its closing line | the headline **81 / 10** |
->
-> **This page uses 81 and 10**, the only figures the artifact states twice and describes as derived
-> and gated by `uis/render-template-info.sh`. **That is a tie-break, not a verification** — the
-> closing line claims an *exact* match to a live measurement while naming different numbers from the
-> ones above it, and only atlas can settle which run is current. Raised on urb-agents#1352.
+> ✅ **RESOLVED in `v20260921-a8d5d1a`, at the cause rather than the symptom.**
+> Through `1a569dc` this field contradicted itself three ways: headline **81** marts against a
+> counting rule reading *"46 + 16 = 62"*; *"**eight** models land in marts as views"* one clause
+> after the **10** it was explaining; and a closing *"match `imac`'s live measurement exactly
+> (61 / 5 / 66 / 52)"*. It now reads **models=63 plus seeds=18** — which is 81, agreeing with its
+> own headline — **views=10** named once, and the exact-match claim retired with a sentence giving
+> the reason: *"a stale claim of exact agreement is worse than no claim, because it invites the
+> reader to stop checking."* **Every figure in the field is now written by
+> `uis/generate-holdings.py`**, none by hand.
+
+> 🔴 **That fix also corrected something THIS page was repeating.** This page said the
+> figures were *"derived and gated by `uis/render-template-info.sh`"*. The artifact now states that
+> credit was wrong — the generator is `uis/generate-holdings.py` — and the wrong name was on this
+> page because it had been quoted faithfully from the field it described. **A quotation inherits the
+> errors of its source**, and nothing available here could have caught it: verifying that a page
+> matches an artifact says nothing about whether the artifact is right about itself.
 
 > 🔴 **This page said 61 and 5 for three pins, and the caveat that stood here misquoted the
 > artifact to do it.** It attributed *"61 marts BASE TABLEs (plus 6 marts views)"* and *"five"* to
@@ -276,10 +280,11 @@ measured 2,906,194.
 > ✅ **The two FIELDS in the artifact do agree, which is the part that used to be broken.**
 > Earlier pins had `install.first_load` saying 60 marts while `first_data.takes` said 64, and this
 > page used 64 with a note saying why. Both now say **81**, and both moved together from 80 in
-> `fcf78e6` — so the cross-field disagreement really is fixed. ⚠️ **What is not fixed is
-> inside one of those fields**, per the table above. This box used to add *"matching `imac`'s live
-> measurement exactly"*; that phrase is the artifact's closing line, and it is the line naming
-> `61 / 5 / 66 / 52`, so repeating it here was repeating the contradiction rather than reporting it.
+> `fcf78e6` — so the cross-field disagreement really is fixed. The disagreement
+> *inside* one of those fields outlived the one between them, and is resolved separately above. This
+> box used to add *"matching `imac`'s live measurement exactly"*; that phrase was the artifact's own
+> closing line — the one naming `61 / 5 / 66 / 52` — so repeating it here was repeating the
+> contradiction rather than reporting it.
 
 ⚠️ **Do not read "~11 minutes" as the total.** That figure is `imac`'s measurement of the four jobs
 that existed when it was taken — `annual_sources_refresh`, `klass_refresh`, `seed_sources_refresh`
@@ -335,7 +340,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches`, `frr` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260921-1a569dc`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260921-a8d5d1a`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
@@ -388,31 +393,53 @@ so an existing tenant is untouched. Verified by `imac` on urb-agents #481.
 An upgrade happens when this catalogue entry's pin moves and you re-install. **What that costs you
 depends on the release, and it is not always nothing.**
 
-#### ✅ What `v20260921-1a569dc` adds, and one thing it only half adds
+#### ✅ What the recent pins add, and what is still missing
 
-**`meta_sources.served_as`** — the first published way to ask *what does this source actually
-reach?* The field does not exist before this build, so finding it populated is itself proof the code
-ran, rather than a green job status. Four sources that had been built, shipped and invisible became
-visible through it.
+**`meta_sources.served_as`** (from `v20260921-1a569dc`) — the first published way to ask *what does
+this source actually reach?* An empty array means nothing published depends on that source. It is
+**named in `data.discover` as of `v20260921-a8d5d1a`**, so this page no longer hand-carries it: the
+endpoint list above is the artifact's own. ✅ *This block previously warned that `served_as` appeared
+nowhere in the install definition and would need re-checking. That was raised on urb-agents#1352 and
+the artifact now documents it — the warning is retired because the condition was met, not because
+it aged.*
 
-**A recovery of 783,104 rows** in `ssb-06913` that a regex had been discarding, and an embedding
+🔴 **18 of 26 dead series recovered** (`v20260921-a8d5d1a`). Series reporting
+`kommuner_with_value = 0` fell **26 → 8**. The `ssb-crime-tables` series moved from `latest_year`
+**2025 → 2014** with coverage **0 → 64–83 kommuner** — and the reason is the useful part: SSB table
+08487 carries **16 `LovbruddKrim` codes, 7 current and 9 legacy**, and the legacy vocabulary stopped
+in 2013–14. **Those series were never empty.** They were being reported at a year they had stopped
+covering, which reads identically to missing data from the outside. Verified at SSB by ops-dev.
+
+**`served_as` is now computed from the corrected lineage seed**, which moved `unattributed_totals`
+from 1 source to **32**; `served_as` empty is still **exactly 5**. A downstream consumer deleted a
+hand-maintained list that had been wrong twice in five hours.
+
+Earlier: **783,104 rows** recovered in `ssb-06913` from a regex that never matched, and an embedding
 check kept as a standing invariant.
 
-⚠️ **`ssb-06913` is a PARTIAL fix and this page says so rather than reporting the release as
-clean.** Of its eight series, **one** — `Folkemengde`, 357 kommuner — delivers a value; the other
-seven return none. The API is self-consistent about it: 2,499 rows with `value IS NULL` agree to the
-row with `indicator_missing_kommuner`, so it publishes what it lacks instead of hiding it. It may
-also be correct, since all eight resolve `latest_year` to 2026 and SSB publishes `Folkemengde` in
-February with the flow series later — but if 2025 values exist for the seven, then `latest_year` is
-picking the newest year *present* rather than the newest year *with a value*. Open with atlas on
-urb-agents#1351.
+⚠️ **TWO GAPS REMAIN, and the pin does not close either.** Under Terje's rule — a release
+claiming to add or fix a data source is not a successful deploy until each named source returns rows
+— this is a **PARTIAL**, and ops-dev nominated it as one.
 
-🟠 **`served_as` is not in the artifact — not in `data:`, not anywhere in the install
-definition.** The three lines above are hand-carried from ops-dev's report (urb-agents#1352, verified
-against the live API by its author, not by this repository), and `data.discover` still names only
-`/meta_endpoints`, `/meta_sources` and `/indicator_summary`. **Hand-carried prose is what every stale
-number on this page has been**, so treat this block as needing re-checking rather than trusted, and
-expect it to be replaced by derivation once the artifact describes the field.
+**1. `ssb-06913`: seven of eight series still return nothing, but the cause is now precise rather
+than open.** `Dode`, `Levende`, `Fodselsoverskudd`, `Folketilvekst`, `Innflyttinger`, `Utflyttinger`
+and `Nettoinnflytting` remain at `latest_year` 2026 with **0 of 357** kommuner. `Folkemengde` alone
+delivers 357. The cause:
+`coalesce(max(year) filter (where value is not null), max(year))` **does not restrict to the kommuner
+the relation serves**, and SSB **zero-fills municipalities dissolved in 1957–59** — `Hopen
+(1915-1959)` reports **0** deaths in 2026, and **a zero is not a null**, so the whole source sits at
+2026. Measured at SSB and independently in the warehouse. 🔵 **This is why the page kept the
+question instead of accepting the February/flow-series explanation**: that explanation was plausible,
+consistent with everything observable, and not the cause.
+
+**2. `ssb-12063`: a second, separate gap, and it is NOT exempt.** `KOSfritidredleie0000` returns 0,
+while SSB holds **1,812 values for it across 2015–2018 — 408 kommuner in 2018 alone** — none of
+which reached the fact table. That is a different defect from the `latest_year` one above and is not
+explained by it.
+
+Both are open with atlas on urb-agents#1351 and #1363. **Nothing regresses against `1a569dc`**: zero
+check drift in either direction, and the inverse defect did not occur — `Folkemengde` held at 2026
+with 357 kommuner, Oslo 728,714.
 
 ### 🔴 After upgrading to this pin, two things look broken and are not
 

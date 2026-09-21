@@ -286,14 +286,34 @@ except Exception: print("")'
 TOK="$(tok_for "$REPO_PATH")"
 [ -n "$TOK" ] || { bad "could not get an anonymous pull token for $REPO_PATH"; printf '\nFAILED\n'; exit 1; }
 
+# Send the FULL set of manifest media types, not the two common ones. ops-dev probed
+# v20260921-a8d5d1a with a short Accept list (urb-agents #1363), got no digest back, and
+# nearly reported the artifact as never built -- the tag was there the whole time. A
+# registry that is not offered the type it holds simply declines to describe it, and
+# "no digest in the response" is NOT "no manifest in the registry". Index types are
+# included because a multi-arch publish would otherwise read as absence.
+GHCR_ACCEPT="application/vnd.oci.image.manifest.v1+json, application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.v2+json, application/vnd.docker.distribution.manifest.list.v2+json"
+
 GHCR_DIGEST="$(curl -sI -H "Authorization: Bearer $TOK" \
-  -H "Accept: application/vnd.oci.image.manifest.v1+json" \
-  -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+  -H "Accept: $GHCR_ACCEPT" \
   "https://ghcr.io/v2/$REPO_PATH/manifests/$TAG" \
   | tr -d '\r' | sed -n 's/^[Dd]ocker-[Cc]ontent-[Dd]igest:[[:space:]]*//p' | head -1)"
 
 if [ -z "$GHCR_DIGEST" ]; then
-  bad "GHCR returned no digest for tag $TAG (does the tag exist?)"
+  # Do not guess which of the two it is. Ask the tag list, which answers a different
+  # question with a different code path.
+  if curl -s -H "Authorization: Bearer $TOK" \
+       "https://ghcr.io/v2/$REPO_PATH/tags/list?n=1000" \
+       | python3 -c 'import json,sys
+try: t=json.load(sys.stdin).get("tags") or []
+except Exception: t=[]
+sys.exit(0 if sys.argv[1] in t else 1)' "$TAG" 2>/dev/null; then
+    bad "GHCR returned no digest for tag $TAG, BUT THE TAG IS IN tags/list"
+    note "the tag exists; this probe could not describe it. Do not read this as 'not published'."
+    note "suspect the Accept list or a manifest type not requested above"
+  else
+    bad "GHCR returned no digest for tag $TAG, and the tag is absent from tags/list"
+  fi
 elif [ -n "$ASSET_DIGEST" ] && [ "$GHCR_DIGEST" != "$ASSET_DIGEST" ]; then
   bad "GHCR and the release asset DISAGREE"
   note "ghcr  $GHCR_DIGEST"
@@ -324,7 +344,7 @@ fi
 # ── 4 + 5. pull the artifact AT the digest and decode it ──────────────────────────
 if [ -n "$DIGEST" ]; then
   MAN="$(curl -s -H "Authorization: Bearer $TOK" \
-    -H "Accept: application/vnd.oci.image.manifest.v1+json" \
+    -H "Accept: $GHCR_ACCEPT" \
     "https://ghcr.io/v2/$REPO_PATH/manifests/$DIGEST")"
   BLOB="$(printf '%s' "$MAN" | python3 -c '
 import json,sys
