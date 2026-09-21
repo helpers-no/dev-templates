@@ -403,7 +403,10 @@ depends on the release, and it is not always nothing.**
 ### 🔴 After upgrading to this pin, two things look broken and are not
 
 Both self-heal, both are documented, and an upgrader who does not know them will think the upgrade
-failed. **Measured on a real upgrade over a loaded install, not a cold one.**
+failed. **Item 1 was measured on a real upgrade over a loaded install, not a cold one. Item 2's exit
+code is read from the script's source and has not been measured on this build** — the distinction
+is kept because the last time this section blurred it, a single measurement was carried across four
+pins as though it were current.
 
 **1. The served documentation lags until you publish.** `COMMENT`s live in the database, so the
 OpenAPI field docs track the last build that *published*. 🔴 **This pin is largely a descriptions
@@ -418,29 +421,37 @@ uis dagster run publish_api_v1      # ~67 s
 
 After that, **4 of 4 succeeded**.
 
-**2. On the currently pinned build only — `uis template check atlas` returns exit 2, "NOTHING WAS
-CHECKED", until one transform has run.** `marts.mart_source_freshness` does not exist yet, so there is
-nothing to check. The same command returned exit 0 on the previous pin and exit 2 straight after this
-install.
+**2. Until the first transform runs, the check reports a fault — and it self-heals.**
+`marts.mart_source_freshness` does not exist until a transform builds it, so the check has nothing to
+read. Let one `transform_and_publish` run (~376 s) and it returns **exit 0** — measured at 29
+bounded sources, 29 within cadence.
 
-⚠️ **That is exit 2 in exactly the window where an operator is checking whether their upgrade
-worked.** Let one `transform_and_publish` run (~376 s) and it returns exit 0 — measured at 29 bounded
-sources, 29 within cadence.
+On an **upgrade**, where marts were built by an earlier build but the view is missing, that is
+**WARN**, not `CANNOT`: a fault waiting on a transform is not a host where nothing has ever run. The
+old code made no such distinction, resting on an assertion that a missing view *"means no transform
+has ever run here"* — which is false on every upgrade. ⚠️ **Read the WARN as what the
+source says, not as a measurement**: nobody has run the check on this build inside the pre-transform
+window. The one live run available is `EXIT=0` on a **healthy** install, which does not exercise this
+case, and the operator who produced it said so rather than offering it as the answer.
 
-⚠️ **This note previously said it would retire "with the next pin". That pin has now happened and
-the note is still here.** The promised fix separates the two cases — **WARN** for marts built before
-but the view missing (an upgrade waiting on a transform, which self-heals) and **CANNOT** for marts
-never built (nothing has run here). At `v20260921-fcf78e6` the artifact's own operator text is
-**byte-identical to the previous pin** and still documents only `CANNOT (exit 2)`, with no WARN case.
-That is not proof the fix is absent — the check's code lives in the image, which this repository
-cannot inspect — but it is no evidence that it landed, and **a retirement condition shaped like a
-date retires on the date whether or not the thing was fixed.** The condition is therefore restated
-as a measurement: **this note retires when an operator reports `uis template check atlas` returning
-WARN, or exit 0, on an install whose transform has not yet run.** Until then, treat the item as true
-of the pinned build. The old behaviour rested on an assertion that a missing view *"means no
-transform has ever run here"*, which is false on every upgrade.
+✅ **The "exit 2, NOTHING WAS CHECKED" claim that stood here is RETIRED — and it had been stale
+for five days and four pins.** The check has had **three** states since **2026-09-16**: `OK`, `WARN`
+and `CANNOT`, combined by a `worst()` rule — *"CANNOT dominates WARN dominates OK; not-asked is OK,
+asked-and-unanswerable is CANNOT"* — with WARN reachable from six distinct sites in the script.
 
-🔵 **Neither cause was inferred; both were established by intervention.**
+🔴 **How the claim went stale is the part worth keeping.** The `exit 2` figure was measured
+**once**, on `v20260916-e439668`, and then carried unchanged through `1709934`, `6e10058`, `2d88589`
+and `fcf78e6`, still introduced by the words *"on the currently pinned build only"* — false four
+times over by the end. The tri-state rework landed **the same day**, in a later build, and **this page
+documented one of its consequences while still saying the split had not demonstrably landed**: the
+dark-Automation `exit 2` → `exit 0` described below **is** that rework. The contradiction sat in two
+sections of this page for four pins. **A measurement carried forward is a quotation, not a
+measurement, and it needs the build it was taken on written beside it.** The retirement finally came
+from reading the script — which was possible the whole time, and dated in its own comment.
+
+🔵 **Item 1's cause was established by intervention. Item 2's was established by reading the
+script** — stronger than the behavioural test this page had been waiting for, and available five
+days earlier than it was used.
 
 ### 🔴 Upgrading still needs TWO operations — unchanged by the current pin
 
@@ -584,10 +595,23 @@ is tuned — and that offset is deliberate and therefore tunable.
 > Enable automation with `uis dagster automation --start`. `uis dagster automation` lists the
 > instigators and their state.
 
-### ⚠️ If you gate on the check's exit code, it changed in this build
+### ⚠️ If you gate on the check's exit code, it changed — on 2026-09-16, not in this build
 
-**A "dark" Automation block — where the check cannot reach Dagster to ask — now returns `exit 0`.**
-On the previous pin the same condition returned `exit 2`.
+**A "dark" Automation block — where the check cannot reach Dagster to ask — returns `exit 0`.** It
+returned `exit 2` up to and including `v20260916-e439668`. **This heading said "in this build" for
+four pins after the change**, which is how a contract change reads as news long after anyone could
+still act on it: if you are coming from any build from **2026-09-16** onward you already have this,
+and if you are coming from an earlier one it is a change you have not yet absorbed.
+
+The three states an exit code can carry, since that same rework:
+
+| exit | state | means |
+|---|---|---|
+| 0 | `OK` | asked and answered, **or not asked at all** |
+| 1 | `WARN` | a real fault, including one that self-heals on the next transform |
+| 2 | `CANNOT` | asked and **unanswerable** — the check could not establish the answer |
+
+**`CANNOT` dominates `WARN` dominates `OK`**, so one unanswerable block sets the whole exit code.
 
 That is deliberate: **an exit code reporting the tool's own wiring is not a health gate.** But it is a
 contract change, and anything of yours that treats non-zero as "unhealthy" will now pass where it
