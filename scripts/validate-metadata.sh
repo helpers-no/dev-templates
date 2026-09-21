@@ -243,6 +243,34 @@ validate_template_yaml() {
                 fi
             done < <(sed -n 's/.*artifact at pin `\([^`]*\)`.*/\1/p' "$readme_path" | sort -u)
         fi
+
+        # A tag named in prose ABOUT the current pin goes stale at the next bump, and
+        # the marker check above cannot see it -- that one only reads the
+        # `artifact at pin `X`` convention. On 2026-09-21 two such sentences were found
+        # still naming a superseded pin: one telling the reader to "install
+        # v20260921-fcf78e6 without running the publish", one attributing a column to
+        # it. Both had been true when written and neither was flagged by anything.
+        #
+        # So: every fully-qualified tag in the README must be either source.tag or
+        # declared in historical_tags. Naming a past build stays possible; it becomes
+        # deliberate.
+        #
+        # Only fully-qualified v<date>-<sha> forms are checked. A bare short sha inside
+        # a list of past pins is unambiguous history and is left alone -- this does not
+        # pretend to catch every way a sentence can age.
+        if [[ -n "$src_tag" && -f "$readme_path" ]]; then
+            local hist_tags named_tag
+            hist_tags=$(_yaml_field "$info_file" "d.historical_tags")
+            while IFS= read -r named_tag; do
+                [[ -z "$named_tag" ]] && continue
+                [[ "$named_tag" == "$src_tag" ]] && continue
+                if ! grep -qxF "$named_tag" <<< "$hist_tags"; then
+                    log_error "$template_name: $readme names pin '$named_tag', which is neither source.tag ('$src_tag') nor listed in historical_tags"
+                    log_error "  if that sentence is about the CURRENT pin, it is stale; if it is history, add the tag to historical_tags"
+                    has_error=true
+                fi
+            done < <(grep -o 'v[0-9]\{8\}-[0-9a-f]\{7\}' "$readme_path" | sort -u)
+        fi
     fi
 
     if [[ "$has_error" == "true" ]]; then

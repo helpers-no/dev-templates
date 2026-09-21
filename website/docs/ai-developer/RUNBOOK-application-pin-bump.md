@@ -255,6 +255,22 @@ the defect that left `brreg_enheter` empty and the freshness test red (urb-agent
 Keep the ⚠️ note that names the pin these tables were copied from, so the next stale row is visible in
 a diff.
 
+### 🔴 Also move every tag named in PROSE, not just the markers
+
+The `artifact at pin \`X\`` markers are checked, but a sentence like *"install `v20260921-fcf78e6`
+without running the publish"* is not a marker and used to go unnoticed. Two such sentences were found
+on 2026-09-21, one of them describing a release the pin had moved past.
+
+`validate-metadata.sh` now requires **every fully-qualified tag** in an application's README to be
+either `source.tag` or listed in `historical_tags:` in `template-info.yaml`. So at each bump:
+
+1. move the markers and any prose about the current pin to the new tag;
+2. add the **outgoing** tag to `historical_tags:` if the page still refers to it as history.
+
+⚠️ **What this does NOT catch:** once a tag is in `historical_tags`, a sentence that talks about
+it as though it were current still passes. The check finds *forgotten* tags, not *mis-declared* ones,
+and bare short shas (`1709934`) are not checked at all. It is a floor, not a guarantee.
+
 ---
 
 ## 5. Run the whole pipeline, in CI order

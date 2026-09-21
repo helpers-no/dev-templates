@@ -9,7 +9,7 @@ import TemplateHeader from '@site/src/components/TemplateHeader';
 <TemplateHeader
   logo="/img/templates/atlas-logo.svg"
   name="Atlas Data"
-  version="v20260921-fcf78e6"
+  version="v20260921-1a569dc"
   description="Norway's civil-society sector as a REST API — municipality-level indicators of humanitarian need, and the NGOs and local chapters that respond to them."
   abstract={"Installs the Atlas data platform as one application: a PostgreSQL database with\nits migrations, a Dagster code location running the ingest and dbt transforms,\nand a PostgREST API over the curated api_v1 views.\n\nThe data is an open semantic layer over Norwegian public sources — SSB\nstatistics, FHI public-health and living-conditions indicators, Bufdir child-poverty\nfigures and the Brønnøysund business register — joined to NGO supply data, so\nthat humanitarian need and the organisations responding to it can be queried\ntogether at kommune level.\n\nThe API is self-describing: meta_sources, meta_endpoints and meta_dimensions let\na consumer discover what is available without out-of-band documentation.\n\nA fresh install serves an empty API until the first pipeline run — the schema and\ngrants exist from install, the data arrives on the ingest schedule. Exports\napi-url for other applications to consume.\n\nInstalling does not start anything: the schedules and sensors ship stopped, so\nno data is fetched until an operator turns them on. That is a deliberate go-live\ndecision, not a side effect of installing. Nothing is ever backfilled — but the\ntiming differs between the two halves and only one of them waits: the schedules\nwait for their next scheduled time, while the automation sensor that drives the\n~40 ingest sources can begin fetching within about a minute of being enabled.\nLaunch the first-data jobs BEFORE enabling automation."}
   install="uis template install atlas"
@@ -180,17 +180,18 @@ order: `brreg_change_feed` will start, find no watermark, and **fail loudly** un
 has run. That is by design rather than a fault — but it is noise nobody needs, and it is avoidable by
 doing the two in the right order.
 
-**First ingest loads roughly 4.1 million rows** across **52 `raw` BASE TABLEs and 61 `marts` BASE
-TABLEs (plus 5 `marts` views)**, from about 41 sources. That is `imac`'s measured 2,906,194 plus the
-1,173,878-record Enhetsregisteret bulk load, so the row count is arithmetic on two measured figures —
-the combined wall time is **not** measured and is deliberately not stated.
+**First ingest loads roughly 4.1 million rows** across **52 `raw` BASE TABLEs and 81 `marts` BASE
+TABLEs (plus 10 `marts` views)**, from about 41 sources. That is `imac`'s measured 2,906,194 plus the
+1,173,878-record Enhetsregisteret bulk load, so the row count is arithmetic on two measured figures.
+The combined wall time **is** measured — **~30 minutes, 1772 s end to end** — and is stated once, in
+the cold-install table below, rather than repeated here.
 
 A "table" here means a **BASE TABLE**; views are excluded and counted separately. That rule is stated
 because two figures in the artifact used to disagree with each other *and* with the database while no
 counting method was written down anywhere.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260921-fcf78e6`:
+`operational.cadence` in the artifact at pin `v20260921-1a569dc`:
 
 **Every row names the job that owns it**, and that is not decoration — see the warning below the
 table.
@@ -276,32 +277,53 @@ vary far more than the total suggests, which is the point of stating the total s
   bootstrap has run — and run first, it **fails loudly** rather than silently walking history: it
   refuses to start without a watermark.
 
-Together these produce **~4.1M rows** across **52 `raw` and 61 `marts` BASE TABLEs (plus 5 `marts`
+Together these produce **~4.1M rows** across **52 `raw` and 81 `marts` BASE TABLEs (plus 10 `marts`
 views)** from ~41 sources — the 1,173,878-record Enhetsregisteret bulk load on top of `imac`'s
 measured 2,906,194.
 
-> ⚠️ **The views count disagrees with itself in the artifact at pin `v20260921-fcf78e6`, and this
-> page keeps 5.**
-> `install.first_load` opens with *"61 marts BASE TABLEs (plus 6 marts views)"* and its own counting
-> rule then says *"five of those models are materialised as views instead"*. **6 and 5, in one
-> field.** This page keeps **5**, because the counting rule shows its method and the summary line
-> does not — but that is a tie-break, not a verification, and only atlas can settle it. Raised on
-> urb-agents#1261 rather than resolved here. It is the same failure the note below describes as
-> fixed, recurring in the adjacent number.
+> ⚠️ **`install.first_load` in the artifact at pin `v20260921-1a569dc` contradicts itself three
+> ways, and this page uses the headline figures.**
+> It opens with *"52 raw BASE TABLEs and 81 marts BASE TABLEs (plus 10 marts views)"*, and
+> `first_data.takes` says the same — **the two fields agree with each other.** Three other figure
+> sets inside that one field do not:
+>
+> | it says | where | disagrees with |
+> |---|---|---|
+> | 46 + 16 = **62** marts | its counting rule | the headline **81** |
+> | *"**eight** models land in marts as views instead and are the 10 marts views above"* | its counting rule | the **10** in its own sentence |
+> | *"match `imac`'s live measurement exactly (**61 / 5** / 66 / 52)"* | its closing line | the headline **81 / 10** |
+>
+> **This page uses 81 and 10**, the only figures the artifact states twice and describes as derived
+> and gated by `uis/render-template-info.sh`. **That is a tie-break, not a verification** — the
+> closing line claims an *exact* match to a live measurement while naming different numbers from the
+> ones above it, and only atlas can settle which run is current. Raised on urb-agents#1352.
 
-> ✅ **The two figures in the artifact now agree, and this page no longer has to choose between them.**
+> 🔴 **This page said 61 and 5 for three pins, and the caveat that stood here misquoted the
+> artifact to do it.** It attributed *"61 marts BASE TABLEs (plus 6 marts views)"* and *"five"* to
+> `install.first_load` — **strings that appear in none of `2d88589`, `fcf78e6` or `1a569dc`.** The
+> headline has read 80, now 81, and 10 since at least `2d88589`. What this page had latched onto was
+> the artifact's own stale closing line, `61 / 5 / 66 / 52`: a caveat written to flag a numeric
+> disagreement was quoting the wrong side of it. ⚠️ **Found by parsing the field, not by
+> grepping the file** — these are folded YAML scalars, so a phrase search across raw lines matches
+> nothing and reads exactly like absence.
+
+> ✅ **The two FIELDS in the artifact do agree, which is the part that used to be broken.**
 > Earlier pins had `install.first_load` saying 60 marts while `first_data.takes` said 64, and this
-> page used 64 with a note saying why. Both now say 61 with the counting rule beside them, derived
-> from the repository with no database and matching `imac`'s live measurement exactly. The note that
-> used to sit here is gone because the disagreement is gone — a caveat about a resolved problem is
-> the same stale-label failure as the problem it described.
+> page used 64 with a note saying why. Both now say **81**, and both moved together from 80 in
+> `fcf78e6` — so the cross-field disagreement really is fixed. ⚠️ **What is not fixed is
+> inside one of those fields**, per the table above. This box used to add *"matching `imac`'s live
+> measurement exactly"*; that phrase is the artifact's closing line, and it is the line naming
+> `61 / 5 / 66 / 52`, so repeating it here was repeating the contradiction rather than reporting it.
 
 ⚠️ **Do not read "~11 minutes" as the total.** That figure is `imac`'s measurement of the four jobs
 that existed when it was taken — `annual_sources_refresh`, `klass_refresh`, `seed_sources_refresh`
 and `transform_and_publish` — on a clean cluster (10.8 min, 2,906,194 rows, zero failures; urb-agents
-#507, #520). It **predates both Brreg jobs**. The bootstrap's download alone is 210 MB / 52 s and its
-write time is not measured, and the change feed is not measured at all, so the combined wall time is
-**unknown rather than estimated**.
+#507, #520). It **predates both Brreg jobs**. ⚠️ **This paragraph used to end by calling the
+combined wall time "unknown rather than estimated", fifty lines below a table stating it as 1772 s
+measured end to end.** Both sentences were on this page at once for several pins. The total **is**
+measured — ~30 minutes — and `brreg_bootstrap` is 501 s of it; what remains unmeasured is narrower
+than the old sentence claimed: the bootstrap's *write* time separately from its 210 MB / 52 s
+download, and `brreg_change_feed`, which the artifact still does not state.
 
 (Stated by naming the four jobs rather than "the first four", because that phrase silently stopped
 being true when the list grew from four to six.)
@@ -347,7 +369,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches`, `frr` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260921-fcf78e6`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260921-1a569dc`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
@@ -400,6 +422,32 @@ so an existing tenant is untouched. Verified by `imac` on urb-agents #481.
 An upgrade happens when this catalogue entry's pin moves and you re-install. **What that costs you
 depends on the release, and it is not always nothing.**
 
+#### ✅ What `v20260921-1a569dc` adds, and one thing it only half adds
+
+**`meta_sources.served_as`** — the first published way to ask *what does this source actually
+reach?* The field does not exist before this build, so finding it populated is itself proof the code
+ran, rather than a green job status. Four sources that had been built, shipped and invisible became
+visible through it.
+
+**A recovery of 783,104 rows** in `ssb-06913` that a regex had been discarding, and an embedding
+check kept as a standing invariant.
+
+⚠️ **`ssb-06913` is a PARTIAL fix and this page says so rather than reporting the release as
+clean.** Of its eight series, **one** — `Folkemengde`, 357 kommuner — delivers a value; the other
+seven return none. The API is self-consistent about it: 2,499 rows with `value IS NULL` agree to the
+row with `indicator_missing_kommuner`, so it publishes what it lacks instead of hiding it. It may
+also be correct, since all eight resolve `latest_year` to 2026 and SSB publishes `Folkemengde` in
+February with the flow series later — but if 2025 values exist for the seven, then `latest_year` is
+picking the newest year *present* rather than the newest year *with a value*. Open with atlas on
+urb-agents#1351.
+
+🟠 **`served_as` is not in the artifact — not in `data:`, not anywhere in the install
+definition.** The three lines above are hand-carried from ops-dev's report (urb-agents#1352, verified
+against the live API by its author, not by this repository), and `data.discover` still names only
+`/meta_endpoints`, `/meta_sources` and `/indicator_summary`. **Hand-carried prose is what every stale
+number on this page has been**, so treat this block as needing re-checking rather than trusted, and
+expect it to be replaced by derivation once the artifact describes the field.
+
 ### 🔴 After upgrading to this pin, two things look broken and are not
 
 Both self-heal, both are documented, and an upgrader who does not know them will think the upgrade
@@ -409,10 +457,12 @@ is kept because the last time this section blurred it, a single measurement was 
 pins as though it were current.
 
 **1. The served documentation lags until you publish.** `COMMENT`s live in the database, so the
-OpenAPI field docs track the last build that *published*. 🔴 **This pin is largely a descriptions
-release, so this item is the whole point of taking it**: install `v20260921-fcf78e6` without running
-the publish and you get the new build serving the OLD window-year text, with every signal green,
-until the 05:00 publish — up to 24 hours. Immediately after installing, the `api_v1`
+OpenAPI field docs track the last build that *published*. 🔴 **If you are coming from anything
+older than `v20260921-fcf78e6`, this item is the whole point of taking the pin**: the window-year
+descriptions arrived in `fcf78e6` and live in the DATABASE, so installing without running the publish
+serves the OLD text with every signal green until the 05:00 publish — up to 24 hours. (That framing
+said *"this pin is largely a descriptions release"* while pinned to `fcf78e6`, and was carried
+unchanged into `1a569dc`, which is not one — the descriptions are inherited, not new here.) Immediately after installing, the `api_v1`
 checks measured **2 pass / 2 fail**:
 
 ```bash
@@ -459,13 +509,15 @@ days earlier than it was used.
 An operator who has not yet taken `72999a4` still needs everything in this section — **this pin does
 not retire it.**
 
-⚠️ **Whether this pin ADDS a case of the same kind is an open question, and the honest answer is
-that this page does not know.** atlas describes `v20260921-fcf78e6` as adding window-year
-descriptions and a **`window_years` column**, and a column added to an incrementally-materialised
-model with `on_schema_change='fail'` is precisely the failure documented below. But the artifact's
-`operational:` block is **byte-identical** to the previous pin and says nothing about
-`window_years` — and *"atlas shipped no new upgrade instruction"* and *"no new instruction is
-needed"* look exactly the same from here. Raised on urb-agents#1341 rather than guessed at. **If you
+⚠️ **Whether a case of the same kind is now in play is STILL an open question, and the honest
+answer is that this page does not know.** atlas described `v20260921-fcf78e6` as adding a
+**`window_years` column**, and everything in `fcf78e6` is in the pin above — so an operator taking
+`1a569dc` over a loaded install inherits that column whether or not they ever installed `fcf78e6`. A
+column added to an incrementally-materialised model with `on_schema_change='fail'` is precisely the
+failure documented below. The artifact says nothing about `window_years` in any of the three builds,
+and *"atlas shipped no new upgrade instruction"* and *"no new instruction is needed"* look exactly
+the same from here. **Asked on urb-agents#1341 and not yet answered** — carried rather than quietly
+dropped, because an unanswered question that disappears at the next pin reads as an answer. **If you
 are upgrading a loaded install, assume a full refresh may be needed and read the failure signature
 below before concluding the release is broken.**
 

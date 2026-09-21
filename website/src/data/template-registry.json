@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-21T17:37:36.052Z",
+  "generated": "2026-09-21T19:59:22.116Z",
   "dctDocsBase": "https://dct.sovereignsky.no",
   "uisDocsBase": "https://uis.sovereignsky.no",
   "categories": [
@@ -948,7 +948,7 @@
     {
       "id": "atlas",
       "folder": "uis-applications/atlas",
-      "version": "v20260921-fcf78e6",
+      "version": "v20260921-1a569dc",
       "name": "Atlas Data",
       "description": "Norway's civil-society sector as a REST API — municipality-level indicators of humanitarian need, and the NGOs and local chapters that respond to them.",
       "category": "APPLICATION",
@@ -995,8 +995,8 @@
       "context": "uis",
       "source": {
         "artifact": "ghcr.io/terchris/atlas-data/uis",
-        "tag": "v20260921-fcf78e6",
-        "digest": "sha256:d68d04c607feec7abc5cc64e46b03241aeb3e6cf81b60206152387df8079065f"
+        "tag": "v20260921-1a569dc",
+        "digest": "sha256:ade84671cfc23d8e271cbdb45b27bb2502f00aea2fb47a6c3e76cd75db2dbf5c"
       },
       "visibility": "public",
       "configureCommand": "uis template install atlas",
