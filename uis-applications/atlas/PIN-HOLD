@@ -2,33 +2,68 @@
 #
 # `--drift` reports BEHIND and is reading the registry correctly. The gap is a decision,
 # not a missed nomination.
+#
+# ⚠️ THREE DIFFERENT TAGS APPEAR BELOW AND THEY ARE NOT INTERCHANGEABLE. One is pinned,
+# one is under test by somebody else, one is merely published. Only the first is verified.
+#
+# 🔵 Note on reading this file: any tag written into it as "the newest" starts going stale
+# immediately. In the 20 minutes it took to write the previous version, the registry moved
+# from a657f4f to 7ff3c08. `--drift` computes the newest AT RUNTIME, which is why its
+# "DO NOT pin X away" line stayed correct while this body text did not. Trust --drift for
+# what is newest; trust this file for what has been decided.
 
 held_tag: v20260921-a8d5d1a
-newer_upstream: v20260921-a657f4f
-newer_upstream_digest: sha256:b6d8a124af7b487ffc9151e7fb6b59463c151d89fe5a4d41b311792ead70579c
+held_digest: sha256:dc23f9a7b5d6f75dff80622cb4ad1505398f58b9c2043b3c58303cc821314d7b
+
+# Under test by imac as urb-agents #1365. NOT pinnable yet.
+under_test: v20260921-a657f4f
+under_test_digest: sha256:b6d8a124af7b487ffc9151e7fb6b59463c151d89fe5a4d41b311792ead70579c
+under_test_released: 2026-09-21T21:45:10Z
+
+# Published only. Nobody has assessed it. Named here so a reader knows it is ACCOUNTED FOR
+# rather than overlooked — not because it is a candidate.
+newest_published: v20260921-7ff3c08
+newest_published_digest: sha256:bed7210c85d68cf2a8b6a499868096ec0b55cab12a25a2533a448160d6d60ab7
+newest_published_released: 2026-09-21T22:21:00Z
 
 reason: >-
   a8d5d1a is what ops-dev nominated and proved deployed on urb-agents #1363 — the image was
-  read off the RUN POD of the transform that ran at 21:17:06Z, not inferred from a job
-  status. a657f4f was released at 21:45:10Z, 28 minutes later, and NOTHING HAS REPORTED IT
-  AS DEPLOYED. Published is not deployed. This catalogue pins what is verified running,
-  because the pin is what a plain `uis template install atlas` fetches on every host and the
-  digest in it is the only record that a human approved that artifact. This is now the second
-  hold in a row (the previous named 6b93107, superseded before anyone assessed it), which is
-  the normal state of affairs and not a problem: atlas publishes faster than anything
-  verifies, so the catalogue trails deployment on purpose.
+  read off the RUN POD of the transform that ran at 21:17:06Z, not inferred from a job status.
+  Everything newer is published but unproven: a657f4f is with imac now, 7ff3c08 has been seen
+  by nobody. Published is not deployed. This catalogue pins what is verified running, because
+  the pin is what a plain `uis template install atlas` fetches on every host and the digest in
+  it is the only record that a human approved that artifact. This is the third hold in a row —
+  6b93107 and a657f4f were both superseded while being assessed — and that is the normal state
+  rather than a problem: atlas publishes faster than anything verifies, so the catalogue trails
+  deployment on purpose.
+
+# 🔴 READ THIS BEFORE PINNING a657f4f OR ANYTHING AFTER IT. Not a plain pin: the ORDER of
+# operations matters, and getting it wrong leaves twelve kommune codes unresolved with
+# everything green.
+upgrade_order_from_a657f4f: >-
+  a657f4f contains 3e72760, which widens the Klass ingest window from 1960 back to 1950. The
+  twelve orphan kommune codes all dissolved ON OR BEFORE 1960, so the old window could never
+  see them — the ingest was not failing, it was not looking far enough back. The sequence is
+  therefore DEPLOY, then `klass_refresh` ON THE NEW IMAGE, then transform. A transform before
+  the refresh runs against the old window and resolves nothing. ops-dev corrected its own
+  earlier answer to add this (#1367), so do not carry over the plain "deploy then transform"
+  shape from previous pins. Anything pinned after a657f4f inherits this requirement unless
+  atlas says the refresh has already run everywhere.
 
 release_when: >-
-  ops-dev or imac reports a657f4f as DEPLOYED and nominates it — or names it superseded, in
-  which case delete this file and wait for the next nomination. The clearing event is
-  somebody else's verdict arriving, never this agent deciding the gap looks small. Note the
-  registry may well have moved past a657f4f by the time anyone reads this; re-run --drift
-  rather than trusting this tag as "the newest".
+  ops-dev or imac reports a specific tag as DEPLOYED and nominates it. The clearing event is
+  somebody else's verdict arriving, never this agent deciding the gap looks small. ops-dev has
+  said it will nominate a657f4f as LANDED if all eight ssb-06913 series come back at 357, and
+  will otherwise name what is short. Re-run --drift before acting: the tags above will have
+  aged.
 
 carry_forward: >-
-  Two data gaps are open with atlas and NEITHER blocks a pin: ssb-06913's seven series, cause
-  now precise (latest_year is computed without restricting to the kommuner the relation
-  serves, and SSB zero-fills municipalities dissolved in 1957-59 — a zero is not a null), and
-  ssb-12063, a separate gap where 1812 SSB values across 2015-2018 never reached the fact
-  table. Both on #1351 and #1363. Also unanswered from #1341: whether fcf78e6's window_years
-  column needs a --full-refresh on an upgrade.
+  275eb4f is website-only (one file, sources-registry.json) and atlas's image workflow is
+  path-filtered to atlas-data/**, so its absence from the registry is the filter working, not a
+  missing build (#1367, verified by listing the commit's files). Do not read "atlas main is
+  ahead of the newest artifact" as a broken build. Two data gaps remain open with atlas and
+  NEITHER blocks a pin: ssb-06913's seven series, cause now precise (latest_year is computed
+  without restricting to the kommuner the relation serves, and SSB zero-fills municipalities
+  dissolved in 1957-59 — a zero is not a null), and ssb-12063, a separate gap where 1812 SSB
+  values across 2015-2018 never reached the fact table. Both on #1351 and #1363. Also
+  unanswered from #1341: whether fcf78e6's window_years column needs a --full-refresh.

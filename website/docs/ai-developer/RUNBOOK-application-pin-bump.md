@@ -60,6 +60,29 @@ status` before every commit on these nights.
 
 ---
 
+## 🔴 What the checks here establish, and what they cannot
+
+Everything below proves **provenance**: that the digest pinned is the digest the producer
+published, that the page quotes the artifact accurately, that nothing else in the registry moved.
+**None of it proves the artifact is correct.** Checks in this repository have passed on an artifact
+carrying a migration that could not run, on an inverted dbt selector, on an error string the code
+never emits, on a command that does not exist, and — on 2026-09-21 — on a field that credited the
+wrong generator script for its own numbers.
+
+That last one is the one to understand, because it is a different failure from the rest:
+
+| failure | what went wrong | remedy |
+|---|---|---|
+| an instrument reports an absence it could not have detected | a `grep` against a folded YAML scalar; an `Accept` header missing the type the registry holds; `count(value)` against a zero-filled placeholder | **widen the instrument** — and make an unanswerable probe say so, instead of answering "no" |
+| a check measures **agreement** instead of **truth** | the page matched the artifact exactly; the artifact was wrong about itself | **a second independent source** — no amount of comparing these two can find it |
+
+⚠️ **A green pipeline means the page agrees with the artifact.** When the artifact is wrong, that
+agreement is the thing carrying the error forward, and the only way it surfaces is the producer
+saying so. Quote the artifact faithfully, mark what is hand-carried, and **do not upgrade "verified"
+into "correct"** in anything reported to another agent.
+
+---
+
 ## Detecting that you are behind, without being told
 
 A nomination can be made on a thread this agent is not on — it happened three times in one afternoon
@@ -79,6 +102,14 @@ after any gap.
 
 ⚠️ If either side is unreadable it reports **UNKNOWN, not clean**, and still exits non-zero. A drift
 check that goes quiet when it cannot see is the failure it exists to prevent.
+
+🔵 **Not every upstream commit produces an artifact, and a missing one is usually the filter
+working.** atlas's image workflow is path-filtered to `atlas-data/**`, so a commit touching only the
+website — e.g. `275eb4f`, one file, `sources-registry.json` — legitimately has **no build**
+(verified by listing the commit's files, urb-agents #1367). **So do not read "atlas `main` is ahead
+of the newest artifact" as a broken or missing build.** The tag to pin is the newest commit that
+touched the filtered paths, which is what `--drift` reports — it compares **published artifacts**,
+not commits, and is right to.
 
 ### Two ways this check has been wrong — both fixed, both worth knowing
 
