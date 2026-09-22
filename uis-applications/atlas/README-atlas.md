@@ -161,7 +161,7 @@ because two figures in the artifact used to disagree with each other *and* with 
 counting method was written down anywhere.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260922-6cb28f4`:
+`operational.cadence` in the artifact at pin `v20260922-d077fd7`:
 
 **Every row names the job that owns it**, and that is not decoration — see the warning below the
 table.
@@ -340,7 +340,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches`, `frr` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260922-6cb28f4`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260922-d077fd7`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
@@ -439,6 +439,48 @@ the kommuner a relation serves, while SSB zero-fills municipalities dissolved in
 table. A different defect from the one just fixed, and not explained by it. Open with atlas on
 urb-agents#1351.
 
+#### 🔴 `v20260922-d077fd7`: a missing value is not a zero, and reading it as one moves help away from small places
+
+**This is the most consequential thing on this page and it is not about the catalogue.** FHI
+**suppresses** small counts: it hides a cell under roughly **6 cases**, and hides the **whole series**
+once more than **20%** of its cells would be suppressed — explicitly so that a partial series cannot
+give a skewed impression of that kommune.
+
+🔴 **So a consumer that reads a gap as "no need here" produces exactly the skew the
+suppression exists to prevent — and it does so in the direction that moves help away from the
+smallest places.** A need index built on those series cannot tell *suppressed* from *zero* unless
+something tells it, and the demo consumer said it could not.
+
+Both surfaces now say so:
+
+| field | before | after |
+|---|---|---|
+| `indicator_summary.properties.kommuner_with_null.description` | 145 chars | **1,788** — `SUPPRESSION` present |
+| `indicator_missing_kommuner.description` | 714 chars | **1,357** — `LOW NEED` present |
+
+⚠️ **And the limit that stops the rule being misapplied: SSB does NOT suppress — it
+ZERO-FILLS.** Same column, two publishers, **opposite conventions, and neither reading transfers.**
+A zero from SSB is a measurement; a gap from FHI is a withheld measurement; and the page that
+already says *"a zero is not a null"* about `latest_year` is making the same distinction from the
+other direction. **Check which publisher a series comes from before interpreting an absence** —
+`/meta_sources` names it.
+
+#### ✅ `v20260922-d077fd7` also landed a release that had never been deployed
+
+One `publish_api_v1` covered **two** releases: `d077fd7` itself and `3072f1f`, which had been built
+and never deployed. That second one is why **both defects this page reported in `operational.upgrade`
+are already fixed here** — the dangling `operational.crons` pointer now reads `operational.cadence`
+**below**, and `transform_checks` is declared under a new `operational.sensor_triggered` with an
+`after:` and a `why:` instead of appearing only in prose. 🔵 **Verified by parsing this
+artifact, not by reading the claim**: `operational.crons` appears nowhere in it and no `crons` key
+exists.
+
+`operational.sensor_triggered` also states the chain a transform actually sets off, which this page
+had only implied: `publish_api_v1` **after** `transform_and_publish` (*"dbt drops the `api_v1` views
+by CASCADE when it swaps the marts tables, so they exist again only after this runs"*), then
+`api_v1_checks`, then `transform_checks` — the last with the fact worth knowing on its own:
+**`transform_and_publish` deliberately excludes tests, so a green transform contains none.**
+
 #### 🔴 `v20260922-6cb28f4`: the OpenAPI now warns you about `count=exact` before you use it
 
 **The field docs for `brreg_enhet` grew from 958 to 1,730 characters**, and the 772 added characters
@@ -456,9 +498,23 @@ are a latency warning that had existed only in bus messages and a website page:
 - **`count=planned` is 50× faster and was 6× wrong** — 118 against an actual 716.
 
 🔵 **This is the one pin so far whose entire deliverable lives in the database**, which is why
-it needed `publish_api_v1` (72.9 s, inside its 49–88 s historical band) and **no transform and no
-checks**. It is the cheap upgrade path the page has described since `fcf78e6`, finally being the
-whole of a release rather than a footnote to one.
+it needed `publish_api_v1` and **no transform and no checks**. It is the cheap upgrade path this page
+has described since `fcf78e6`, being the whole of a release rather than a footnote to one.
+
+🔴 **RETRACTED: the "49–88 s historical band" this page quoted for `publish_api_v1` is
+withdrawn, and no band replaces it.** The figure was inherited through nominations and **nobody
+recorded which clock it measured.** There are two, and they disagree by 20–40% on every run:
+
+| run | tool clock | run-storage clock |
+|---|---|---|
+| `6cb28f4` | 72.9 s | **103.8 s** |
+| `d077fd7` | 107.4 s | **150.3 s** |
+
+⚠️ **So the band cannot be checked, only chosen.** If it was tool-clock, `6cb28f4` was inside
+it; if storage-clock, `6cb28f4` was already over and this page said it was inside. ops-dev retired
+the number rather than defend it (urb-agents#1382) and asked that this page drop it, which it has.
+🔵 **A duration with no named clock is the same class of claim as a measurement with no named
+build** — and this page has now shipped one of each.
 
 #### ✅ `v20260922-ff164d5`: published ranges now match the rows they sit beside
 
@@ -549,10 +605,18 @@ unchanged into `1a569dc`, which is not one — the descriptions are inherited, n
 checks measured **2 pass / 2 fail**:
 
 ```bash
-uis dagster run publish_api_v1      # ~67 s
+uis dagster run publish_api_v1
 ```
 
 After that, **4 of 4 succeeded**.
+
+⚠️ **Every per-job duration on this page is an ORDER OF MAGNITUDE, not a tripwire.** They were
+quoted from bus nominations and **none of them names the clock it was read from**; `publish_api_v1`
+alone has been reported here at ~67 s, 72.9 s and 107.4 s, and the two clocks differ by 20–40% on
+the same run. **Do not gate anything on them.** The cold-install total further up is different — the
+artifact states its own method for that one (*"1772 s wall, measured end to end on a factory-reset
+cluster"*) — and what actually settles *"did something else run?"* is a before-and-after diff of
+`indicator_summary`, not a stopwatch.
 
 **2. Until the first transform runs, the check reports a fault — and it self-heals.**
 `marts.mart_source_freshness` does not exist until a transform builds it, so the check has nothing to
@@ -589,7 +653,7 @@ days earlier than it was used.
 ### 🔴 Taking this pin is THREE steps, and the middle one is not optional
 
 ```
-install v20260922-6cb28f4  →  uis dagster run klass_refresh  →  uis dagster run transform_and_publish
+install v20260922-d077fd7  →  uis dagster run klass_refresh  →  uis dagster run transform_and_publish
 ```
 
 🔴 **Skip the middle step and the release does nothing, with every signal green.** The whole
@@ -627,7 +691,7 @@ sections that together state something neither states alone.**
 ✅ **THE HAND-CARRY IS OVER — this section is now derived, not carried.** For three pins the
 sequence above existed only in bus messages, and this page said it would stop *"when a build
 carrying `operational.upgrade` is PINNED"*. **That build is pinned.** The rule below mirrors
-`operational.upgrade` in the artifact at pin `v20260922-6cb28f4`:
+`operational.upgrade` in the artifact at pin `v20260922-d077fd7`:
 
 | | the artifact's rule |
 |---|---|
