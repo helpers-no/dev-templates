@@ -161,7 +161,7 @@ because two figures in the artifact used to disagree with each other *and* with 
 counting method was written down anywhere.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260921-a8d5d1a`:
+`operational.cadence` in the artifact at pin `v20260921-a657f4f`:
 
 **Every row names the job that owns it**, and that is not decoration — see the warning below the
 table.
@@ -340,7 +340,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches`, `frr` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260921-a8d5d1a`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260921-a657f4f`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
@@ -393,7 +393,7 @@ so an existing tenant is untouched. Verified by `imac` on urb-agents #481.
 An upgrade happens when this catalogue entry's pin moves and you re-install. **What that costs you
 depends on the release, and it is not always nothing.**
 
-#### ✅ What the recent pins add, and what is still missing
+#### ✅ What the recent pins add, and the one gap left
 
 **`meta_sources.served_as`** (from `v20260921-1a569dc`) — the first published way to ask *what does
 this source actually reach?* An empty array means nothing published depends on that source. It is
@@ -417,29 +417,58 @@ hand-maintained list that had been wrong twice in five hours.
 Earlier: **783,104 rows** recovered in `ssb-06913` from a regex that never matched, and an embedding
 check kept as a standing invariant.
 
-⚠️ **TWO GAPS REMAIN, and the pin does not close either.** Under Terje's rule — a release
-claiming to add or fix a data source is not a successful deploy until each named source returns rows
-— this is a **PARTIAL**, and ops-dev nominated it as one.
+✅ **`ssb-06913` IS CLOSED at `v20260921-a657f4f` — all eight series at 357.** The seven that
+returned nothing now report `latest_year` **2025** with **357 of 357** kommuner, `Folkemengde` holds
+at 2026, and `indicator_missing_kommuner` for the source went **2,499 → 0**. **Those 2,499 values
+were in the fact table the whole time** and are now served. Spot cells were predicted from SSB
+*before* the run and matched to the digit — `0301 Dode 2025 = 4 033`, `1103 = 940`, `5001 = 1 329`,
+`0301 Folkemengde 2026 = 728 714` — and acceptance was measured twice against two different
+`dim_kommune` versions (1,158 codes and 1,170), identical both times. One FK check cleared, none new,
+reproduced by an independent sensor run.
 
-**1. `ssb-06913`: seven of eight series still return nothing, but the cause is now precise rather
-than open.** `Dode`, `Levende`, `Fodselsoverskudd`, `Folketilvekst`, `Innflyttinger`, `Utflyttinger`
-and `Nettoinnflytting` remain at `latest_year` 2026 with **0 of 357** kommuner. `Folkemengde` alone
-delivers 357. The cause:
-`coalesce(max(year) filter (where value is not null), max(year))` **does not restrict to the kommuner
-the relation serves**, and SSB **zero-fills municipalities dissolved in 1957–59** — `Hopen
-(1915-1959)` reports **0** deaths in 2026, and **a zero is not a null**, so the whole source sits at
-2026. Measured at SSB and independently in the warehouse. 🔵 **This is why the page kept the
-question instead of accepting the February/flow-series explanation**: that explanation was plausible,
-consistent with everything observable, and not the cause.
+🔵 **Worth keeping: this page held the question open rather than adopting the plausible
+answer.** The February/flow-series explanation for those seven series was consistent with everything
+observable from outside, and was not the cause. The cause was that `latest_year` did not restrict to
+the kommuner a relation serves, while SSB zero-fills municipalities dissolved in 1957–59 — `Hopen
+(1915-1959)` reporting **0** deaths in 2026, and **a zero is not a null**, held the whole source at
+2026.
 
-**2. `ssb-12063`: a second, separate gap, and it is NOT exempt.** `KOSfritidredleie0000` returns 0,
-while SSB holds **1,812 values for it across 2015–2018 — 408 kommuner in 2018 alone** — none of
-which reached the fact table. That is a different defect from the `latest_year` one above and is not
-explained by it.
+⚠️ **ONE GAP REMAINS: `ssb-12063`.** It is now the **only** series left at
+`kommuner_with_value = 0` (down from 8). `KOSfritidredleie0000` returns nothing while SSB holds
+**1,812 values across 2015–2018 — 408 kommuner in 2018 alone** — none of which reached the fact
+table. A different defect from the one just fixed, and not explained by it. Open with atlas on
+urb-agents#1351.
 
-Both are open with atlas on urb-agents#1351 and #1363. **Nothing regresses against `1a569dc`**: zero
-check drift in either direction, and the inverse defect did not occur — `Folkemengde` held at 2026
-with 357 kommuner, Oslo 728,714.
+#### ⚠️ Two things this pin must NOT be read as fixing
+
+**1. `#394` is not observable on the deployed host, and this page does not assert its effect.**
+`89a774e` is titled for the six two-digit codes claiming to be fylker and is in this range — but
+after install, `klass_refresh` and transform, those six still violate with exactly **3,648 rows**:
+`21 22 23 25 26 88`. **A re-ingest cannot help:** `raw.ssb_klass_fylker` carries `01..20`, `30..56`
+and `99`, and **none of the six**. 🔵 That is not a claim the commit is broken — only that its
+stated effect is not visible where it was looked for, which is a different statement and the one the
+evidence supports.
+
+**2. `9999 "Uoppgitt"` is an active kommune, and it is NOT a regression in this release.** A code
+whose name means *unspecified* carries `is_active = true`, because both raw rows have NULL validity
+and an open end reads as current. **Norway has 357; any denominator of "active kommuner" is 358.**
+It was reported as introduced by the Klass re-ingest and it was not — the pre-rebuild measurement
+settles it:
+
+| when | `dim_kommune` | `is_active = true` |
+|---|---|---|
+| 22:25Z, before the rebuild | 1,158 codes | **358** |
+| 00:30Z, after it | 1,170 codes | **358**, unchanged |
+
+So the twelve new codes arrived **inactive** (1,170 = 358 + 812) and `9999` was active beforehand. ✅
+**A pre-existing defect found while verifying a release is not a defect in it**, and that distinction
+is the difference between pinning this and holding it. It does not touch the numbers above:
+`indicator_summary` filters `not f.kommune_is_sentinel` on both counts, so the sentinel cannot reach
+`kommuner_with_value` or `kommuner_with_null`. Both with atlas.
+
+**Nothing regressed:** `ssb-crime-tables` 18 series at 2014 and 14 at 2025, zero empty, coverage
+64–83; `kommune_befolkning_alder` 357 rows; `served_as = []` the same five; mixed sources exactly
+two; and the inverse defect absent — `Folkemengde` held at 2026, Oslo 728,714.
 
 ### 🔴 After upgrading to this pin, two things look broken and are not
 
@@ -496,11 +525,39 @@ from reading the script — which was possible the whole time, and dated in its 
 script** — stronger than the behavioural test this page had been waiting for, and available five
 days earlier than it was used.
 
-### 🔴 Upgrading still needs TWO operations — unchanged by the current pin
+### 🔴 Taking this pin is THREE steps, and the middle one is not optional
 
-⚠️ **The `--full-refresh` requirement below arrived with `v20260914-72999a4` and still applies.**
-An operator who has not yet taken `72999a4` still needs everything in this section — **this pin does
-not retire it.**
+```
+install v20260921-a657f4f  →  uis dagster run klass_refresh  →  uis dagster run transform_and_publish
+```
+
+🔴 **Skip the middle step and the release does nothing, with every signal green.** The whole
+point of this build is `3e72760`, which widens the Klass ingest window from **1960 back to 1950** —
+and the twelve orphan kommune codes all dissolved **on or before 1960**, so the old window could
+never see them. **The ingest was not failing; it was not looking far enough back.**
+`transform_and_publish` rebuilds `mart_dim_kommune` from `raw.ssb_klass_kommuner` **but never
+re-fetches it**, so deploy-then-transform rebuilds the same stale rows. In the operator's words:
+*"two of those three, and it does nothing."*
+
+With the re-ingest in the right order:
+
+| | before | after |
+|---|---|---|
+| `raw` Klass codes | 1,327 | **2,073** |
+| `dim_kommune` | 1,158 | **1,170** |
+| `ssb-06913` kommune FK violations | 7,296 rows / 12 codes | **0 / 0** |
+
+🟠 **This sequence is HAND-CARRIED and the artifact does not contain it.** `data:` and
+`operational:` are **byte-identical** to `v20260921-a8d5d1a`, so nothing in the install definition
+mentions `klass_refresh` — an operator following only the artifact would do deploy-then-transform and
+get the inert outcome above. Carried here from ops-dev's report (urb-agents#1368) at its explicit
+request. **Treat it as needing re-checking rather than trusted**, and expect it to be replaced by
+derivation if atlas adds it to `operational:` — which it should, because this is the second time a
+release's essential step has existed only in a bus message.
+
+⚠️ **The `--full-refresh` requirement below is SEPARATE and still applies.** It arrived with
+`v20260914-72999a4`; an operator who has not yet taken `72999a4` needs everything in this section as
+well, and **this pin does not retire it.**
 
 ⚠️ **Whether a case of the same kind is now in play is STILL an open question, and the honest
 answer is that this page does not know.** atlas described `v20260921-fcf78e6` as adding a

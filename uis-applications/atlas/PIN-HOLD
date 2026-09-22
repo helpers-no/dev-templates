@@ -3,67 +3,58 @@
 # `--drift` reports BEHIND and is reading the registry correctly. The gap is a decision,
 # not a missed nomination.
 #
-# ⚠️ THREE DIFFERENT TAGS APPEAR BELOW AND THEY ARE NOT INTERCHANGEABLE. One is pinned,
-# one is under test by somebody else, one is merely published. Only the first is verified.
-#
-# 🔵 Note on reading this file: any tag written into it as "the newest" starts going stale
-# immediately. In the 20 minutes it took to write the previous version, the registry moved
-# from a657f4f to 7ff3c08. `--drift` computes the newest AT RUNTIME, which is why its
-# "DO NOT pin X away" line stayed correct while this body text did not. Trust --drift for
-# what is newest; trust this file for what has been decided.
+# 🔵 Any tag written into this file as "the newest" is stale on arrival — the registry moved
+# twice while the previous two versions of this file were being written. `--drift` computes
+# the newest AT RUNTIME. Trust --drift for what is newest; trust this file for what has been
+# decided.
 
-held_tag: v20260921-a8d5d1a
-held_digest: sha256:dc23f9a7b5d6f75dff80622cb4ad1505398f58b9c2043b3c58303cc821314d7b
+held_tag: v20260921-a657f4f
+held_digest: sha256:b6d8a124af7b487ffc9151e7fb6b59463c151d89fe5a4d41b311792ead70579c
 
-# Under test by imac as urb-agents #1365. NOT pinnable yet.
-under_test: v20260921-a657f4f
-under_test_digest: sha256:b6d8a124af7b487ffc9151e7fb6b59463c151d89fe5a4d41b311792ead70579c
-under_test_released: 2026-09-21T21:45:10Z
-
-# Published only. Nobody has assessed it. Named here so a reader knows it is ACCOUNTED FOR
-# rather than overlooked — not because it is a candidate.
+# Published only. Assessed by nobody. Named so a reader knows it is ACCOUNTED FOR rather than
+# overlooked — not because it is a candidate.
 newest_published: v20260921-7ff3c08
 newest_published_digest: sha256:bed7210c85d68cf2a8b6a499868096ec0b55cab12a25a2533a448160d6d60ab7
 newest_published_released: 2026-09-21T22:21:00Z
 
 reason: >-
-  a8d5d1a is what ops-dev nominated and proved deployed on urb-agents #1363 — the image was
-  read off the RUN POD of the transform that ran at 21:17:06Z, not inferred from a job status.
-  Everything newer is published but unproven: a657f4f is with imac now, 7ff3c08 has been seen
-  by nobody. Published is not deployed. This catalogue pins what is verified running, because
-  the pin is what a plain `uis template install atlas` fetches on every host and the digest in
-  it is the only record that a human approved that artifact. This is the third hold in a row —
-  6b93107 and a657f4f were both superseded while being assessed — and that is the normal state
-  rather than a problem: atlas publishes faster than anything verifies, so the catalogue trails
-  deployment on purpose.
+  a657f4f is what ops-dev nominated as LANDED on urb-agents #1368, and it is the image the
+  operator READ OFF THE RUN POD — not inferred from a job status and not the newest tag.
+  7ff3c08 was released at 22:21:00Z and nothing has reported it deployed. Published is not
+  deployed. This catalogue pins what is verified running, because the pin is what a plain
+  `uis template install atlas` fetches on every host and the digest in it is the only record
+  that a human approved that artifact. This is the fourth hold in a row — 6b93107, a657f4f
+  (since nominated and now pinned) and 7ff3c08 — which is the normal state rather than a
+  problem: atlas publishes faster than anything verifies, so the catalogue trails deployment
+  on purpose.
 
-# 🔴 READ THIS BEFORE PINNING a657f4f OR ANYTHING AFTER IT. Not a plain pin: the ORDER of
-# operations matters, and getting it wrong leaves twelve kommune codes unresolved with
-# everything green.
-upgrade_order_from_a657f4f: >-
-  a657f4f contains 3e72760, which widens the Klass ingest window from 1960 back to 1950. The
-  twelve orphan kommune codes all dissolved ON OR BEFORE 1960, so the old window could never
-  see them — the ingest was not failing, it was not looking far enough back. The sequence is
-  therefore DEPLOY, then `klass_refresh` ON THE NEW IMAGE, then transform. A transform before
-  the refresh runs against the old window and resolves nothing. ops-dev corrected its own
-  earlier answer to add this (#1367), so do not carry over the plain "deploy then transform"
-  shape from previous pins. Anything pinned after a657f4f inherits this requirement unless
-  atlas says the refresh has already run everywhere.
+# 🔴 APPLIES TO THE PIN THAT IS LIVE RIGHT NOW, not only to future ones.
+three_step_upgrade: >-
+  Taking a657f4f is install -> `uis dagster run klass_refresh` -> `uis dagster run
+  transform_and_publish`. The middle step is NOT optional: transform_and_publish rebuilds
+  mart_dim_kommune from raw.ssb_klass_kommuner but never re-fetches it, so deploy-then-transform
+  rebuilds the same stale rows and 3e72760 (Klass window widened 1960 -> 1950) is inert with
+  every signal green. THE ARTIFACT DOES NOT SAY THIS — data: and operational: are byte-identical
+  to a8d5d1a — so it is hand-carried onto README-atlas.md from #1368 and marked as such there.
+  Anything pinned after a657f4f inherits the requirement unless atlas says the refresh has
+  already run everywhere, or puts it in operational:.
 
 release_when: >-
   ops-dev or imac reports a specific tag as DEPLOYED and nominates it. The clearing event is
-  somebody else's verdict arriving, never this agent deciding the gap looks small. ops-dev has
-  said it will nominate a657f4f as LANDED if all eight ssb-06913 series come back at 357, and
-  will otherwise name what is short. Re-run --drift before acting: the tags above will have
-  aged.
+  somebody else's verdict arriving, never this agent deciding the gap looks small. Re-run
+  --drift before acting: the tags above will have aged.
 
 carry_forward: >-
-  275eb4f is website-only (one file, sources-registry.json) and atlas's image workflow is
-  path-filtered to atlas-data/**, so its absence from the registry is the filter working, not a
-  missing build (#1367, verified by listing the commit's files). Do not read "atlas main is
-  ahead of the newest artifact" as a broken build. Two data gaps remain open with atlas and
-  NEITHER blocks a pin: ssb-06913's seven series, cause now precise (latest_year is computed
-  without restricting to the kommuner the relation serves, and SSB zero-fills municipalities
-  dissolved in 1957-59 — a zero is not a null), and ssb-12063, a separate gap where 1812 SSB
-  values across 2015-2018 never reached the fact table. Both on #1351 and #1363. Also
-  unanswered from #1341: whether fcf78e6's window_years column needs a --full-refresh.
+  Open with atlas, none of it blocking a pin. (1) ssb-12063 is now the ONLY series at
+  kommuner_with_value = 0, down from 8: SSB holds 1812 values across 2015-2018 that never
+  reached the fact table — #1351. (2) #394's stated effect is not observable on the deployed
+  host: the six two-digit pseudo-fylker (21 22 23 25 26 88) still violate with 3648 rows and a
+  re-ingest cannot help, because raw.ssb_klass_fylker carries 01..20, 30..56, 99 and none of
+  the six. The page does not assert that effect and must not start. (3) 9999 "Uoppgitt" is an
+  active kommune, so an "active kommuner" denominator is 358 while Norway has 357 —
+  PRE-EXISTING, not caused by the Klass re-ingest (358 active measured at 22:25Z on 1158 codes,
+  before the rebuild). It cannot reach the published counts: indicator_summary filters
+  `not f.kommune_is_sentinel`. (4) Still unanswered from #1341: whether fcf78e6's window_years
+  column needs a --full-refresh on an upgrade.
+  Also: 275eb4f is website-only and atlas's image workflow is path-filtered to atlas-data/**,
+  so its absence from the registry is the filter working, not a missing build (#1367).
