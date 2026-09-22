@@ -581,13 +581,45 @@ With the re-ingest in the right order:
 | `dim_kommune` | 1,158 | **1,170** |
 | `ssb-06913` kommune FK violations | 7,296 rows / 12 codes | **0 / 0** |
 
-🟠 **This sequence is HAND-CARRIED and the artifact does not contain it.** `data:` and
-`operational:` are **byte-identical** to `v20260921-a8d5d1a`, so nothing in the install definition
-mentions `klass_refresh` — an operator following only the artifact would do deploy-then-transform and
-get the inert outcome above. Carried here from ops-dev's report (urb-agents#1368) at its explicit
-request. **Treat it as needing re-checking rather than trusted**, and expect it to be replaced by
-derivation if atlas adds it to `operational:` — which it should, because this is the second time a
-release's essential step has existed only in a bus message.
+🔴 **LEFT UNRUN, THE MIDDLE STEP DOES NOT STAY MISSING — IT SELF-HEALS, WHICH IS WORSE.**
+`klass_refresh` has a cron of `0 1 1 * *`: **01:00 on the 1st of each month.** So `3e72760` was not
+inert forever. It was inert for **nine days**, and on **1 October** the 7,296-row FK failure would
+have cleared **on its own**, with nobody having changed anything and no record of why. ⚠️ **A
+defect that repairs itself on a schedule is not a mild defect** — it is one that cannot be found by
+noticing it stopped happening. atlas had been treating the missed re-ingest as a one-off ordering
+mistake it kept repeating; the class self-heals, so it only became visible because four parties
+looked at the same source on the same night. **That is not a repeatable detection method**, which is
+why the trigger now lives in the artifact rather than only the remedy (`self_healing_warning`, urb-agents#1373).
+
+🔵 **Both halves of that were already on this page, 360 lines apart.** The cadence table above
+says `klass_refresh` runs on the 1st at 01:00; this section says the fix needs `klass_refresh`. The
+conclusion — *"then an operator who skips it gets a silent repair up to a month later"* — needed no
+new information and was not drawn. **Same shape as the check-note contradiction three pins ago: two
+sections that together state something neither states alone.**
+
+🟠 **The sequence here is HAND-CARRIED, but not for the reason this page gave.**
+
+🔴 **CORRECTION.** This block previously said *"the artifact does not contain it … nothing in
+the install definition mentions `klass_refresh`."* **That was wrong.** The pinned artifact names
+`klass_refresh` **twice** — `first_data.jobs` lists it **second, before `transform_and_publish`**,
+and the monthly cadence row names it. **A first install following `first_data.jobs` already gets the
+correct order.** Worse, this repository's own verifier prints `first_data.jobs (6, order matters):
+annual_sources_refresh, klass_refresh, …` on **every** pin run, so the refutation was on screen each
+time the claim was repeated. Corrected on urb-agents#1373.
+
+✅ **The real gap was narrower and is now closed upstream: the artifact had no concept of an
+UPGRADE at all.** `first_data` describes a *first* install; nothing addressed a host that already has
+data. `operational.upgrade` was merged at `6cb28f4` and states the **rule** rather than another job
+list — the default for an upgrade is the transform alone, and the exception is a release that changes
+**what an ingest fetches** (its window, its filters, its dimensions), because *"the transform cannot
+recover rows that were never requested."* 🔵 **A rule with a stated trigger survives a release;
+a per-release job list has to be maintained by the person most likely to have just forgotten the
+step.**
+
+⚠️ **So this sequence stays hand-carried only until a build carrying `operational.upgrade` is
+pinned** — `v20260921-a657f4f` does not have it (`operational.upgrade` and `operational.crons` are
+both absent; verified by parsing the pinned artifact, not by grepping it). **Treat it as needing
+re-checking rather than trusted until then.**
 
 ⚠️ **The `--full-refresh` requirement below is SEPARATE and still applies.** It arrived with
 `v20260914-72999a4`; an operator who has not yet taken `72999a4` needs everything in this section as

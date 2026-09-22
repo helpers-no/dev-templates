@@ -11,17 +11,20 @@
 held_tag: v20260921-a657f4f
 held_digest: sha256:b6d8a124af7b487ffc9151e7fb6b59463c151d89fe5a4d41b311792ead70579c
 
-# Published only. Assessed by nobody. Named so a reader knows it is ACCOUNTED FOR rather than
-# overlooked — not because it is a candidate.
-newest_published: v20260921-7ff3c08
-newest_published_digest: sha256:bed7210c85d68cf2a8b6a499868096ec0b55cab12a25a2533a448160d6d60ab7
-newest_published_released: 2026-09-21T22:21:00Z
+# 🔴 THERE IS DELIBERATELY NO "newest_published" FIELD HERE ANY MORE.
+# Three versions of this file recorded one and all three were stale within the hour: a657f4f,
+# then 7ff3c08, then v20260922-6cb28f4 (the commit that ADDED operational.upgrade). A digest
+# written next to the word "newest" invites the next reader to trust it, and this file cannot
+# keep that promise — `--drift` resolves the newest at runtime and is the only honest source
+# for it. What this file is for is what has been DECIDED, which does not move on its own.
+#
+#     bash scripts/verify-application-pin.sh --app atlas --drift
 
 reason: >-
   a657f4f is what ops-dev nominated as LANDED on urb-agents #1368, and it is the image the
   operator READ OFF THE RUN POD — not inferred from a job status and not the newest tag.
-  7ff3c08 was released at 22:21:00Z and nothing has reported it deployed. Published is not
-  deployed. This catalogue pins what is verified running, because the pin is what a plain
+  Everything newer is published and unproven — several tags have appeared since, including
+  v20260922-6cb28f4. Published is not deployed. This catalogue pins what is verified running, because the pin is what a plain
   `uis template install atlas` fetches on every host and the digest in it is the only record
   that a human approved that artifact. This is the fourth hold in a row — 6b93107, a657f4f
   (since nominated and now pinned) and 7ff3c08 — which is the normal state rather than a
@@ -34,15 +37,34 @@ three_step_upgrade: >-
   transform_and_publish`. The middle step is NOT optional: transform_and_publish rebuilds
   mart_dim_kommune from raw.ssb_klass_kommuner but never re-fetches it, so deploy-then-transform
   rebuilds the same stale rows and 3e72760 (Klass window widened 1960 -> 1950) is inert with
-  every signal green. THE ARTIFACT DOES NOT SAY THIS — data: and operational: are byte-identical
-  to a8d5d1a — so it is hand-carried onto README-atlas.md from #1368 and marked as such there.
-  Anything pinned after a657f4f inherits the requirement unless atlas says the refresh has
-  already run everywhere, or puts it in operational:.
+  every signal green. Anything pinned after a657f4f inherits the requirement unless atlas says
+  the refresh has already run everywhere.
+  CORRECTION to what this file said before (#1373): the claim "the artifact does not say this"
+  was WRONG. The pinned artifact names klass_refresh twice — first_data.jobs lists it SECOND,
+  before transform_and_publish, and the monthly cadence row names it — so a FIRST INSTALL
+  following first_data.jobs already gets the right order. This repo's own verifier prints that
+  job list on every run. The real gap was that the artifact had no concept of an UPGRADE, and
+  operational.upgrade (merged upstream at 6cb28f4) closes it by stating the RULE rather than
+  another job list. a657f4f does NOT carry operational.upgrade, so the page still hand-carries
+  the sequence; that stops when a build with the field is pinned.
+  🔴 AND IT SELF-HEALS, which is why the ordering mistake stayed invisible: klass_refresh runs
+  `0 1 1 * *`, so an unrun re-ingest repairs itself at 01:00 on the 1st — up to a month later,
+  with no record of why the failure cleared.
 
 release_when: >-
   ops-dev or imac reports a specific tag as DEPLOYED and nominates it. The clearing event is
   somebody else's verdict arriving, never this agent deciding the gap looks small. Re-run
   --drift before acting: the tags above will have aged.
+
+# What is expected next, per ops-dev #1373. NOT a licence to pin any of it.
+next_expected: >-
+  v20260922-ff164d5 — note the DATE ROLLED, v20260922-, not v20260921-. It is the min/max scope
+  fix: 33 of 222 series publish a range over kommuner the relation does not serve, found by the
+  demo consumer. Deploying with imac as #1372, with all 33 expected values measured in advance.
+  DO NOT PIN IT UNTIL IMAC REPORTS. ops-dev expects to nominate it with the 33 verified rather
+  than with a claim. It also says this hold can likely be retired STRAIGHT to ff164d5 rather than
+  stepping through, because 7ff3c08 is the inert interlock tags and 50c9700 is docs — but that is
+  ops-dev's read, not a verified skip, so the nomination still governs.
 
 carry_forward: >-
   Open with atlas, none of it blocking a pin. (1) ssb-12063 is now the ONLY series at
