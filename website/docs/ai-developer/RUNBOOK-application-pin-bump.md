@@ -103,6 +103,19 @@ after any gap.
 ⚠️ If either side is unreadable it reports **UNKNOWN, not clean**, and still exits non-zero. A drift
 check that goes quiet when it cannot see is the failure it exists to prevent.
 
+🔴 **"Artifact-only" and "docs-only" are claims about a RANGE, not about a head commit.**
+atlas's rule: a release touching only `uis/` and `template-info.yaml` needs no job, because the
+artifact *is* the deliverable and it is deployed the moment the image exists. **But the test is the
+range.** On 2026-09-22 a release was described as artifact-only from its head commit's file list,
+and a commit inside the range added **15 `COMMENT ON` statements** — which live in the database, not
+the image, and which only `publish_api_v1` applies (urb-agents#1377). Without the second sentence
+the rule is a trap.
+
+⚠️ **This runbook has accepted range descriptions it did not inspect** — `275eb4f`
+"website-only" and `50c9700` "docs" (#1367). Those may well be right; they were not verified here.
+When a nomination's justification depends on a range containing nothing that needs a job, **ask for
+the file list of the range**, not of the tip.
+
 🔵 **Not every upstream commit produces an artifact, and a missing one is usually the filter
 working.** atlas's image workflow is path-filtered to `atlas-data/**`, so a commit touching only the
 website — e.g. `275eb4f`, one file, `sources-registry.json` — legitimately has **no build**

@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260922-ff164d5"
+version: "v20260922-6cb28f4"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -71,44 +71,51 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #1374):
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #1377):
 #   asset artifact_digest and GHCR docker-content-digest agree; image_digest
-#   (sha256:9d3588a9…) distinguished and asserted NOT to be this value
+#   (sha256:7982dff0…) distinguished and asserted NOT to be this value
 #   blob hashes to the manifest; kind/id/tag self-consistent
 #
-# ⚠️ THE DATE PREFIX ROLLED: v20260922-, not v20260921-. Five pins in a row carried the
-# earlier date and pattern-matching the prefix would have looked right and resolved wrong.
+# ✅ THE HAND-CARRY ENDS HERE. operational.upgrade is ADDED in this build — the only
+# difference in either block against ff164d5 — so the klass sequence README-atlas.md has
+# carried by hand for three pins is now DERIVED from the artifact and marked with this pin.
+# The condition this entry wrote ("when a build WITH the field is pinned") is met, which is
+# the first time one of these conditions has been cleared by the thing happening rather
+# than by the condition being rewritten.
 #
-# ✅ LANDED. The min/max scope fix: min_value and max_value were computed over every kommune
-# the fact table holds while the counts beside them were scoped to active non-sentinel
-# kommuner, so 33 of 222 series published a range over kommuner the relation does not serve.
-# 33 -> 0, measured from outside by paging all 79254 fact rows and folding per series, and
-# independently on the host. transform 5d6cb18c SUCCESS 337.9s, run pod ff164d5, checks
-# 990/18/1008 with NEW none and GONE none.
+# 🔵 What was added is a RULE, not another job list: default for an upgrade is
+# transform_and_publish alone; the exception is a release that changes WHAT AN INGEST
+# FETCHES (window, filters, dimensions), because the transform cannot recover rows that
+# were never requested. Plus a self_healing_warning that an unrun ingest change is repaired
+# by its next cron — up to a month for klass_refresh — with the cause never recorded.
 #
-# 🔵 The restraint is the part worth keeping: ssb-06913 Levende still has min = 0.
-# Excluding zeros along with sentinels would have made a tidier table, passed a casual read,
-# and silently deleted the fact that a kommune had no live births. And ssb-12063 keeps its
-# row with NULL min/max and count 0 — present and empty, not dropped.
+# ⚠️ TWO POINTERS IN THAT FIELD DO NOT RESOLVE, verified by walking the parsed artifact:
+# it says "operational.crons above maps every job" and there is NO crons key (the map is
+# operational.cadence), and it ends the sequence with transform_checks, which appears in no
+# map at all — not cadence, not manual_only, not unscheduled. Neither changes what an
+# operator should do; both would send a reader looking for something absent. Reported #1377.
 #
-# 🔴 THE HAND-CARRIED KLASS SEQUENCE STAYS, and this pin is why. operational.upgrade
-# exists at 6cb28f4, which is BUILT AND NOT DEPLOYED; ff164d5 is what ran and is two commits
-# behind it, so the pinned artifact still has no upgrade field (verified by parsing it). "The
-# field exists in the artifact" and "the pinned artifact has the field" are different claims
-# and this repo was handed the first (#1373) before being told the difference (#1374).
+# ✅ WHAT THE RELEASE DELIVERS lives entirely in the DATABASE: the brreg_enhet field docs
+# grew 958 -> 1730 chars with the count=exact latency warning (12-33 s filtered against
+# sub-second; inside a browser fetch that is a TIMEOUT, not a slow answer; count=planned is
+# 50x faster and was 6x wrong, 118 against an actual 716). So this pin needed publish_api_v1
+# (72.9 s, inside its 49-88 s band) and NO transform and NO checks — the cheap upgrade path
+# this entry has described since fcf78e6, as the whole of a release for once.
 #
-# ⚠️ NO GATE CAUGHT ANY OF IT. Three scope defects in two days — counts vs the range,
-# the null filter vs its subject, latest_year vs the counts — all found from outside by
-# consumers, with the suite reporting 990/18 before and after each. A gate for the class is
-# being written upstream. Recorded on the page beside "the check is never proactive".
+# 🔴 AND THE RANGE, NOT THE HEAD COMMIT, IS THE TEST. ops-dev called this release
+# artifact-only from the head commit's file list; 7fe3a0d inside the range adds 15 COMMENT ON
+# lines, which live in the database and which only publish_api_v1 applies. atlas's rule is
+# that a release touching only uis/ and template-info.yaml needs no job — but the test is
+# the RANGE. This entry has previously accepted "website-only" and "docs-only" descriptions
+# of ranges it did not inspect (275eb4f, 50c9700, #1367).
 #
-# ⚠️ UNCHANGED, and not this release's doing: ssb-12063 is still the only series at
-# kommuner_with_value = 0; #394's stated effect is still not observable (3648 rows, the six
-# two-digit pseudo-fylker); 9999 "Uoppgitt" is still an active kommune making an "active
-# kommuner" denominator 358 against Norway's 357. All already on the page as caveats.
+# ⚠️ UNCHANGED, none of it this release's doing: ssb-12063 is still the only series at
+# kommuner_with_value = 0 and is current-year-only by ingest (Tid: TOP(1)); #394 remains a
+# filing whose title reads as a fix; 9999 "Uoppgitt" has is_active correct with is_sentinel
+# carrying the meaning. All on the page as caveats.
 #
-# ⚠️ A PIN DOES NOT LAND THE DATA. Pin and run are two actions and this catalogue
-# performs only the first.
+# ⚠️ A PIN DOES NOT LAND THE DATA — though this one needed no transform. Pin and run are
+# two actions and this catalogue performs only the first.
 #
 # Procedural lessons from the previous bump (tags/list truncation, and a stale working
 # tree nearly reverting PR #86) now live in RUNBOOK-application-pin-bump.md, under
@@ -116,8 +123,8 @@ links:
 # every bump and a lesson stored in it is a lesson scheduled for deletion.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260922-ff164d5
-  digest: "sha256:1692e026932881f2c23c772b80a349ff58066d1d1a1554a69cb67ed46650b1f3"
+  tag: v20260922-6cb28f4
+  digest: "sha256:eefce7bcc53a87def7b490aa67a47eed1b51d907f63cd68100fca76043345eee"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public
@@ -135,6 +142,7 @@ historical_tags:
   - v20260921-1a569dc   # where served_as arrived, and the three-way contradiction
   - v20260921-a8d5d1a   # the PARTIAL: 18 of 26 series recovered, ssb-06913 still short
   - v20260921-a657f4f   # the Klass re-ingest LANDED pin; last of the v20260921- run
+  - v20260922-ff164d5   # the min/max scope fix
 
 configure_command: "uis template install atlas"
 
