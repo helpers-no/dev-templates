@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260921-a657f4f"
+version: "v20260922-ff164d5"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -71,54 +71,43 @@ links:
 # be blessed by the next unrelated docs build. Bumping atlas is a reviewed change
 # to `digest` here.
 #
-# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #1368):
+# Verified before pinning by `scripts/verify-application-pin.sh` (urb-agents #1374):
 #   asset artifact_digest and GHCR docker-content-digest agree; image_digest
-#   (sha256:dba56560…) distinguished and asserted NOT to be this value
+#   (sha256:9d3588a9…) distinguished and asserted NOT to be this value
 #   blob hashes to the manifest; kind/id/tag self-consistent
 #
-# ✅ LANDED, not PARTIAL — the first tonight the word applies to. ssb-06913's eight
-# series all report 357 of 357 (seven at 2025, Folkemengde at 2026) and
-# indicator_missing_kommuner for the source went 2499 -> 0: those values were in the
-# fact table all along. Spot cells predicted from SSB BEFORE the run matched to the
-# digit, and acceptance was measured twice against two dim_kommune versions (1158 and
-# 1170 codes) with identical results. One FK check cleared, none new, reproduced by an
-# independent sensor run.
+# ⚠️ THE DATE PREFIX ROLLED: v20260922-, not v20260921-. Five pins in a row carried the
+# earlier date and pattern-matching the prefix would have looked right and resolved wrong.
 #
-# 🔴 TAKING THIS PIN IS THREE STEPS AND THE MIDDLE ONE IS NOT OPTIONAL:
-#     install a657f4f -> uis dagster run klass_refresh -> uis dagster run transform_and_publish
-#   transform_and_publish rebuilds mart_dim_kommune from raw.ssb_klass_kommuner but never
-#   RE-FETCHES it, so deploy-then-transform rebuilds the same stale rows and 3e72760 (the
-#   Klass window widened 1960 -> 1950) is inert with every signal green. The twelve orphan
-#   codes all dissolved on or before 1960 — the ingest was not failing, it was not looking
-#   far enough back.
+# ✅ LANDED. The min/max scope fix: min_value and max_value were computed over every kommune
+# the fact table holds while the counts beside them were scoped to active non-sentinel
+# kommuner, so 33 of 222 series published a range over kommuner the relation does not serve.
+# 33 -> 0, measured from outside by paging all 79254 fact rows and folding per series, and
+# independently on the host. transform 5d6cb18c SUCCESS 337.9s, run pod ff164d5, checks
+# 990/18/1008 with NEW none and GONE none.
 #
-# 🟠 AND THAT SEQUENCE IS NOT IN THE ARTIFACT. data: and operational: are
-# BYTE-IDENTICAL to a8d5d1a, so the install definition does not mention klass_refresh at
-# all; an operator following only the artifact gets the inert outcome. Hand-carried onto
-# the page from #1368 at ops-dev's explicit request, and marked as hand-carried. Second
-# time a release's essential step has lived only in a bus message — atlas should put it in
-# operational:.
+# 🔵 The restraint is the part worth keeping: ssb-06913 Levende still has min = 0.
+# Excluding zeros along with sentinels would have made a tidier table, passed a casual read,
+# and silently deleted the fact that a kommune had no live births. And ssb-12063 keeps its
+# row with NULL min/max and count 0 — present and empty, not dropped.
 #
-# ⚠️ THE PAGE MUST NOT ASSERT #394's EFFECT, and does not. 89a774e is titled for the six
-# two-digit codes claiming to be fylker and is in this range, but after install +
-# klass_refresh + transform those six still violate with exactly 3648 rows (21 22 23 25 26
-# 88), and a re-ingest cannot help: raw.ssb_klass_fylker carries 01..20, 30..56, 99 and
-# none of the six. Not a claim the commit is broken — a claim its stated effect is not
-# visible where it was looked for.
+# 🔴 THE HAND-CARRIED KLASS SEQUENCE STAYS, and this pin is why. operational.upgrade
+# exists at 6cb28f4, which is BUILT AND NOT DEPLOYED; ff164d5 is what ran and is two commits
+# behind it, so the pinned artifact still has no upgrade field (verified by parsing it). "The
+# field exists in the artifact" and "the pinned artifact has the field" are different claims
+# and this repo was handed the first (#1373) before being told the difference (#1374).
 #
-# ⚠️ 9999 "Uoppgitt" is an ACTIVE kommune, so any "active kommuner" denominator is 358
-# while Norway has 357. Reported as introduced by the re-ingest; it was NOT — 22:25Z before
-# the rebuild already showed 358 active on 1158 codes, and 00:30Z showed 358 on 1170, so
-# the twelve new codes arrived inactive and 9999 was active beforehand. A pre-existing
-# defect found while verifying a release is not a defect in it, and that distinction is
-# the difference between pinning and holding. It cannot reach the numbers above:
-# indicator_summary filters `not f.kommune_is_sentinel` on both counts. With atlas.
+# ⚠️ NO GATE CAUGHT ANY OF IT. Three scope defects in two days — counts vs the range,
+# the null filter vs its subject, latest_year vs the counts — all found from outside by
+# consumers, with the suite reporting 990/18 before and after each. A gate for the class is
+# being written upstream. Recorded on the page beside "the check is never proactive".
 #
-# ⚠️ ONE GAP LEFT: ssb-12063 is now the only series at kommuner_with_value = 0, down
-# from 8. SSB holds 1812 values across 2015-2018 that never reached the fact table. #1351.
+# ⚠️ UNCHANGED, and not this release's doing: ssb-12063 is still the only series at
+# kommuner_with_value = 0; #394's stated effect is still not observable (3648 rows, the six
+# two-digit pseudo-fylker); 9999 "Uoppgitt" is still an active kommune making an "active
+# kommuner" denominator 358 against Norway's 357. All already on the page as caveats.
 #
-# ⚠️ A PIN DOES NOT LAND THE DATA. Image read off the RUN POD; transform aa5188d3
-# SUCCESS 361.8s; checks 990/18/1008. Pin and run are two actions and this catalogue
+# ⚠️ A PIN DOES NOT LAND THE DATA. Pin and run are two actions and this catalogue
 # performs only the first.
 #
 # Procedural lessons from the previous bump (tags/list truncation, and a stale working
@@ -127,8 +116,8 @@ links:
 # every bump and a lesson stored in it is a lesson scheduled for deletion.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260921-a657f4f
-  digest: "sha256:b6d8a124af7b487ffc9151e7fb6b59463c151d89fe5a4d41b311792ead70579c"
+  tag: v20260922-ff164d5
+  digest: "sha256:1692e026932881f2c23c772b80a349ff58066d1d1a1554a69cb67ed46650b1f3"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public
@@ -145,6 +134,7 @@ historical_tags:
   - v20260921-fcf78e6   # the window-year descriptions pin
   - v20260921-1a569dc   # where served_as arrived, and the three-way contradiction
   - v20260921-a8d5d1a   # the PARTIAL: 18 of 26 series recovered, ssb-06913 still short
+  - v20260921-a657f4f   # the Klass re-ingest LANDED pin; last of the v20260921- run
 
 configure_command: "uis template install atlas"
 
