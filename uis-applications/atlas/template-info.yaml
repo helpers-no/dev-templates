@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20260922-d077fd7"
+version: "v20261002-e9e33a5"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -115,14 +115,48 @@ links:
 # model .sql files are in the range. Pin and run are two actions and this catalogue performs
 # only the first.
 #
+# NOMINATED urb-agents #1814 (atlas), BUMPED ops-dev 2026-10-03. This single bump absorbs
+# everything published since d077fd7 (2026-09-22) — the catalogue had gone 11 days and
+# several releases behind, not one release's worth of drift.
+#
+# Verified three ways, not copied from the nomination: `verify-application-pin.sh --app
+# atlas --tag v20261002-e9e33a5 --expect-digest sha256:f91d7dee...` PASSed — release asset,
+# GHCR docker-content-digest, and the decoded artifact's own tag/id/kind all agree.
+#
+# 🔴 THE HEADLINE NUMBERS MOVED FAR MORE THAN "counts" SUGGESTS. data.sources 44->51,
+# publishers 5->9, public_relations 19->88 (4.6x), raw BASE TABLEs 52->60, marts BASE
+# TABLEs 81->90, marts views 10->76. Three NAV sources landed in this range
+# (nav-aap, nav-helt-ledige, nav-uforetrygd), each CC BY 4.0 rather than NLOD — the licence
+# line is now "NLOD for 47 of 51" with FOUR named exceptions, not two.
+#
+# 🔴 A NEW SCHEDULED JOB EXISTS THAT THE PAGE DID NOT MENTION AT ALL: monthly_sources_refresh
+# (cron "0 1 1 * *", same monthly tick as klass_refresh, separate job because its data is
+# genuinely monthly rather than annual-data polled monthly). first_data.jobs is now 7 long,
+# not 6 — the artifact's own first_data.takes says so explicitly: "NOW SEVEN JOBS, NOT SIX
+# ... the 1772 s figure has not been re-measured with it included."
+#
+# ⚠️ OPEN QUESTION, FLAGGED RATHER THAN SILENTLY RESOLVED EITHER WAY: the artifact's
+# operational.automation still reads "Ships stopped... until an operator enables both the
+# schedules and the sensors" — but urb-agents #1794 measured all six schedules/sensors come
+# up RUNNING on a real redeploy of this same image, firing a real automatic run
+# (dagster/from_automation_condition: true) ~15 min after the pod started, no operator
+# involved. Checked atlas's own uis/ definition for an install-time "stop" hook: none exists
+# (only `uis/init/001_bootstrap.sql`, one line). Two readings fit the facts and I cannot
+# settle which from here: (a) UIS's own install flow stops things after a FRESH
+# `uis template install`, which our ad-hoc pod-image swap never ran, so the artifact's text
+# is still correct for the real install path; or (b) the artifact's self-description is
+# stale since atlas-data PR #482 changed default_status to RUNNING and nobody updated this
+# field. Quoted faithfully below either way, per this runbook's own rule — not upgrading
+# "verified" into "correct". Raised with atlas on urb-agents #1814/#1816 for them to settle.
+#
 # Procedural lessons from the previous bump (tags/list truncation, and a stale working
 # tree nearly reverting PR #86) now live in RUNBOOK-application-pin-bump.md, under
 # "Two ways this check has been wrong" — not here, because this block is rewritten
 # every bump and a lesson stored in it is a lesson scheduled for deletion.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20260922-d077fd7
-  digest: "sha256:8f3342503ecfab0bf60507c8291e80cb20c7d7402064847c90b67c7e10a34d0e"
+  tag: v20261002-e9e33a5
+  digest: "sha256:f91d7dee689f2cbbeb326d130703524a5e4e21bc8d8332832cba0490dd9a7ff4"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public
@@ -142,6 +176,8 @@ historical_tags:
   - v20260921-a657f4f   # the Klass re-ingest LANDED pin; last of the v20260921- run
   - v20260922-ff164d5   # the min/max scope fix
   - v20260922-6cb28f4   # where operational.upgrade arrived and the hand-carry ended
+  - v20260922-d077fd7   # the pin this entry just moved past; suppression/zero-fill, the
+                         # unattributed-generator fix, two releases in one publish
 
 configure_command: "uis template install atlas"
 

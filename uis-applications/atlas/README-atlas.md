@@ -22,10 +22,10 @@ pinned definition now carries a `data:` block:
 
 | | |
 |---|---|
-| sources | **44** |
-| publishers | **5** — Folkehelseinstituttet (21), Statistisk sentralbyrå (17), Brønnøysundregistrene (3), Norges Røde Kors (2), Bufdir |
-| public relations | **19** |
-| licence | NLOD for 42 of 44 |
+| sources | **51** |
+| publishers | **9** — Folkehelseinstituttet (21), Statistisk sentralbyrå (18), Brønnøysundregistrene (3), Arbeids- og velferdsdirektoratet (3), Barne-, ungdoms- og familiedirektoratet (2), Husbanken (1), Integrerings- og mangfoldsdirektoratet (1), Norges Røde Kors (1), Utdanningsdirektoratet (1) |
+| public relations | **88** |
+| licence | NLOD for 47 of 51 — the exceptions are `nav-aap`, `nav-helt-ledige`, `nav-uforetrygd` (all CC BY 4.0) and `redcross-branches` (permissive, Red Cross's own data rather than the state's) |
 
 **Norwegian public data at kommune level, joined into one semantic layer.**
 
@@ -79,6 +79,20 @@ consumer discover what is available without any out-of-band documentation.
 **Installing starts nothing.** The Dagster **schedules and sensors** ship **stopped**. No data is
 fetched, and no external service is contacted, until an operator turns them on. Turning them on is the
 go-live decision.
+
+> 🔴 **Unresolved as of `v20261002-e9e33a5`: this sentence may no longer describe every install.**
+> The artifact's own `operational.automation` still says "ships stopped", quoted faithfully above —
+> but `urb-agents #1794` measured all three schedules and all three sensors come up **RUNNING** on a
+> real redeploy of this image, with the automation sensor then firing a real, unprompted run
+> (`dagster/from_automation_condition: true`) about 15 minutes later. Checked atlas's own `uis/`
+> definition for an install-time "stop" hook — none exists; `uis/init/001_bootstrap.sql` is one line
+> of schema creation and nothing else. Two explanations fit what was measured: either UIS's own
+> **install** flow (not exercised by that redeploy, which only swapped a running pod's image) stops
+> things after a fresh `uis template install` and this sentence is still correct for that path; or
+> atlas-data's `default_status=RUNNING` change (PR #482) means a genuinely fresh install now starts
+> itself too, and this sentence is stale. **Not settled here** — raised with atlas on the nomination
+> that landed this pin. If you install fresh and the schedules come up running on their own, that is
+> this discrepancy, not a bug in your install.
 
 ⚠️ **Turning them on never backfills — no history is replayed, ever.** But the *timing* differs
 between the two halves, and **only one of them waits**:
@@ -150,8 +164,8 @@ order: `brreg_change_feed` will start, find no watermark, and **fail loudly** un
 has run. That is by design rather than a fault — but it is noise nobody needs, and it is avoidable by
 doing the two in the right order.
 
-**First ingest loads roughly 4.1 million rows** across **52 `raw` BASE TABLEs and 81 `marts` BASE
-TABLEs (plus 10 `marts` views)**, from about 41 sources. That is `imac`'s measured 2,906,194 plus the
+**First ingest loads roughly 4.1 million rows** across **60 `raw` BASE TABLEs and 90 `marts` BASE
+TABLEs (plus 76 `marts` views)**, from 51 sources. That is `imac`'s measured 2,906,194 plus the
 1,173,878-record Enhetsregisteret bulk load, so the row count is arithmetic on two measured figures.
 The combined wall time **is** measured — **~30 minutes, 1772 s end to end** — and is stated once, in
 the cold-install table below, rather than repeated here.
@@ -161,15 +175,16 @@ because two figures in the artifact used to disagree with each other *and* with 
 counting method was written down anywhere.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20260922-d077fd7`:
+`operational.cadence` in the artifact at pin `v20261002-e9e33a5`:
 
 **Every row names the job that owns it**, and that is not decoration — see the warning below the
 table.
 
 | when | job | what |
 |---|---|---|
-| Sunday 02:00 | `annual_sources_refresh` | ~37 annual public-sector sources — SSB, FHI, Bufdir |
+| Sunday 02:00 | `annual_sources_refresh` | ~42 annual public-sector sources — SSB, FHI, Bufdir, Husbanken |
 | 1st of month, 01:00 | `klass_refresh` | SSB Klass classifications (kommune/fylke) |
+| 1st of month, 01:00 | `monthly_sources_refresh` | Sources whose manifest declares periodicity P1M — `nav-uforetrygd`, `nav-aap`, `nav-helt-ledige`. Same monthly cron as `klass_refresh`; a separate job because this data is genuinely monthly, not annual data polled monthly. New since `v20260922-d077fd7` — not previously on this page. |
 | **Every 30 min** (:00, :30) | `brreg_change_feed` | Brønnøysundregistrene **change feed** — only what moved, ~114 records per cycle at the measured 3.8 changes a minute. **Appends to raw only; rebuilds nothing and cannot affect the public API** |
 | **Every 30 min** (:10, :40) | `brreg_transform` | Brreg **reconciliation into marts** — ONE incremental model, ten minutes behind each poll. Rows are inserted and deleted, never the table replaced, so **no `api_v1` view is disturbed** |
 | Daily 04:00 | `brreg_change_feed` | **Frivillighetsregisteret** — a full re-walk of ~72,800 organisations (~727 requests) |
@@ -197,9 +212,12 @@ conservative — an annual statistical table is polled weekly, not nightly, beca
 tables every night would be roughly 15,000 pointless requests a year against services Atlas depends
 on staying welcome at.
 
-**Two sources are deliberately unscheduled** (`redcross-branches`, `frr`) pending a credential. They
-never self-trigger; invoking them by hand on a cluster without the private data repo fails, and that
-is correct.
+**One source is deliberately unscheduled** (`redcross-branches`) pending a credential. It never
+self-triggers; invoking it by hand on a cluster without the private data repo fails, and that is
+correct. ⚠️ **`frr` no longer appears in the artifact's `unscheduled` list at all** — it was named
+here through every pin since at least `d077fd7`; checked directly in this bump and it is simply
+absent now, not moved elsewhere. Not investigated further — flagging the removal rather than
+guessing why.
 
 ⚠️ **The cadence lives in the image, not in this entry.** It changes when the pinned tag changes,
 with nothing here to review. If that matters to you, diff `cadence.py` between tags.
@@ -210,26 +228,34 @@ Enabling the schedules does **not** backfill. Every schedule is `on_cron`, which
 so a Thursday install waits until Sunday 02:00 for raw data, and until the 1st for the monthly
 sources. The API stays empty in the meantime, with nothing to explain why.
 
-To get data immediately, launch these six jobs from the Dagster UI, **serially, in exactly this
-order**:
+To get data immediately, launch these **seven** jobs from the Dagster UI, **serially, in exactly
+this order**:
 
 | order | job | ~time |
 |---|---|---|
 | 1 | `annual_sources_refresh` | 474 s (7.9 min) |
 | 2 | `klass_refresh` | 1.0 min |
-| 3 | `seed_sources_refresh` | 0.8 min |
-| 4 | `brreg_bootstrap` | 501 s (8.4 min) |
-| 5 | `brreg_change_feed` | not stated |
-| 6 | `transform_and_publish` | 484 s (8.1 min) |
+| 3 | `monthly_sources_refresh` | not re-measured — see below |
+| 4 | `seed_sources_refresh` | 0.8 min |
+| 5 | `brreg_bootstrap` | 501 s (8.4 min) |
+| 6 | `brreg_change_feed` | not stated |
+| 7 | `transform_and_publish` | 484 s (8.1 min) |
 
 **A cold install is ~30 minutes — 1772 s wall, measured end to end on a factory-reset cluster**
 (urb-agents #1027). `brreg_bootstrap` is **no longer the unmeasured part**.
 
-⚠️ **Rows 1, 4 and 6 are from that cold-install measurement; rows 2, 3 and 5 are carried from the
-earlier four-job run and the artifact does not restate them.** They are left as they were rather
-than rescaled, because a number invented to make a table look consistent is worse than a number
-from a different run that says so. **The three measured jobs do not sum to the total** — the jobs
-vary far more than the total suggests, which is the point of stating the total separately.
+⚠️ **Seven jobs, not six, as of `monthly_sources_refresh` (added 2026-10-01 for `nav-uforetrygd`,
+and now also covering `nav-aap` and `nav-helt-ledige`) — and the 1772 s total has NOT been
+re-measured with it included.** The artifact's own words: *"nav-uforetrygd is one xlsx download and
+parse, so the real addition to wall time is expected to be small, but that is an expectation, not a
+measurement."* Treat 1772 s as a floor, not the figure, until someone re-times a cold install.
+
+⚠️ **Rows 1, 5 and 7 are from the cold-install measurement; rows 2, 4 and 6 are carried from the
+earlier four-job run and the artifact does not restate them; row 3 has no measurement at all yet.**
+They are left as they were rather than rescaled, because a number invented to make a table look
+consistent is worse than a number from a different run that says so. **The measured jobs do not sum
+to the total** — the jobs vary far more than the total suggests, which is the point of stating the
+total separately.
 
 > ⚠️ **An earlier figure of ~11 minutes is still in circulation and understates a cold install by
 > nearly 3x.** It was the measurement of the *first four* jobs (#507: 11.1 min, 2,906,194 rows) and
@@ -239,17 +265,25 @@ vary far more than the total suggests, which is the point of stating the total s
 
 **The order is not arbitrary**, for two separate reasons:
 
-- `seed_sources_refresh` contains `raw/_migrations` and runs third, so the migrations apply after two
-  source jobs have already written. That is safe because they are idempotent, but reordering has not
-  been tested.
+- `seed_sources_refresh` contains `raw/_migrations` and runs fourth, so the migrations apply after
+  three source jobs have already written. That is safe because they are idempotent, but reordering
+  has not been tested.
 - `brreg_change_feed` runs **immediately after** `brreg_bootstrap` because the bootstrap seeds the
   feed's watermark from the snapshot's own date. The feed has nothing to start from until the
   bootstrap has run — and run first, it **fails loudly** rather than silently walking history: it
   refuses to start without a watermark.
 
-Together these produce **~4.1M rows** across **52 `raw` and 81 `marts` BASE TABLEs (plus 10 `marts`
-views)** from ~41 sources — the 1,173,878-record Enhetsregisteret bulk load on top of `imac`'s
+Together these produce **~4.1M rows** across **60 `raw` and 90 `marts` BASE TABLEs (plus 76 `marts`
+views)** from 51 sources — the 1,173,878-record Enhetsregisteret bulk load on top of `imac`'s
 measured 2,906,194.
+
+> 🔴 **The raw BASE TABLE figure is hand-maintained, not generated, and had drifted stale before
+> this bump.** `uis/generate-holdings.py` writes the `marts`/`views` figures; it has no
+> substitution for the `raw` count (confirmed 2026-10-03 — the script does not mention "raw" at
+> all), so a human types it. It read **(56)** while the true count was **59**, before
+> `nav-helt-ledige`'s migration made it **60** — caught here, not by the generator. CI
+> (`render-template-info.sh`) checks it against `atlas-data/migrations` directly and would fail
+> a wrong number, but fixing it is still manual until a substitution exists.
 
 > ✅ **RESOLVED in `v20260921-a8d5d1a`, at the cause rather than the symptom.**
 > Through `1a569dc` this field contradicted itself three ways: headline **81** marts against a
@@ -335,12 +369,12 @@ So the three kinds of job on this page are not interchangeable:
 
 | | runs by itself? | run by hand on day one? |
 |---|---|---|
-| the four source/transform jobs | yes, on their crons | yes |
+| the five source/transform jobs | yes, on their crons | yes |
 | `brreg_bootstrap` | **never** — no schedule, no automation condition | yes, exactly once |
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
-| `redcross-branches`, `frr` | no — parked, **cannot** run | no |
+| `redcross-branches` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20260922-d077fd7`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20261002-e9e33a5`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
@@ -691,7 +725,7 @@ sections that together state something neither states alone.**
 ✅ **THE HAND-CARRY IS OVER — this section is now derived, not carried.** For three pins the
 sequence above existed only in bus messages, and this page said it would stop *"when a build
 carrying `operational.upgrade` is PINNED"*. **That build is pinned.** The rule below mirrors
-`operational.upgrade` in the artifact at pin `v20260922-d077fd7`:
+`operational.upgrade` in the artifact at pin `v20261002-e9e33a5`, unchanged since `d077fd7`:
 
 | | the artifact's rule |
 |---|---|
