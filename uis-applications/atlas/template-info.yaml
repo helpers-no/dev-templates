@@ -147,7 +147,7 @@ links:
 # is still correct for the real install path; or (b) the artifact's self-description is
 # stale since atlas-data PR #482 changed default_status to RUNNING and nobody updated this
 # field. Quoted faithfully below either way, per this runbook's own rule — not upgrading
-# "verified" into "correct". Raised with atlas on urb-agents #1814/#1816 for them to settle.
+# "verified" into "correct". Raised with atlas on urb-agents #1814 for them to settle.
 #
 # Procedural lessons from the previous bump (tags/list truncation, and a stale working
 # tree nearly reverting PR #86) now live in RUNBOOK-application-pin-bump.md, under
