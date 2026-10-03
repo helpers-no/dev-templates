@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20261003-0ffeb79"
+version: "v20261003-37769d0"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -115,20 +115,22 @@ links:
 # model .sql files are in the range. Pin and run are two actions and this catalogue performs
 # only the first.
 #
-# NOMINATED urb-agents #1828 (atlas), BUMPED ops-dev 2026-10-03 — the fourth pin today, each
-# one routine (single release, no catch-up).
+# NOMINATED urb-agents #1829 (atlas), BUMPED ops-dev 2026-10-03/04 — the fifth pin in the
+# same day, each one routine (single release, no catch-up).
 #
 # Verified three ways, not copied from the nomination: `verify-application-pin.sh --app
-# atlas --tag v20261003-0ffeb79 --expect-digest sha256:fe8ab71e...` PASSed — release asset,
+# atlas --tag v20261003-37769d0 --expect-digest sha256:c93b2549...` PASSed — release asset,
 # GHCR docker-content-digest, and the decoded artifact's own tag/id/kind all agree.
 #
 # WHAT MOVED, re-derived from `operational:`, not just copied from the nomination's headline:
-# data.sources 53->54, public_relations 90->91 (raw/marts/views: 62/92/78 -> 63/93/79), a
-# third new Utdanningsdirektoratet source (udir-fravar, PLAN-017) taking that publisher from
-# 3 to 4 — now ahead of Brønnøysundregistrene in the publisher list. Licence line now "NLOD
-# for 50 of 54" — same four CC BY 4.0 exceptions, denominator only. first_data.jobs, cadence,
-# external_services, unscheduled and operational.upgrade all checked directly against the
-# artifact and confirmed UNCHANGED.
+# data.sources 54->55, publishers 9->10 (a NEW one this time, not another count bump),
+# public_relations 91->92 (raw/marts/views: 63/93/79 -> 64/94/80). The new publisher is
+# Lotteri- og stiftelsestilsynet (1 source, lottstift-momskompensasjon, PLAN-020), inserted
+# alphabetically between Integrerings- og mangfoldsdirektoratet and Norges Røde Kors — and
+# counted under NLOD, not named as a licence exception. Licence line now "NLOD for 51 of 55"
+# — same four CC BY 4.0 exceptions as before, this new source isn't one of them.
+# first_data.jobs, cadence, external_services, unscheduled and operational.upgrade all
+# checked directly against the artifact and confirmed UNCHANGED.
 #
 # ⚠️ Still open, unchanged this release: operational.automation still reads "ships stopped" —
 # see urb-agents #1814 for the live question, raised with atlas. Not re-litigated each bump.
@@ -139,8 +141,8 @@ links:
 # every bump and a lesson stored in it is a lesson scheduled for deletion.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20261003-0ffeb79
-  digest: "sha256:fe8ab71e9dcf91b4b5dc6554a3f79bf198ed494818bab2c9cd78716082866530"
+  tag: v20261003-37769d0
+  digest: "sha256:c93b25499370d521fb490ae69cc6f83fb7f03c287ca5b9f4655726d4eb0d7903"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public
@@ -166,6 +168,7 @@ historical_tags:
                          # landed, monthly_sources_refresh arrived, frr dropped out
   - v20261003-c4a450c   # udir-elevundersokelsen-mobbing; routine single-release bump
   - v20261003-d7a59cb   # udir-nasjonale-prover; routine single-release bump
+  - v20261003-0ffeb79   # udir-fravar; routine single-release bump
 
 configure_command: "uis template install atlas"
 
