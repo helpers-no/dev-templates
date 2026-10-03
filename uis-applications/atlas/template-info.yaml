@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20261003-c4a450c"
+version: "v20261003-d7a59cb"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -115,24 +115,22 @@ links:
 # model .sql files are in the range. Pin and run are two actions and this catalogue performs
 # only the first.
 #
-# NOMINATED urb-agents #1823 (atlas), BUMPED ops-dev 2026-10-03, same day as the previous
-# bump (e9e33a5) — this one is routine, a single release, not another catch-up.
+# NOMINATED urb-agents #1825 (atlas), BUMPED ops-dev 2026-10-03 — the third pin today, each
+# one routine (single release, no catch-up).
 #
 # Verified three ways, not copied from the nomination: `verify-application-pin.sh --app
-# atlas --tag v20261003-c4a450c --expect-digest sha256:a31efe43...` PASSed — release asset,
+# atlas --tag v20261003-d7a59cb --expect-digest sha256:a7b13360...` PASSed — release asset,
 # GHCR docker-content-digest, and the decoded artifact's own tag/id/kind all agree.
 #
 # WHAT MOVED, re-derived from `operational:`, not just copied from the nomination's headline:
-# data.sources 51->52, public_relations 88->89 (raw/marts/views: 60/90/76 -> 61/91/77), one
-# new Utdanningsdirektoratet source (udir-elevundersokelsen-mobbing, PLAN-015) taking that
-# publisher from 1 to 2. Licence line now "NLOD for 48 of 52" — same four CC BY 4.0
-# exceptions as last bump, denominator only. first_data.jobs, cadence, external_services,
-# unscheduled and operational.upgrade all checked and confirmed UNCHANGED from e9e33a5 — not
-# assumed stable because the last bump already covered them.
+# data.sources 52->53, public_relations 89->90 (raw/marts/views: 61/91/77 -> 62/92/78), a
+# second new Utdanningsdirektoratet source (udir-nasjonale-prover, PLAN-016) taking that
+# publisher from 2 to 3. Licence line now "NLOD for 49 of 53" — same four CC BY 4.0
+# exceptions, denominator only. first_data.jobs, cadence, external_services, unscheduled and
+# operational.upgrade all checked directly against the artifact and confirmed UNCHANGED.
 #
-# ⚠️ Still open from the last bump, unchanged this release: operational.automation still
-# reads "ships stopped" — see urb-agents #1814/#1823 for the live question, raised with
-# atlas, not resolved either way. Not re-litigated here each bump; watch that thread.
+# ⚠️ Still open, unchanged this release: operational.automation still reads "ships stopped" —
+# see urb-agents #1814 for the live question, raised with atlas. Not re-litigated each bump.
 #
 # Procedural lessons from an earlier bump (tags/list truncation, and a stale working
 # tree nearly reverting PR #86) now live in RUNBOOK-application-pin-bump.md, under
@@ -140,8 +138,8 @@ links:
 # every bump and a lesson stored in it is a lesson scheduled for deletion.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20261003-c4a450c
-  digest: "sha256:a31efe43001d7bd5d0ee8fb72ffb012b8d9e5e754f0282eb2424c466f0a3de53"
+  tag: v20261003-d7a59cb
+  digest: "sha256:a7b13360e3433890fc69666669a3802912439f9e7b78d8f8085b5831354e93ef"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public
@@ -165,6 +163,7 @@ historical_tags:
                          # unattributed-generator fix, two releases in one publish
   - v20261002-e9e33a5   # the 11-day catch-up pin; nav-aap/nav-helt-ledige/nav-uforetrygd
                          # landed, monthly_sources_refresh arrived, frr dropped out
+  - v20261003-c4a450c   # udir-elevundersokelsen-mobbing; routine single-release bump
 
 configure_command: "uis template install atlas"
 
