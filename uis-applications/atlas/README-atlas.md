@@ -22,10 +22,10 @@ pinned definition now carries a `data:` block:
 
 | | |
 |---|---|
-| sources | **51** |
-| publishers | **9** — Folkehelseinstituttet (21), Statistisk sentralbyrå (18), Brønnøysundregistrene (3), Arbeids- og velferdsdirektoratet (3), Barne-, ungdoms- og familiedirektoratet (2), Husbanken (1), Integrerings- og mangfoldsdirektoratet (1), Norges Røde Kors (1), Utdanningsdirektoratet (1) |
-| public relations | **88** |
-| licence | NLOD for 47 of 51 — the exceptions are `nav-aap`, `nav-helt-ledige`, `nav-uforetrygd` (all CC BY 4.0) and `redcross-branches` (permissive, Red Cross's own data rather than the state's) |
+| sources | **52** |
+| publishers | **9** — Folkehelseinstituttet (21), Statistisk sentralbyrå (18), Brønnøysundregistrene (3), Arbeids- og velferdsdirektoratet (3), Barne-, ungdoms- og familiedirektoratet (2), Utdanningsdirektoratet (2), Husbanken (1), Integrerings- og mangfoldsdirektoratet (1), Norges Røde Kors (1) |
+| public relations | **89** |
+| licence | NLOD for 48 of 52 — the exceptions are `nav-aap`, `nav-helt-ledige`, `nav-uforetrygd` (all CC BY 4.0) and `redcross-branches` (permissive, Red Cross's own data rather than the state's) |
 
 **Norwegian public data at kommune level, joined into one semantic layer.**
 
@@ -164,8 +164,8 @@ order: `brreg_change_feed` will start, find no watermark, and **fail loudly** un
 has run. That is by design rather than a fault — but it is noise nobody needs, and it is avoidable by
 doing the two in the right order.
 
-**First ingest loads roughly 4.1 million rows** across **60 `raw` BASE TABLEs and 90 `marts` BASE
-TABLEs (plus 76 `marts` views)**, from 51 sources. That is `imac`'s measured 2,906,194 plus the
+**First ingest loads roughly 4.1 million rows** across **61 `raw` BASE TABLEs and 91 `marts` BASE
+TABLEs (plus 77 `marts` views)**, from 52 sources. That is `imac`'s measured 2,906,194 plus the
 1,173,878-record Enhetsregisteret bulk load, so the row count is arithmetic on two measured figures.
 The combined wall time **is** measured — **~30 minutes, 1772 s end to end** — and is stated once, in
 the cold-install table below, rather than repeated here.
@@ -175,7 +175,7 @@ because two figures in the artifact used to disagree with each other *and* with 
 counting method was written down anywhere.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20261002-e9e33a5`:
+`operational.cadence` in the artifact at pin `v20261003-c4a450c`:
 
 **Every row names the job that owns it**, and that is not decoration — see the warning below the
 table.
@@ -277,8 +277,8 @@ total separately.
   bootstrap has run — and run first, it **fails loudly** rather than silently walking history: it
   refuses to start without a watermark.
 
-Together these produce **~4.1M rows** across **60 `raw` and 90 `marts` BASE TABLEs (plus 76 `marts`
-views)** from 51 sources — the 1,173,878-record Enhetsregisteret bulk load on top of `imac`'s
+Together these produce **~4.1M rows** across **61 `raw` and 91 `marts` BASE TABLEs (plus 77 `marts`
+views)** from 52 sources — the 1,173,878-record Enhetsregisteret bulk load on top of `imac`'s
 measured 2,906,194.
 
 > 🔴 **The raw BASE TABLE figure is hand-maintained, not generated, and had drifted stale before
@@ -378,7 +378,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20261002-e9e33a5`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20261003-c4a450c`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
@@ -729,7 +729,7 @@ sections that together state something neither states alone.**
 ✅ **THE HAND-CARRY IS OVER — this section is now derived, not carried.** For three pins the
 sequence above existed only in bus messages, and this page said it would stop *"when a build
 carrying `operational.upgrade` is PINNED"*. **That build is pinned.** The rule below mirrors
-`operational.upgrade` in the artifact at pin `v20261002-e9e33a5`, unchanged since `d077fd7`:
+`operational.upgrade` in the artifact at pin `v20261003-c4a450c`, unchanged since `d077fd7`:
 
 | | the artifact's rule |
 |---|---|
