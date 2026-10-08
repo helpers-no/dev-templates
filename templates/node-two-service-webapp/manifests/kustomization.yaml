@@ -1,0 +1,20 @@
+# filename: templates/node-two-service-webapp/manifests/kustomization.yaml
+# Kustomization configuration for ArgoCD
+#
+# Template variables:
+# {{GITHUB_USERNAME}} - replaced with the GitHub username
+# {{REPO_NAME}}       - replaced with the repository name
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - deployment.yaml
+
+commonLabels:
+  owner: "{{GITHUB_USERNAME}}"
+  managed-by: argocd
+
+commonAnnotations:
+  description: "Deployed via Urbalurba infrastructure"
+  repository: "https://github.com/{{GITHUB_USERNAME}}/{{REPO_NAME}}"

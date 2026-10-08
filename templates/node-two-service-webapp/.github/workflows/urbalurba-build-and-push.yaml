@@ -1,0 +1,85 @@
+# filename: .github/workflows/urbalurba-build-and-push.yaml
+#
+# UIS deployment: build both services, push the images to ghcr.io with a unique tag, write the
+# tags into manifests/deployment.yaml. ArgoCD sees the manifest change and rolls the cluster.
+#
+# Loop protection (as in every UIS template): changes under manifests/ do not trigger this
+# workflow, and the tag-update commit is made by github-actions.
+#
+# (The Red Cross platform does NOT use this file: it has its own Azure DevOps build and deploy
+#  pipelines per service. See README-node-two-service-webapp.md.)
+name: Build and Push
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'manifests/**'
+
+permissions:
+  contents: write   # push the updated tags back to the repository
+  packages: write   # push images to ghcr.io
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.tag.outputs.image_tag }}
+      owner: ${{ steps.tag.outputs.owner }}
+      repo: ${{ steps.tag.outputs.repo }}
+    steps:
+      - id: tag
+        run: |
+          echo "image_tag=${GITHUB_SHA::7}-$(date +%Y%m%d%H%M%S)" >> "$GITHUB_OUTPUT"
+          echo "owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+          echo "repo=$(echo '${{ github.event.repository.name }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
+  image:
+    needs: tag
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [web, api]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push (build context = services/<name>/, exactly as on the Red Cross platform)
+        run: |
+          base="ghcr.io/${{ needs.tag.outputs.owner }}/${{ needs.tag.outputs.repo }}-${{ matrix.service }}"
+          docker build -f services/${{ matrix.service }}/Dockerfile \
+            -t "$base:${{ needs.tag.outputs.image_tag }}" -t "$base:latest" \
+            services/${{ matrix.service }}/
+          docker push "$base:${{ needs.tag.outputs.image_tag }}"
+          docker push "$base:latest"
+
+  update-manifests:
+    needs: [tag, image]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Write the new image tags into manifests/deployment.yaml
+        run: |
+          if [ "$(git log -1 --pretty=format:'%an')" = "GitHub Actions" ]; then
+            echo "Automated commit, nothing to do"; exit 0
+          fi
+          owner="${{ needs.tag.outputs.owner }}"
+          repo="${{ needs.tag.outputs.repo }}"
+          tag="${{ needs.tag.outputs.image_tag }}"
+          sed -i "s|image: ghcr.io/${owner}/${repo}-web:.*|image: ghcr.io/${owner}/${repo}-web:${tag}|" manifests/deployment.yaml
+          sed -i "s|image: ghcr.io/${owner}/${repo}-api:.*|image: ghcr.io/${owner}/${repo}-api:${tag}|" manifests/deployment.yaml
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@github.com"
+          git add manifests/deployment.yaml
+          git diff --cached --quiet && { echo "no change"; exit 0; }
+          git commit -m "[ci-skip] Update images to ${tag}"
+          git pull --rebase origin main
+          git push
