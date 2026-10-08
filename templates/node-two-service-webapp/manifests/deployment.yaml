@@ -1,0 +1,122 @@
+# filename: templates/node-two-service-webapp/manifests/deployment.yaml
+# Kubernetes manifests for UIS (synced by ArgoCD after `uis argocd register`).
+# Template variables:
+# {{GITHUB_USERNAME}} - replaced with the GitHub username
+# {{REPO_NAME}}       - replaced with the repository name
+#
+# Two services in one namespace:
+#   {{REPO_NAME}}      Service -> the web front end (public: http://<name>.localhost)
+#   {{REPO_NAME}}-api  Service -> the API (internal only, reached by the web service)
+#
+# NB: the platform's IngressRoute points at the FIRST Service of the namespace in alphabetical
+# order. The public Service is therefore named exactly {{REPO_NAME}}, which sorts before
+# {{REPO_NAME}}-api. Do not rename them without checking that.
+#
+# The image lines are rewritten by .github/workflows/urbalurba-build-and-push.yaml.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{REPO_NAME}}-web"
+  labels:
+    app: "{{REPO_NAME}}-web"
+    owner: "{{GITHUB_USERNAME}}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{REPO_NAME}}-web"
+  template:
+    metadata:
+      labels:
+        app: "{{REPO_NAME}}-web"
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/{{GITHUB_USERNAME}}/{{REPO_NAME}}-web:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: ENVIRONMENT
+              value: uis
+            - name: API_URL
+              value: "http://{{REPO_NAME}}-api"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+          resources:
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{REPO_NAME}}"
+spec:
+  selector:
+    app: "{{REPO_NAME}}-web"
+  ports:
+    - port: 80
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{REPO_NAME}}-api"
+  labels:
+    app: "{{REPO_NAME}}-api"
+    owner: "{{GITHUB_USERNAME}}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{REPO_NAME}}-api"
+  template:
+    metadata:
+      labels:
+        app: "{{REPO_NAME}}-api"
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/{{GITHUB_USERNAME}}/{{REPO_NAME}}-api:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: ENVIRONMENT
+              value: uis
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+          resources:
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{REPO_NAME}}-api"
+spec:
+  selector:
+    app: "{{REPO_NAME}}-api"
+  ports:
+    - port: 80
+      targetPort: 3000

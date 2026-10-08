@@ -9,6 +9,7 @@ Investigations and plans waiting for implementation, sorted by last updated date
 
 | Document | Goal | Updated |
 |----------|------|---------|
+| [Plan: Add the `node-two-service-webapp` template (UIS + Red Cross container platform)](PLAN-node-two-service-webapp.md) | One app template whose layout deploys on **both** UIS (ArgoCD, GitHub Actions, ghcr.io) and the Red Cross container platform (Azure Container Apps), with a public web service and an internal API service. | 2026-10-08 |
 | [Plan: Application catalogue entries (`install_type: application`)](PLAN-application-catalogue.md) | Support a third entry kind in `template-registry.json` — an **application**, whose install | 2026-09-10 |
 | [Investigate: Add `inClusterPort` to UIS `services.json`](INVESTIGATE-uis-in-cluster-port.md) | Determine how UIS should surface the in-cluster port for each service it manages (the upstream Helm chart's default service port), so downstream consumers like TMP's template-registry generator and documentation builders can render accurate "pod connects to `<service>.svc.cluster.local:<port>`" labels and instructions without hardcoding. | 2026-09-09 |
 | [Investigate: Docusaurus Design Tweaks](INVESTIGATE-docusaurus-design-tweaks.md) | Collect and track design improvements for the Docusaurus site. Each tweak is independent and can be implemented separately. | 2026-09-09 |

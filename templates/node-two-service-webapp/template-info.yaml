@@ -1,0 +1,58 @@
+id: node-two-service-webapp
+version: "1.0.0"
+name: Node Two-Service Web App
+description: Public web service plus internal API service, ready for UIS and the Red Cross container platform
+category: WEB_APP
+install_type: app
+abstract: >
+  A starting point for an application with a public web front end and an
+  internal API, each its own container under services/. The same Dockerfiles
+  deploy on UIS (ArgoCD, GitHub Actions, ghcr.io) and on the Red Cross
+  container platform (Azure Container Apps), because the layout follows the
+  platform's: one folder per service, Docker build context is the service folder.
+tools: dev-typescript
+readme: README-node-two-service-webapp.md
+tags:
+  - nodejs
+  - express
+  - webapp
+  - two-service
+  - uis
+  - azure-container-apps
+  - redcross
+logo: node-two-service-webapp-logo.svg
+website: ""
+docs: https://github.com/helpers-no/dev-templates/tree/main/templates/node-two-service-webapp
+summary: >
+  Two Express services, each with a health endpoint and a Dockerfile: web
+  (public, port 3000, calls the API on the internal network) and api
+  (internal, port 3000). Kubernetes manifests and a GitHub Actions workflow
+  deploy both to UIS with `uis argocd register`. The services/ layout is the
+  one the Red Cross Azure Container Apps platform generates, so the same
+  Dockerfiles and app folders drop into a Red Cross repository.
+maintainers:
+  - terchris
+links:
+  - url: https://github.com/helpers-no/dev-templates/tree/main/templates/node-two-service-webapp
+    title: Source code
+    icon: github
+related:
+  - typescript-basic-webserver
+  - python-basic-webserver
+
+quickstart:
+  title: "Run both services"
+  setup:
+    - npm ci --prefix services/api/app
+    - npm ci --prefix services/web/app
+  run: "(PORT=3001 npm start --prefix services/api/app &) ; API_URL=http://localhost:3001 npm start --prefix services/web/app"
+  note: |
+    The API runs on port 3001 and the web service on port 3000 (VS Code forwards it).
+    In a container both services listen on 3000; the web service finds the API through API_URL.
+
+params:
+  app_name: "my-app"
+
+prerequisites:
+  - text: "DCT devcontainer running"
+    url: "https://dct.sovereignsky.no"
