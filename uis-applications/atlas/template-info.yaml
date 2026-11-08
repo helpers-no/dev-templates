@@ -6,7 +6,7 @@
 # artifact's own template-info.yaml. See ../README.md.
 
 id: atlas
-version: "v20261003-37769d0"
+version: "v20261108-34628e3"
 name: Atlas Data
 description: >-
   Norway's civil-society sector as a REST API — municipality-level indicators of
@@ -115,22 +115,64 @@ links:
 # model .sql files are in the range. Pin and run are two actions and this catalogue performs
 # only the first.
 #
-# NOMINATED urb-agents #1829 (atlas), BUMPED ops-dev 2026-10-03/04 — the fifth pin in the
-# same day, each one routine (single release, no catch-up).
+# NOMINATED urb-agents #2114 (atlas), BUMPED ops-dev 2026-11-08 — a 36-day CATCH-UP pin, not
+# a routine single release. The previous pin (v20261003-37769d0) was never moved despite
+# atlas filing nominations for it the whole way: #1840 through #1872 (seven of them,
+# 2026-10-04..06) were addressed `to: dev-templates`, which is not a live agent on this
+# fleet and never has been (urb-agents #2115) — so none were ever actioned here, silently,
+# until atlas re-addressed this one to ops-dev directly, matching the working pattern from
+# #1814-#1829. The root-cause report is #2115, filed to urb-agents-maintainer; not re-litigated
+# here.
 #
 # Verified three ways, not copied from the nomination: `verify-application-pin.sh --app
-# atlas --tag v20261003-37769d0 --expect-digest sha256:c93b2549...` PASSed — release asset,
-# GHCR docker-content-digest, and the decoded artifact's own tag/id/kind all agree.
+# atlas --tag v20261108-34628e3 --expect-digest sha256:d44778b3...` PASSed — release asset,
+# GHCR docker-content-digest, and the decoded artifact's own tag/id/kind all agree. Also
+# cluster-load-checked per this runbook's step 2 before pinning, since this is a real code
+# change, not text-only: imac loaded the image on its own test cluster and confirmed Dagster's
+# GraphQL `loadStatus = LOADED` (not just pod Running), all new assets present (urb-agents
+# #2118).
 #
-# WHAT MOVED, re-derived from `operational:`, not just copied from the nomination's headline:
-# data.sources 54->55, publishers 9->10 (a NEW one this time, not another count bump),
-# public_relations 91->92 (raw/marts/views: 63/93/79 -> 64/94/80). The new publisher is
-# Lotteri- og stiftelsestilsynet (1 source, lottstift-momskompensasjon, PLAN-020), inserted
-# alphabetically between Integrerings- og mangfoldsdirektoratet and Norges Røde Kors — and
-# counted under NLOD, not named as a licence exception. Licence line now "NLOD for 51 of 55"
-# — same four CC BY 4.0 exceptions as before, this new source isn't one of them.
-# first_data.jobs, cadence, external_services, unscheduled and operational.upgrade all
-# checked directly against the artifact and confirmed UNCHANGED.
+# WHAT MOVED, re-derived from `operational:` and the generated `data:` block, not just copied
+# from the nomination's headline — but this is a 36-day range, not one release, so the
+# per-PR attribution below is only as complete as what I personally tracked (urb-agents #2098
+# through #2112), not a claim of having audited every commit in the gap:
+#
+# data.sources 55->66 (+11), publishers 10->12 (+2), public_relations 92->107 (+15),
+# raw/marts/views BASE TABLEs: 64/94/80 -> 78/111(89 models+22 seeds)/96.
+#
+# TWO genuinely new publishers, both fully attributable to releases I tracked today:
+# Kartverket (0->4: kartverket-postnummeromrade R3, kartverket-kommune + kartverket-fylke R4,
+# kartverket-matrikkel-adresse R5 — urb-agents #2108/#2109/#2110) and Posten Bring (0->1:
+# bring-postnummer R2, urb-agents #2107). Also attributable to today: Brønnøysundregistrene
+# +1 (brreg-underenhet R1, #2102), FHI +1 (fhi-ensomhet T5, #2104), SSB +1 (ssb-klass-endring
+# R6, #2112, plus the NLOD->CC BY 4.0 licence correction on every existing ssb-* source,
+# #2111). The REMAINING movement (SSB +2 sources beyond today's one, Brønnøysundregistrene +1
+# beyond today's one, 3 more sources overall) comes from the Oct 4-6 releases behind the seven
+# stuck nominations above — real, landed in production per atlas's #2115/#2113 findings, but
+# NOT individually re-verified against `operational:` here; I'm reporting the net delta the
+# artifact states, not vouching for each intervening PR.
+#
+# first_data.jobs (order verified against the artifact, now 7 entries: annual_sources_refresh,
+# klass_refresh, monthly_sources_refresh, seed_sources_refresh, brreg_bootstrap,
+# brreg_change_feed, transform_and_publish — same order as the artifact declares),
+# manual_only ([brreg_bootstrap]), unscheduled ([redcross-branches]), external_services
+# ([SSB, FHI, Bufdir, Brønnøysundregistrene] — UNCHANGED, checked directly, though this is
+# worth flagging back to atlas: it does not name Kartverket or Posten Bring despite both now
+# having live-API-calling ingest sources; not corrected here since the artifact itself still
+# says so and this page mirrors the artifact, not an improvement on it) and
+# operational.upgrade.jobs ([transform_and_publish], unchanged) all checked directly.
+#
+# ⚠️ first_data.takes and the ~4.1M row / 1772s figures are EXPLICITLY NOT RE-MEASURED against
+# this pin — the artifact's own takes field says so, and the README now carries that caveat
+# rather than restating stale numbers as current. See README-atlas.md's two first-ingest
+# paragraphs.
+#
+# ⚠️ Separately, unresolved by this pin: eleven commits' worth of DATA (daf626a through
+# 34628e3) are not yet live in production — the Dagster code-location Helm image was stuck at
+# v20261006-08df751, independent of this catalogue pin entirely (confirmed: other releases'
+# data landed in production while their catalogue pins sat unactioned, urb-agents #2115). That
+# is tracked on urb-agents #2102/#2117 (routed to tor-agent then ops, who holds the actual
+# cluster credentials), not fixed by this commit.
 #
 # ⚠️ Still open, unchanged this release: operational.automation still reads "ships stopped" —
 # see urb-agents #1814 for the live question, raised with atlas. Not re-litigated each bump.
@@ -141,8 +183,8 @@ links:
 # every bump and a lesson stored in it is a lesson scheduled for deletion.
 source:
   artifact: ghcr.io/terchris/atlas-data/uis
-  tag: v20261003-37769d0
-  digest: "sha256:c93b25499370d521fb490ae69cc6f83fb7f03c287ca5b9f4655726d4eb0d7903"
+  tag: v20261108-34628e3
+  digest: "sha256:d44778b36ac0ec027ce468c418e3c18c55885b54bdccba7b2478692703cad651"
 
 # Top-level, NOT inside source: that is where UIS reads it from.
 visibility: public
@@ -169,6 +211,9 @@ historical_tags:
   - v20261003-c4a450c   # udir-elevundersokelsen-mobbing; routine single-release bump
   - v20261003-d7a59cb   # udir-nasjonale-prover; routine single-release bump
   - v20261003-0ffeb79   # udir-fravar; routine single-release bump
+  - v20261003-37769d0   # the pin this entry just moved past; a 36-day catch-up (#2114) —
+                         # seven interim nominations (#1840-#1872) were misaddressed to
+                         # dev-templates, a non-live agent, and never actioned (#2115)
 
 configure_command: "uis template install atlas"
 
