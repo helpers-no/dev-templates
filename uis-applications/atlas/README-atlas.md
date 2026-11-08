@@ -181,7 +181,7 @@ because two figures in the artifact used to disagree with each other *and* with 
 counting method was written down anywhere.
 
 **Once schedules are on**, Atlas polls on this cadence (Europe/Oslo) — mirroring
-`operational.cadence` in the artifact at pin `v20261108-34628e3`:
+`operational.cadence` in the artifact at pin `v20261108-055a068`:
 
 **Every row names the job that owns it**, and that is not decoration — see the warning below the
 table.
@@ -217,7 +217,10 @@ requests a day against a public-sector API, a 48× increase on someone else's se
 ingests are on separate schedules for that reason and must stay that way.
 
 **The external services Atlas calls** are SSB (Statistics Norway), FHI (Folkehelseinstituttet),
-Bufdir and Brønnøysundregistrene. All are public-sector APIs. The cadence is deliberately
+Bufdir, Brønnøysundregistrene, Kartverket and Posten Bring — the last two added at pin
+`v20261108-055a068`, catching up a gap left by `v20261108-34628e3` adding the Kartverket- and
+Posten-Bring-calling sources (R2-R5) without updating this list. All are public-sector APIs
+except Posten Bring, which is Norway's postal operator; the cadence is deliberately
 conservative — an annual statistical table is polled weekly, not nightly, because fetching annual
 tables every night would be roughly 15,000 pointless requests a year against services Atlas depends
 on staying welcome at.
@@ -385,7 +388,7 @@ So the three kinds of job on this page are not interchangeable:
 | `brreg_change_feed` | yes, nightly at 04:00 | yes, once, after the bootstrap |
 | `redcross-branches` | no — parked, **cannot** run | no |
 
-> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20261108-34628e3`.** It is
+> ⚠️ **This list mirrors `operational.first_data` in the artifact at pin `v20261108-055a068`.** It is
 > duplicated here, by hand, because as of that pin `uis template info` renders none of the artifact's
 > `operational` block, so this page is the only place an operator can read it. It is therefore
 > **capable of going stale on the next bump** — the artifact is the source of truth. Generating this
@@ -736,7 +739,7 @@ sections that together state something neither states alone.**
 ✅ **THE HAND-CARRY IS OVER — this section is now derived, not carried.** For three pins the
 sequence above existed only in bus messages, and this page said it would stop *"when a build
 carrying `operational.upgrade` is PINNED"*. **That build is pinned.** The rule below mirrors
-`operational.upgrade` in the artifact at pin `v20261108-34628e3`, unchanged since `d077fd7`:
+`operational.upgrade` in the artifact at pin `v20261108-055a068`, unchanged since `d077fd7`:
 
 | | the artifact's rule |
 |---|---|
